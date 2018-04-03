@@ -31,7 +31,7 @@
 * https://state-machine.com
 * mailto:info@state-machine.com
 *****************************************************************************/
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h>
 #include <arm-cm/trafficLight/Inc/main.h>  /* CMSIS-compliant header file for the MCU used */
 #include "qpc.h"
 #include "trafficlight.h"

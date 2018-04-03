@@ -187,7 +187,7 @@
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.1717056736" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
 								<option id="gnu.c.link.option.ldflags.1236974004" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mwindows -pthread" valueType="string"/>
 								<option id="gnu.c.link.option.userobjs.1315838589" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
-								<option id="gnu.c.link.option.libs.205600929" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs"/>
+								<option id="gnu.c.link.option.libs.205600929" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<option id="gnu.c.link.option.other.1651445827" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
@@ -276,7 +276,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

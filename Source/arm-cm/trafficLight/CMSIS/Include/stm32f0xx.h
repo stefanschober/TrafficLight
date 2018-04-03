@@ -130,37 +130,37 @@
   */
 
 #if defined(STM32F030x6)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f030x6.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f030x6.h>
 #elif defined(STM32F030x8)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f030x8.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f030x8.h>
 #elif defined(STM32F031x6)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f031x6.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f031x6.h>
 #elif defined(STM32F038xx)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f038xx.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f038xx.h>
 #elif defined(STM32F042x6)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f042x6.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f042x6.h>
 #elif defined(STM32F048xx)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f048xx.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f048xx.h>
 #elif defined(STM32F051x8)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f051x8.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f051x8.h>
 #elif defined(STM32F058xx)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f058xx.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f058xx.h>
 #elif defined(STM32F070x6)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f070x6.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f070x6.h>
 #elif defined(STM32F070xB)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f070xb.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f070xb.h>
 #elif defined(STM32F071xB)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f071xb.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f071xb.h>
 #elif defined(STM32F072xB)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f072xb.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f072xb.h>
 #elif defined(STM32F078xx)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f078xx.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f078xx.h>
 #elif defined(STM32F091xC)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f091xc.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f091xc.h>
 #elif defined(STM32F098xx)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f098xx.h>
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f098xx.h>
 #elif defined(STM32F030xC)
-  #include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f030xc.h>    
+  #include <arm-cm/trafficLight/CMSIS/Include/stm32f030xc.h>    
 #else
  #error "Please select first the target STM32F0xx device used in your application (in stm32f0xx.h file)"
 #endif

@@ -44,7 +44,7 @@
 #if !defined(STM32F030x6) && !defined(STM32F030x8) && !defined(STM32F070x6) && !defined(STM32F070xB) && !defined(STM32F030xC) 
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{
@@ -989,7 +989,7 @@ typedef struct
   */
 
 /* Include SMARTCARD HAL Extended module */
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_smartcard_ex.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_smartcard_ex.h>
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup SMARTCARD_Exported_Functions

@@ -42,7 +42,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{
@@ -595,7 +595,7 @@ typedef struct
   */
 
 /* Include RTC HAL Extended module */
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rtc_ex.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rtc_ex.h>
 
 /* Exported functions --------------------------------------------------------*/
 /** @defgroup RTC_Exported_Functions RTC Exported Functions

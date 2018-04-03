@@ -44,7 +44,7 @@
 #if defined(STM32F072xB) || defined(STM32F042x6) || defined(STM32F048xx) || defined(STM32F078xx) || defined(STM32F091xC) || defined(STM32F098xx) 
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{

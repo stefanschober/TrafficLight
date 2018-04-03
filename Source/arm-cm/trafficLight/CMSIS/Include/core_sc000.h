@@ -160,8 +160,8 @@
 
 #endif
 
-#include <arm-cm/trafficLight/Drivers/CMSIS/Include/core_cmInstr.h>                /* Core Instruction Access */
-#include <arm-cm/trafficLight/Drivers/CMSIS/Include/core_cmFunc.h>                 /* Core Function Access */
+#include <arm-cm/trafficLight/CMSIS/Include/core_cmInstr.h>                /* Core Instruction Access */
+#include <arm-cm/trafficLight/CMSIS/Include/core_cmFunc.h>                 /* Core Function Access */
 
 #ifdef __cplusplus
 }

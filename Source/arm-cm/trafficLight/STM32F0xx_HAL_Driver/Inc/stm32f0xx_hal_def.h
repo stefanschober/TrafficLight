@@ -43,9 +43,9 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h>
+#include <arm-cm/trafficLight/CMSIS/Include/stm32f0xx.h>
 #if defined(USE_HAL_LEGACY)
-  #include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h>
+  #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h>
 #endif
 #include <stdio.h>
 

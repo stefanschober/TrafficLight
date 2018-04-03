@@ -37,7 +37,7 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h>
 
 extern void _Error_Handler(char *, int);
 /* USER CODE BEGIN 0 */

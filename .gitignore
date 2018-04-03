@@ -7,3 +7,8 @@
 *.bin
 *.mk
 makefile
+/GTK+/
+/WinCon/
+/arm-cm/
+/WinGui/
+/Posix/

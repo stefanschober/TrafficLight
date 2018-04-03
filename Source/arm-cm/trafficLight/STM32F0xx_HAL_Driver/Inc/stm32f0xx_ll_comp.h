@@ -42,7 +42,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h>
+#include <arm-cm/trafficLight/CMSIS/Include/stm32f0xx.h>
 
 /** @addtogroup STM32F0xx_LL_Driver
   * @{

@@ -50,7 +50,7 @@
     defined(STM32F091xC) || defined(STM32F098xx)
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
            
 /** @addtogroup DACEx
   * @{

@@ -1,0 +1,6 @@
+*.o
+*.d
+*.map
+*.bin
+*.mk
+makefile

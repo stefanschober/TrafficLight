@@ -1,3 +1,6 @@
+#
+# git ignore file masks for the TrafficLight project
+#
 *.o
 *.d
 *.map

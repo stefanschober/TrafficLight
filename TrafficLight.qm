@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.1.0" links="0">
+<model version="4.1.2" links="0">
  <framework name="qpc"/>
  <package name="AOs" stereotype="0x02">
   <class name="TLtraffic" superclass="qpc::QActive">
@@ -125,7 +125,7 @@ sendMessage(TL_IS_RED_SIG);</entry>
        </tran_glyph>
       </tran>
       <tran trig="STARTNEWCYCLE" target="../../3">
-       <tran_glyph conn="76,20,2,3,8,10">
+       <tran_glyph conn="76,20,2,3,7,10">
         <action box="0,1,10,2"/>
        </tran_glyph>
       </tran>
@@ -134,7 +134,7 @@ sendMessage(TL_IS_RED_SIG);</entry>
      <state name="RED_2">
       <entry>sendMessage(TL_IS_RED_SIG);</entry>
       <tran trig="PL_IS_RED" target="../../3">
-       <tran_glyph conn="108,20,2,1,10,-4">
+       <tran_glyph conn="108,20,2,1,9,-4">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
@@ -145,16 +145,16 @@ sendMessage(TL_IS_RED_SIG);</entry>
      <state name="RED_3">
       <entry>startTimeout(T_2sec);</entry>
       <tran trig="TIMEOUT" target="../../../2">
-       <tran_glyph conn="94,38,2,1,19,-5">
+       <tran_glyph conn="94,37,2,1,20,-5">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
       <tran trig="PEDREQUEST" target="../../1">
-       <tran_glyph conn="86,34,3,2,-18,-14">
+       <tran_glyph conn="86,33,3,2,-18,-13">
         <action box="0,0,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="86,24,18,14">
+      <state_glyph node="86,23,18,14">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>
@@ -216,45 +216,42 @@ QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_15sec);</entry>
      <state name="RED_2">
       <entry>TLpedestrian_sendMessage(me, START_BLINK_SIG);
 TLpedestrian_sendMessage(me, PEDREQUEST_SIG);</entry>
-      <tran trig="TL_IS_RED">
-       <choice>
-        <guard>else</guard>
-        <action>me-&gt;tlRedCount++;</action>
-        <choice_glyph conn="44,37,4,-1,2,3">
-         <action box="-5,1,10,2"/>
-        </choice_glyph>
-       </choice>
-       <choice target="../../../2">
-        <guard>(me-&gt;tlRedCount &gt;= 1)</guard>
-        <action>QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_2sec);
-me-&gt;tlRedCount = 0;</action>
-        <choice_glyph conn="44,37,5,3,18">
-         <action box="1,-3,20,2"/>
-        </choice_glyph>
-       </choice>
-       <tran_glyph conn="36,37,3,-1,8">
+      <tran trig="TL_IS_RED" target="../../4">
+       <tran_glyph conn="43,36,1,0,8,4">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="36,31,16,10">
+      <state_glyph node="31,31,12,10">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>
      <state name="RED_3">
+      <entry>QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_2sec);
+me-&gt;tlRedCount = 0;</entry>
       <tran trig="TIMEOUT" target="../../../1">
        <tran_glyph conn="70,31,0,1,-16,-18">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="62,31,16,10"/>
+      <state_glyph node="62,31,16,10">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
      </state>
      <state name="RED_1">
       <tran trig="BUTTON" target="../../1">
-       <tran_glyph conn="24,36,1,3,12">
+       <tran_glyph conn="24,36,1,3,7">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
       <state_glyph node="8,31,16,10"/>
+     </state>
+     <state name="state1">
+      <tran trig="TL_IS_RED" target="../../2">
+       <tran_glyph conn="54,40,0,3,-4,8">
+        <action box="0,-2,10,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="49,40,7,9"/>
      </state>
      <state_glyph node="4,26,78,24">
       <entry box="1,2,6,2"/>

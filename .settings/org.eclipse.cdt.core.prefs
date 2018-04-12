@@ -29,6 +29,17 @@ environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678/MSYS_HOME/value=C\:\\msys64
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678/append=true
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678/appendContributed=true
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/CYGWIN_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/CYGWIN_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/CYGWIN_HOME/value=C\:\\cygwin64
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/MINGW_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/MINGW_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/MINGW_HOME/value=C\:\\msys64\\MinGW64
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/MSYS_HOME/delimiter=;
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/MSYS_HOME/operation=replace
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/MSYS_HOME/value=C\:\\msys64
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/append=true
+environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573/appendContributed=true
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526/CYGWIN_HOME/delimiter=;
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526/CYGWIN_HOME/operation=replace
 environment/project/cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526/CYGWIN_HOME/value=C\:\\cygwin64

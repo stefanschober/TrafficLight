@@ -80,6 +80,7 @@ void QF_onClockTick(void) {
             case 'p':
             case 'P':
                 // keyPressed = 1;
+				printf("Pedestrian button pressed...\n");
             	QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
                 break;
             default:

@@ -46,82 +46,14 @@ Q_DEFINE_THIS_FILE
 
 /* Local objects -----------------------------------------------------------*/
 static struct termios l_tsav; /* structure with saved terminal attributes */
-static uint32_t l_rnd;        /* random seed */
-static uint8_t keyPressed = 0;
+// static uint8_t keyPressed = 0;
 
 #ifdef Q_SPY
     enum {
-        PHILO_STAT = QS_USER
+        TL_STAT = QS_USER
     };
     static uint8_t const l_clock_tick = 0U;
 #endif
-
-/* BSP functions ===========================================================*/
-void BSP_init(int argc, char **argv) {
-
-#ifndef Q_SPY
-    (void)argc; /* unused parameter */
-    (void)argv; /* unused parameter */
-#endif
-
-    printf("Traffic Light example"
-           "\nQP %s\n"
-           "Press 'p' for pedestrian signal\n"
-           "Press ESC to quit...\n",
-           QP_versionStr);
-
-    Q_ALLEGE(QS_INIT((argc > 1) ? argv[1] : ""));
-    QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
-    QS_USR_DICTIONARY(TL_STAT);
-
-    /* setup the QS filters... */
-    QS_FILTER_ON(QS_SM_RECORDS); // state machine records
-    QS_FILTER_ON(QS_UA_RECORDS); // all usedr records
-    //QS_FILTER_ON(QS_MUTEX_LOCK);
-    //QS_FILTER_ON(QS_MUTEX_UNLOCK);
-}
-/*..........................................................................*/
-void BSP_terminate(int16_t result) {
-    (void)result;
-#ifdef Q_SPY
-    l_running = (uint8_t)0; /* stop the QS output thread */
-#endif
-    QF_stop();
-}
-/*..........................................................................*/
-void BSP_setlight(eTLidentity_t id, eTLlight_t light)
-{
-    static char * const strIdentity[MaxIdentity] = {
-        "Traffic Light A", "Traffic Light B", "Pedestrian Light"
-    };
-    static char * const strColor[NO_LIGHT] = {
-        "RED", "YELLOW", "GREEN"
-    };
-    printf("%s is %s\n", strIdentity[id], strColor[light]);
-
-#if 0
-    QS_BEGIN(T, AO_Philo[n]) /* application-specific record begin */
-        QS_U8(1, n);  /* Philosopher number */
-        QS_STR(stat); /* Philosopher status */
-    QS_END()
-#endif
-}
-/*..........................................................................*/
-void BSP_setPedLed(uint16_t status)
-{
-    (void)status;
-}
-/*..........................................................................*/
-uint16_t BSP_getButton(void)
-{
-    uint16_t retCode;
-
-    retCode = keyPressed;
-    keyPressed = 0;
-
-    return retCode;
-}
-
 
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
@@ -142,13 +74,13 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
+    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
     struct timeval timeout = { 0, 0 };  /* timeout for select() */
     fd_set con; /* FD set representing the console */
 
     //QF_TICK_X(0U, &l_clock_tick); /* perform the QF clock tick processing */
     QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
-    QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
+    //QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
 
     FD_ZERO(&con);
     FD_SET(0, &con);
@@ -159,11 +91,15 @@ void QF_onClockTick(void) {
         switch (ch)
         {
 			case '\33':  // ESC pressed
+			case 'q':    // q pressed
+			case 'Q':    // Q pressed
 				BSP_terminate(0);
 				break;
 			case 'P':
 			case 'p':
-                keyPressed = 1;
+				printf("Pedestrian button pressed...\n");
+				QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
+                // keyPressed = 1;
                 break;
 			default:
 				break;
@@ -196,6 +132,7 @@ void Q_onAssert(char const *module, int loc) {
 * Please set the value of this macro to either 1 or 2:
 */
 #define QS_IMPL_OPTION 1
+#include "qspy.h"
 
 /*--------------------------------------------------------------------------*/
 #if (QS_IMPL_OPTION == 1)
@@ -431,14 +368,13 @@ static void *idleThread(void *par) { // the expected P-Thread signature
 *    to the console from the running application. (This option requires
 *    the QSPY source code, which is part of the QTools collection).
 */
-#include "qspy.h"
 
 /*..........................................................................*/
 static void *idleThread(void *par); // the expected P-Thread signature
 static uint8_t l_running;
 
 /*..........................................................................*/
-bool QS_onStartup(void const */*arg*/) {
+uint8_t QS_onStartup(void const *arg) {
     static uint8_t qsBuf[4*1024]; // 4K buffer for Quantum Spy
     initBuf(qsBuf, sizeof(qsBuf));
 
@@ -502,11 +438,6 @@ void QS_onFlush(void) {
     }
 }
 /*..........................................................................*/
-void QSPY_onPrintLn(void) {
-    fputs(QSPY_line, stdout);
-    fputc('\n', stdout);
-}
-/*..........................................................................*/
 static void *idleThread(void *par) { // the expected P-Thread signature
     (void)par;
 
@@ -552,6 +483,11 @@ void QS_onCommand(uint8_t cmdId, uint32_t param1,
     (void)param3; // unused parameter
     //TBD
 }
+/*..........................................................................*/
+void QSPY_onPrintLn(void) {
+    fputs(QSPY_line, stdout);
+    fputc('\n', stdout);
+}
 
 //****************************************************************************
 // NOTE01:
@@ -561,4 +497,73 @@ void QS_onCommand(uint8_t cmdId, uint32_t param1,
 //
 
 #endif // Q_SPY
+
+/* BSP functions ===========================================================*/
+void BSP_init(int argc, char **argv) {
+
+#ifndef Q_SPY
+    (void)argc; /* unused parameter */
+    (void)argv; /* unused parameter */
+#endif
+
+    printf("Traffic Light example"
+           "\nQP %s\n"
+           "Press 'p' for pedestrian signal\n"
+           "Press ESC to quit...\n",
+           QP_versionStr);
+
+    Q_ALLEGE(QS_INIT((argc > 1) ? argv[1] : ""));
+    QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
+    QS_USR_DICTIONARY(TL_STAT);
+
+    /* setup the QS filters... */
+    QS_FILTER_ON(QS_SM_RECORDS); // state machine records
+    QS_FILTER_ON(QS_UA_RECORDS); // all usedr records
+    //QS_FILTER_ON(QS_MUTEX_LOCK);
+    //QS_FILTER_ON(QS_MUTEX_UNLOCK);
+}
+/*..........................................................................*/
+void BSP_terminate(int16_t result) {
+    (void)result;
+#ifdef Q_SPY
+    l_running = (uint8_t)0; /* stop the QS output thread */
+#endif
+    QF_stop();
+}
+/*..........................................................................*/
+void BSP_setlight(eTLidentity_t id, eTLlight_t light)
+{
+    static char * const strIdentity[MaxIdentity] = {
+        "Traffic Light A", "Traffic Light B", "Pedestrian Light"
+    };
+    static char * const strColor[NO_LIGHT] = {
+        "RED", "YELLOW", "GREEN"
+    };
+    printf("%s is %s\n", strIdentity[id], strColor[light]);
+
+#if 0
+    QS_BEGIN(T, AO_Philo[n]) /* application-specific record begin */
+        QS_U8(1, n);  /* Philosopher number */
+        QS_STR(stat); /* Philosopher status */
+    QS_END()
+#endif
+}
+/*..........................................................................*/
+void BSP_setPedLed(uint16_t status)
+{
+    (void)status;
+}
+/*..........................................................................*/
+#if 0
+uint16_t BSP_getButton(void)
+{
+    uint16_t retCode;
+
+    retCode = keyPressed;
+    keyPressed = 0;
+
+    return retCode;
+}
+#endif
 /*--------------------------------------------------------------------------*/
+

@@ -356,6 +356,12 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
+								<option id="gnu.c.link.option.paths.868914713" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/posix/dbg}&quot;"/>
+								</option>
+								<option id="gnu.c.link.option.libs.1887763123" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1955478176" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -610,6 +616,79 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573" moduleId="org.eclipse.cdt.core.settings" name="Posix_Spy">
+				<macros>
+					<stringMacro name="DirectoryDelimiter" type="VALUE_TEXT" value="/"/>
+					<stringMacro name="CONF" type="VALUE_TEXT" value=""/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573" name="Posix_Spy" parent="org.eclipse.cdt.build.core.emptycfg" prebuildStep="">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.base.297196890" name="Cygwin GCC" superClass="cdt.managedbuild.toolchain.gnu.cygwin.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.Cygwin_PE" id="cdt.managedbuild.target.gnu.platform.cygwin.base.841513259" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.cygwin.base"/>
+							<builder buildPath="${workspace_loc:/TrafficLight}/Posix" id="cdt.managedbuild.target.gnu.builder.cygwin.base.1122596640" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.cygwin.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.base.1722443300" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.292247352" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.1501842529" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.base.77896694" name="Cygwin C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.862776632" name="Cygwin C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.base">
+								<option id="gnu.c.compiler.option.include.paths.372096018" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/posix}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/posix}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.632944097" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="Q_SPY"/>
+								</option>
+								<option id="gnu.c.compiler.option.optimization.level.180061108" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.1615748806" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -ffunction-sections -fdata-sections" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.verbose.186091124" name="Verbose (-v)" superClass="gnu.c.compiler.option.misc.verbose" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.2049434901" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.base.1671338506" name="Cygwin C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.base">
+								<option id="gnu.c.link.option.ldflags.1007362007" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-Wl,-Map,'${CWD}/${BuildArtifactFileBaseName}.map',--cref,--gc-sections" valueType="string"/>
+								<option id="gnu.c.link.option.other.1271183275" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
+									<listOptionValue builtIn="false" value="--cref"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+								</option>
+								<option id="gnu.c.link.option.paths.608972735" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/posix/spy}&quot;"/>
+								</option>
+								<option id="gnu.c.link.option.libs.1694696849" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1657892200" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.base.1261831263" name="Cygwin C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.base"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/TLbutton.c|qpc/src|qpc/ports|Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="TrafficLight.null.593625540" name="TrafficLight"/>
@@ -676,6 +755,9 @@
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.517062573.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.862776632;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.2049434901">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1145275954;cdt.managedbuild.tool.gnu.c.compiler.input.2121206456">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
@@ -695,6 +777,9 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1193784683;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1193784683.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1442888143;cdt.managedbuild.tool.gnu.c.compiler.input.2017542782">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.210769413;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.169222824">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.322226890;cdt.managedbuild.tool.gnu.c.compiler.input.1367776841">

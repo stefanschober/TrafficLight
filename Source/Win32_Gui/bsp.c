@@ -59,7 +59,7 @@ static SegmentDisplay   l_trafficlights[3];   /* SegmentDisplay to show Philo st
 static SegmentDisplay   l_pedLed;
 static SegmentDisplay   l_timeDisplay;
 
-static uint8_t keyPressed = 0;
+// static uint8_t keyPressed = 0;
 
 static const DWORD trafficlightsSeg[MaxIdentity][3] = {
     { IDC_RED_A, IDC_YELLOW_A, IDC_GREEN_A },
@@ -186,6 +186,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 
         /* commands from regular buttons and menus... */
         case WM_COMMAND: {
+            static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+
             SetFocus(hWnd);
             switch (wParam) {
                 case IDOK:
@@ -196,7 +198,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                     PostQuitMessage(0);
                     break;
                 case IDC_PED_BTN:
-                    keyPressed = 1;
+                    QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
+                    // keyPressed = 1;
                     break;
                 default:
                     break;
@@ -275,10 +278,10 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
+    //static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
 
     QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
-    QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
+    //QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
 }
 
 /*..........................................................................*/
@@ -366,6 +369,7 @@ void BSP_setPedLed(uint16_t status)
     SegmentDisplay_setSegment(&l_pedLed, 0U, status ? 1 : 0);
 }
 /*..........................................................................*/
+#if 0
 uint16_t BSP_getButton(void)
 {
     uint16_t retCode;
@@ -375,6 +379,7 @@ uint16_t BSP_getButton(void)
 
     return retCode;
 }
+#endif
 
 /*--------------------------------------------------------------------------*/
 #ifdef Q_SPY /* define QS callbacks */
@@ -518,9 +523,9 @@ uint8_t QS_onStartup(void const *arg) {
     QS_FILTER_ON(QS_QEP_DISPATCH);
     QS_FILTER_ON(QS_QEP_UNHANDLED);
 
-    QS_FILTER_ON(QS_QF_ACTIVE_POST_FIFO);
-    QS_FILTER_ON(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_ON(QS_QF_PUBLISH);
+    QS_FILTER_OFF(QS_QF_ACTIVE_POST_FIFO);
+    QS_FILTER_OFF(QS_QF_ACTIVE_POST_LIFO);
+    QS_FILTER_OFF(QS_QF_PUBLISH);
 
     // QS_FILTER_ON(TL_STAT);
     QS_FILTER_ON(COMMAND_STAT);

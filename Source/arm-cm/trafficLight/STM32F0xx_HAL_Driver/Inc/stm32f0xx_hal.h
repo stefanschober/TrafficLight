@@ -43,7 +43,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/Inc/stm32f0xx_hal_conf.h>
+#include <stm32f0xx_hal_conf.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{

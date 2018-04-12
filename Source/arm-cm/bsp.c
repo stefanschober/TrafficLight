@@ -71,7 +71,7 @@ static void readUserButtons(void);
 
 #define ARRAY_SIZE(x)    (sizeof(x)/sizeof((x)[0]))
 
-static uint8_t keyPressed = 0;
+// static uint8_t keyPressed = 0;
 
 #ifdef Q_SPY
     QSTimeCtr QS_tickTime_;
@@ -106,6 +106,8 @@ void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
 
 static void readUserButtons(void)
 {
+    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+
     /* get state of the user button */
     /* Perform the debouncing of buttons. The algorithm for debouncing
     * adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -113,7 +115,8 @@ static void readUserButtons(void)
     */
     static uint8_t debounceBuffer[5] = {0, 0, 0, 0, 0};;
     static uint8_t debounceIndex = 0;
-    static uint8_t debouncedButtons;
+    static uint8_t debouncedButtons = 0;
+    static uint8_t oldButtons = 0;
     uint8_t currentButtons = 0;
     uint8_t currentAND = 0xFFu;
     uint8_t currentOR = 0x00u;
@@ -131,7 +134,11 @@ static void readUserButtons(void)
     }
     debouncedButtons |= currentAND;
     debouncedButtons &= currentOR;
-    keyPressed = (debouncedButtons & 0x01u);
+    if ((debouncedButtons & 0x01) && ((oldButtons ^ debouncedButtons) & 0x01))
+    {
+    	QF_PUBLISH(&buttonEvt, &l_SysTick_Handler); /* publish to all subscribers */
+    }
+    oldButtons = debouncedButtons;
 }
 
 /* BSP functions ===========================================================*/
@@ -262,6 +269,7 @@ void BSP_setPedLed(uint16_t status)
         BSP_ledOff();
 }
 /*..........................................................................*/
+#if 0
 uint16_t BSP_getButton(void)
 {
     uint16_t retCode = keyPressed;
@@ -269,6 +277,8 @@ uint16_t BSP_getButton(void)
     keyPressed = 0;
     return (retCode);
 }
+#endif
+
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
     /* set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate */

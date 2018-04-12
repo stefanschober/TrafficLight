@@ -33,13 +33,17 @@ QActive *the_Ticker0 = &l_ticker0;
 
 /*..........................................................................*/
 #if defined(QWIN_GUI)
+#ifdef main
+#undef main
+#endif
+
 #define main main_gui
+int main_gui(int argc, char *argv[]);
 #endif
 int main(int argc, char *argv[])
 {
     static QEvt const *trafficQueueSto[N_TL][5 * WIN_FUDGE_FACTOR];
     static QEvt const *pedestrianQueueSto[5 * WIN_FUDGE_FACTOR];
-    static QEvt const *buttonQueueSto[5 * WIN_FUDGE_FACTOR];
     static QEvt const *blinkerQueueSto[5 * WIN_FUDGE_FACTOR];
     static QSubscrList subscrSto[MAX_PUBLISH_SIG];
     static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
@@ -48,7 +52,6 @@ int main(int argc, char *argv[])
 
     TLtraffic_ctor(); /* instantiate all Philosopher active objects */
     TLpedestrian_ctor(); /* instantiate the Table active object */
-    TLbutton_ctor();
     TLblinker_ctor();
     QTicker_ctor(&l_ticker0, 0U); /* ticker AO for tick rate 0 */
 
@@ -60,13 +63,21 @@ int main(int argc, char *argv[])
     QS_OBJ_DICTIONARY(pedestrianQueueSto);
     QS_OBJ_DICTIONARY(trafficQueueSto[0]);
     QS_OBJ_DICTIONARY(trafficQueueSto[1]);
-    QS_OBJ_DICTIONARY(buttonQueueSto);
     QS_OBJ_DICTIONARY(blinkerQueueSto);
     QS_OBJ_DICTIONARY(AO_TLtraffic[0]);
     QS_OBJ_DICTIONARY(AO_TLtraffic[1]);
     QS_OBJ_DICTIONARY(AO_TLpedestrian);
-    QS_OBJ_DICTIONARY(AO_TLbutton);
     QS_OBJ_DICTIONARY(AO_TLblinker);
+
+    QS_SIG_DICTIONARY(TIME_TICK_SIG, (void *)0);
+    QS_SIG_DICTIONARY(GLOBAL_START_SIG, (void *)0);
+    QS_SIG_DICTIONARY(STARTNEWCYCLE_SIG, (void *)0);
+    QS_SIG_DICTIONARY(PEDREQUEST_SIG, (void *)0);
+    QS_SIG_DICTIONARY(TL_IS_RED_SIG, (void *)0);
+    QS_SIG_DICTIONARY(PL_IS_RED_SIG, (void *)0);
+    QS_SIG_DICTIONARY(BUTTON_SIG, (void *)0);
+    QS_SIG_DICTIONARY(START_BLINK_SIG, (void *)0);
+    QS_SIG_DICTIONARY(STOP_BLINK_SIG, (void *)0);
 
     /* initialize publish-subscribe... */
     QF_psInit(subscrSto, Q_DIM(subscrSto));
@@ -91,13 +102,6 @@ int main(int argc, char *argv[])
                   aoPrio++, /* QP priority of the AO */
                   pedestrianQueueSto,             /* event queue storage */
                   Q_DIM(pedestrianQueueSto),      /* queue length [events] */
-                  (void *)0,                 /* stack storage (not used) */
-                  0U,                        /* size of the stack [bytes] */
-                  (QEvt *)0);                /* initialization event */
-    QACTIVE_START(AO_TLbutton,                  /* AO to start */
-                  aoPrio++, /* QP priority of the AO */
-                  buttonQueueSto,             /* event queue storage */
-                  Q_DIM(buttonQueueSto),      /* queue length [events] */
                   (void *)0,                 /* stack storage (not used) */
                   0U,                        /* size of the stack [bytes] */
                   (QEvt *)0);                /* initialization event */

@@ -47,7 +47,7 @@
     defined(STM32F058xx) || defined(STM32F078xx) || defined(STM32F098xx)
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <stm32f0xx_hal_def.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{

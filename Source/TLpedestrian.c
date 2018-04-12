@@ -110,7 +110,7 @@ static QState TLpedestrian_GREEN(TLpedestrian * const me, QEvt const * const e) 
         /*${AOs::TLpedestrian::SM::GREEN} */
         case Q_ENTRY_SIG: {
             TLpedestrian_setLight(me, GREEN);
-            QTimeEvt_rearm(&me->timeEvt, T_15sec);
+            QTimeEvt_rearm(&me->timeEvt, T_5sec); // was 15s
             status_ = Q_HANDLED();
             break;
         }

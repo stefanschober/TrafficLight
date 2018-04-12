@@ -40,7 +40,7 @@
  extern "C" {
 #endif
 
-#include <arm-cm/trafficLight/Inc/main.h>
+#include <main.h>
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
@@ -190,19 +190,19 @@
   */
 
 #ifdef HAL_RCC_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_rcc.h>
+ #include <stm32f0xx_hal_rcc.h>
 #endif /* HAL_RCC_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_gpio.h>
+ #include <stm32f0xx_hal_gpio.h>
 #endif /* HAL_GPIO_MODULE_ENABLED */
 
 #ifdef HAL_DMA_MODULE_ENABLED
-  #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_dma.h>
+  #include <stm32f0xx_hal_dma.h>
 #endif /* HAL_DMA_MODULE_ENABLED */
 
 #ifdef HAL_CORTEX_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_cortex.h>
+ #include <stm32f0xx_hal_cortex.h>
 #endif /* HAL_CORTEX_MODULE_ENABLED */
 
 #ifdef HAL_ADC_MODULE_ENABLED
@@ -230,11 +230,11 @@
 #endif /* HAL_DAC_MODULE_ENABLED */
 
 #ifdef HAL_FLASH_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_flash.h>
+ #include <stm32f0xx_hal_flash.h>
 #endif /* HAL_FLASH_MODULE_ENABLED */
 
 #ifdef HAL_I2C_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_i2c.h>
+ #include <stm32f0xx_hal_i2c.h>
 #endif /* HAL_I2C_MODULE_ENABLED */
 
 #ifdef HAL_I2S_MODULE_ENABLED
@@ -254,7 +254,7 @@
 #endif /* HAL_PCD_MODULE_ENABLED */
 
 #ifdef HAL_PWR_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_pwr.h>
+ #include <stm32f0xx_hal_pwr.h>
 #endif /* HAL_PWR_MODULE_ENABLED */
 
 #ifdef HAL_RTC_MODULE_ENABLED
@@ -282,7 +282,7 @@
 #endif /* HAL_TSC_MODULE_ENABLED */
 
 #ifdef HAL_UART_MODULE_ENABLED
- #include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_uart.h>
+ #include <stm32f0xx_hal_uart.h>
 #endif /* HAL_UART_MODULE_ENABLED */
 
 #ifdef HAL_USART_MODULE_ENABLED

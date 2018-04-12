@@ -94,13 +94,8 @@ void TLpedestrian_ctor(void);
 extern QActive * const AO_TLpedestrian;
 /*$enddecl${AOs::AO_TLpedestrian} ##########################################*/
 
-/*$declare${AOs::TLbutton_ctor} ############################################*/
-/*${AOs::TLbutton_ctor} ....................................................*/
-void TLbutton_ctor(void);
-/*$enddecl${AOs::TLbutton_ctor} ############################################*/
-/*$declare${AOs::AO_TLbutton} ##############################################*/
-extern QActive * const AO_TLbutton;
-/*$enddecl${AOs::AO_TLbutton} ##############################################*/
+// $declare(AOs::TLbutton_ctor)
+// $declare(AOs::AO_TLbutton)
 
 /*$declare${AOs::TLblinker_ctor} ###########################################*/
 /*${AOs::TLblinker_ctor} ...................................................*/

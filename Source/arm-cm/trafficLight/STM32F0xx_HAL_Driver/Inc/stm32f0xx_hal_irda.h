@@ -45,7 +45,7 @@
 #if !defined(STM32F030x6) && !defined(STM32F030x8) && !defined(STM32F070x6) && !defined(STM32F070xB) && !defined(STM32F030xC) 
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <stm32f0xx_hal_def.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{
@@ -697,7 +697,7 @@ typedef enum
  */
 
 /* Include IRDA HAL Extended module */
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_irda_ex.h>
+#include <stm32f0xx_hal_irda_ex.h>
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup IRDA_Exported_Functions IRDA Exported Functions

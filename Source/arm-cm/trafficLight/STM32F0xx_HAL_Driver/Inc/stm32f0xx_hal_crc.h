@@ -42,7 +42,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <stm32f0xx_hal_def.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{
@@ -262,7 +262,7 @@ typedef struct
 
 
 /* Include CRC HAL Extension module */
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_crc_ex.h>
+#include <stm32f0xx_hal_crc_ex.h>
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup CRC_Exported_Functions CRC Exported Functions

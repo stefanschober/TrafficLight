@@ -12,3 +12,10 @@ makefile
 /arm-cm/
 /WinGui/
 /Posix/
+/WinGui_Spy/
+/GTK+_Spy/
+/arm-cm_Spy/
+*.ce
+*.he
+*/dbg/
+*/spy/

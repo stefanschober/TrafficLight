@@ -33,9 +33,9 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_rcc.h>
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_system.h>
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_utils.h>
+#include <stm32f0xx_ll_rcc.h>
+#include <stm32f0xx_ll_system.h>
+#include <stm32f0xx_ll_utils.h>
 #ifdef  USE_FULL_ASSERT
 #include "stm32_assert.h"
 #else

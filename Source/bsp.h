@@ -26,7 +26,7 @@ void BSP_terminate(int16_t result);
 
 void BSP_setlight(eTLidentity_t id, eTLlight_t light);
 void BSP_setPedLed(uint16_t status);
-uint16_t BSP_getButton(void);
+// uint16_t BSP_getButton(void);
 
 extern QActive *the_Ticker0; /* "Ticker" active object for tick rate 0 */
 

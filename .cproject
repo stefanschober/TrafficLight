@@ -9,12 +9,12 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -57,6 +57,12 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
+								<option id="gnu.c.link.option.libs.1466170387" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+								</option>
+								<option id="gnu.c.link.option.paths.1048453861" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32/dbg}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1745976581" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -66,7 +72,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/posix|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/posix|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -80,12 +86,12 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -124,6 +130,12 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
+								<option id="gnu.c.link.option.paths.690506337" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32/dbg}&quot;"/>
+								</option>
+								<option id="gnu.c.link.option.libs.1709292311" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1423495708" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -133,7 +145,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/posix|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/posix|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -147,12 +159,12 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -166,7 +178,7 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.1216115288" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1966571570" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base"/>
-							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1106902562" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1106902562" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
 								<option id="gnu.c.compiler.option.include.paths.207631218" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/src}&quot;"/>
@@ -187,11 +199,16 @@
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.1717056736" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
 								<option id="gnu.c.link.option.ldflags.1236974004" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mwindows -pthread" valueType="string"/>
 								<option id="gnu.c.link.option.userobjs.1315838589" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
-								<option id="gnu.c.link.option.libs.205600929" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
+								<option id="gnu.c.link.option.libs.205600929" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+								</option>
 								<option id="gnu.c.link.option.other.1651445827" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
+								</option>
+								<option id="gnu.c.link.option.paths.1680445289" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/gtk+/dbg}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.2105689297" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -202,7 +219,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -216,12 +233,12 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -254,7 +271,10 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1256168385" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1606025965" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.libs.1984028228" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
+								<option id="gnu.c.link.option.libs.1984028228" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="hal"/>
+								</option>
 								<option id="gnu.c.link.option.userobjs.971204091" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
 								<option id="gnu.c.link.option.ldflags.225400179" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mcpu=cortex-m0 -specs=nano.specs  -T./trafficlight-qk.ld" valueType="string"/>
 								<option id="gnu.c.link.option.nostdlibs.2042150596" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" value="true" valueType="boolean"/>
@@ -262,6 +282,10 @@
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
+								</option>
+								<option id="gnu.c.link.option.paths.1560068963" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/arm-cm/dbg}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/dbg}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.129731434" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -276,7 +300,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver|Source/arm-cm/trafficLight/Src|qpc/src|Source/TLbutton.c|qpc/ports|qspy|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -290,12 +314,12 @@
 				</macros>
 				<externalSettings/>
 				<extensions>
+					<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -341,7 +365,246 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678" moduleId="org.eclipse.cdt.core.settings" name="WinGui_Spy">
+				<macros>
+					<stringMacro name="DirectoryDelimiter" type="VALUE_TEXT" value="/"/>
+					<stringMacro name="CONF" type="VALUE_TEXT" value=""/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678" name="WinGui_Spy" parent="org.eclipse.cdt.build.core.emptycfg" prebuildStep="windres -I../Source/Win32_Gui/Res -i ../Source/Win32_Gui/trafficlight-gui.rc -o ./gui.o">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.2072465575" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.1888257940" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
+							<builder buildPath="${workspace_loc:/TrafficLight}/WinGui" id="cdt.managedbuild.builder.gnu.cross.670257884" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.1236515003" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1012028924" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.408827209" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.809368087" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1465325789" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
+								<option id="gnu.c.compiler.option.include.paths.1418557262" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/Win32_Gui/Res}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/Win32_Gui}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.dialect.std.452415344" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.optimization.level.806609361" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.1154616610" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows -ffunction-sections -fdata-sections -pthread" valueType="string"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1329657436" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="QWIN_GUI"/>
+									<listOptionValue builtIn="false" value="WIN32"/>
+									<listOptionValue builtIn="false" value="Q_SPY"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2028177982" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.533029864" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
+								<option id="gnu.c.link.option.ldflags.905952802" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mwindows -pthread" valueType="string"/>
+								<option id="gnu.c.link.option.userobjs.36326453" name="Other objects" superClass="gnu.c.link.option.userobjs" valueType="userObjs">
+									<listOptionValue builtIn="false" value="gui.o"/>
+								</option>
+								<option id="gnu.c.link.option.other.814938004" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
+									<listOptionValue builtIn="false" value="--cref"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+								</option>
+								<option id="gnu.c.link.option.libs.1728829719" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="wsock32"/>
+								</option>
+								<option id="gnu.c.link.option.paths.847671661" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32/spy}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.93892875" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.145169486" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/posix|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.666715282">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.666715282" moduleId="org.eclipse.cdt.core.settings" name="GTK+_Spy">
+				<macros>
+					<stringMacro name="DirectoryDelimiter" type="VALUE_TEXT" value="/"/>
+					<stringMacro name="CONF" type="VALUE_TEXT" value=""/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.666715282" name="GTK+_Spy" parent="org.eclipse.cdt.build.core.emptycfg" prebuildStep="">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.666715282." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.base.249481760" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.PE" id="cdt.managedbuild.target.gnu.platform.mingw.base.790456913" name="Debug Platform" osList="win32" superClass="cdt.managedbuild.target.gnu.platform.mingw.base"/>
+							<builder buildPath="${workspace_loc:/TrafficLight}/WinGui" id="cdt.managedbuild.builder.gnu.cross.541538863" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.1520297654" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1955864646" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.1353102290" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.156781259" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base"/>
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1413780611" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
+								<option id="gnu.c.compiler.option.include.paths.1687907374" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/gtk+}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/GTK+}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/GTK+/Res}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.dialect.std.1927115546" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.optimization.level.615653140" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.2004104893" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows -ffunction-sections -fdata-sections -pthread" valueType="string"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.738837017" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="QWIN_GUI"/>
+									<listOptionValue builtIn="false" value="Q_SPY"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1345279789" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.303612761" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
+								<option id="gnu.c.link.option.ldflags.1933869564" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mwindows -pthread" valueType="string"/>
+								<option id="gnu.c.link.option.userobjs.1120479861" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
+								<option id="gnu.c.link.option.libs.2139312247" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+								</option>
+								<option id="gnu.c.link.option.other.830653395" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
+									<listOptionValue builtIn="false" value="--cref"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+								</option>
+								<option id="gnu.c.link.option.paths.1968431881" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/gtk+/spy}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.196495116" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base.2092542645" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.base"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="Source/TLbutton.c|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|qpc/src|qpc/ports|Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814" moduleId="org.eclipse.cdt.core.settings" name="arm-cm_Spy">
+				<macros>
+					<stringMacro name="DirectoryDelimiter" type="VALUE_TEXT" value="/"/>
+					<stringMacro name="CONF" type="VALUE_TEXT" value=""/>
+				</macros>
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814" name="arm-cm_Spy" parent="org.eclipse.cdt.build.core.emptycfg" postbuildStep="arm-none-eabi-objcopy -O binary ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.bin" prebuildStep="cp ${ProjDirPath}/Source/arm-cm/trafficlight-qk.ld .">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.395040856" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.716809563" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-none-eabi-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.path.1246331528" name="Path" superClass="cdt.managedbuild.option.gnu.cross.path" value="C:\Users\schobers\AppData\Local\Programs\ArmEmbedded\bin" valueType="string"/>
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.120074070" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
+							<builder buildPath="${workspace_loc:/TrafficLight}/arm-cm" id="cdt.managedbuild.builder.gnu.cross.1535281460" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.443129178" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
+								<option id="gnu.c.compiler.option.include.paths.2098610794" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qspy/source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/arm-cm}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/trafficLight/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/trafficLight/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1343100580" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="USE_HAL_DRIVER"/>
+									<listOptionValue builtIn="false" value="STM32F091xC"/>
+									<listOptionValue builtIn="false" value="Q_SPY"/>
+								</option>
+								<option id="gnu.c.compiler.option.dialect.std.1955374241" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.optimization.level.1445712198" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.misc.other.2044212574" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mcpu=cortex-m0 -mthumb  -ffunction-sections -fdata-sections" valueType="string"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.399794650" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1693082977" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1670529748" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
+								<option id="gnu.c.link.option.libs.1760079088" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="hal"/>
+								</option>
+								<option id="gnu.c.link.option.userobjs.1126841064" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
+								<option id="gnu.c.link.option.ldflags.402684510" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mcpu=cortex-m0 -specs=nano.specs  -T./trafficlight-qk.ld" valueType="string"/>
+								<option id="gnu.c.link.option.nostdlibs.501790058" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.other.662674641" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
+									<listOptionValue builtIn="false" value="--cref"/>
+									<listOptionValue builtIn="false" value="--gc-sections"/>
+								</option>
+								<option id="gnu.c.link.option.paths.565783184" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/arm-cm/spy}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/spy}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1222121453" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.linker.1440308330" name="Cross G++ Linker" superClass="cdt.managedbuild.tool.gnu.cross.cpp.linker"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.archiver.1883866565" name="Cross GCC Archiver" superClass="cdt.managedbuild.tool.gnu.cross.archiver"/>
+							<tool id="cdt.managedbuild.tool.gnu.cross.assembler.299289076" name="Cross GCC Assembler" superClass="cdt.managedbuild.tool.gnu.cross.assembler">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.802755479" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver|Source/arm-cm/trafficLight/Src|qpc/src|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/TLbutton.c|qpc/ports|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -353,14 +616,41 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="WinGui"/>
+		<configuration configurationName="qk_dbg">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="Gui_rel"/>
+		<configuration configurationName="WinGui_Spy">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="GTK+_rel">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="arm-cm">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="Posix_spy">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="Win32_spy">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="Win32_rel">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="Posix_dbg">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
+		<configuration configurationName="GTK+">
+			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
+		</configuration>
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
 		</configuration>
+		<configuration configurationName="Gui_spy"/>
+		<configuration configurationName="WinGui"/>
+		<configuration configurationName="GTK+_spy"/>
 		<configuration configurationName="Gui_dbg">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="qk_dbg">
 			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
 		</configuration>
 		<configuration configurationName="qk_rel">
@@ -373,49 +663,47 @@
 		<configuration configurationName="WinCon">
 			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
 		</configuration>
-		<configuration configurationName="GTK+_spy"/>
-		<configuration configurationName="GTK+">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="Gui_spy"/>
-		<configuration configurationName="Posix_dbg">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="Debug"/>
-		<configuration configurationName="GTK+_rel">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="Gui_rel"/>
-		<configuration configurationName="Posix_rel">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="Win32_spy">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="Posix_spy">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
-		<configuration configurationName="arm-cm">
-			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
-		</configuration>
+		<configuration configurationName="Posix"/>
 		<configuration configurationName="Win32_dbg">
 			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
 		</configuration>
-		<configuration configurationName="Win32_rel">
+		<configuration configurationName="Posix_rel">
 			<resource resourceType="PROJECT" workspacePath="/TrafficLight"/>
 		</configuration>
+		<configuration configurationName="Debug"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.966759601;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.70384553">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.1337462526.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1145275954;cdt.managedbuild.tool.gnu.c.compiler.input.2121206456">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.247797774;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.247797774.;cdt.managedbuild.tool.gnu.cross.c.compiler.459138450;cdt.managedbuild.tool.gnu.c.compiler.input.99168860">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.201971192;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.201971192.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1066211758;cdt.managedbuild.tool.gnu.c.compiler.input.143190307">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814.;cdt.managedbuild.tool.gnu.cross.c.compiler.443129178;cdt.managedbuild.tool.gnu.c.compiler.input.399794650">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.1986229433;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.1986229433.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.272204932;cdt.managedbuild.tool.gnu.c.compiler.input.841949281">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1106902562;cdt.managedbuild.tool.gnu.c.compiler.input.1796049120">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1193784683;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1193784683.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1442888143;cdt.managedbuild.tool.gnu.c.compiler.input.2017542782">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.322226890;cdt.managedbuild.tool.gnu.c.compiler.input.1367776841">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.;cdt.managedbuild.tool.gnu.cross.c.compiler.168133976;cdt.managedbuild.tool.gnu.c.compiler.input.1123106740">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377.;cdt.managedbuild.tool.gnu.c.compiler.base.972490992;cdt.managedbuild.tool.gnu.c.compiler.input.219402063">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.2045034333;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.2045034333.;cdt.managedbuild.tool.gnu.c.compiler.base.332744737;cdt.managedbuild.tool.gnu.c.compiler.input.1467808774">
@@ -424,10 +712,19 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.429266782.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1345200972;cdt.managedbuild.tool.gnu.c.compiler.input.448423552">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.;cdt.managedbuild.tool.gnu.cross.c.compiler.168133976;cdt.managedbuild.tool.gnu.c.compiler.input.1123106740">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1872171678.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1465325789;cdt.managedbuild.tool.gnu.c.compiler.input.2028177982">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1106902562;cdt.managedbuild.tool.gnu.c.compiler.input.1796049120">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1698344997;cdt.managedbuild.tool.gnu.c.compiler.input.1546767334">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.;cdt.managedbuild.tool.gnu.c.compiler.base.810336809;cdt.managedbuild.tool.gnu.c.compiler.input.1108855508">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377.;cdt.managedbuild.tool.gnu.c.compiler.cygwin.base.966759601;cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.70384553">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.666715282;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.666715282.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1413780611;cdt.managedbuild.tool.gnu.c.compiler.input.1345279789">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.;cdt.managedbuild.tool.gnu.cross.c.compiler.851648395;cdt.managedbuild.tool.gnu.c.compiler.input.410473309">
@@ -436,28 +733,7 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.884565700;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1014669553;cdt.managedbuild.tool.gnu.c.compiler.input.1284039697">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.247797774;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.247797774.;cdt.managedbuild.tool.gnu.cross.c.compiler.459138450;cdt.managedbuild.tool.gnu.c.compiler.input.99168860">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.1698824377.;cdt.managedbuild.tool.gnu.c.compiler.base.972490992;cdt.managedbuild.tool.gnu.c.compiler.input.219402063">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.247797774.1840447978;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.247797774.1840447978.;cdt.managedbuild.tool.gnu.cross.c.compiler.91873258;cdt.managedbuild.tool.gnu.c.compiler.input.2120916147">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1467731183.;cdt.managedbuild.tool.gnu.c.compiler.base.810336809;cdt.managedbuild.tool.gnu.c.compiler.input.1108855508">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.1986229433;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.1986229433.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.272204932;cdt.managedbuild.tool.gnu.c.compiler.input.841949281">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1698344997;cdt.managedbuild.tool.gnu.c.compiler.input.1546767334">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.201971192;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.201971192.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1066211758;cdt.managedbuild.tool.gnu.c.compiler.input.143190307">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1193784683;cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.1193784683.;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1442888143;cdt.managedbuild.tool.gnu.c.compiler.input.2017542782">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>

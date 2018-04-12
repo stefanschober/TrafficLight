@@ -38,7 +38,7 @@
 
 #include <gtk/gtk.h>
 
-Q_DEFINE_THIS_FILE
+// Q_DEFINE_THIS_FILE
 
 #define WINDOW_W    350
 #define WINDOW_H    250
@@ -56,7 +56,7 @@ static void     appThread(GTask *task, gpointer source_object, gpointer task_dat
 static void     appThreadReadyCallback (GObject *source_object, GAsyncResult *res, gpointer user_data);
 
 // static struct termios l_tsav; /* structure with saved terminal attributes */
-static guint8 keyPressed = 0;
+// static guint8 keyPressed = 0;
 static GMutex myMutex;
 static GRand  *myRnd;
 static guint32 rndCountDown = 0;
@@ -320,8 +320,11 @@ static void appThread(GTask *task, gpointer source_object, gpointer task_data, G
 // called when button PEDESTRIAN is clicked
 static void on_btn_ped_clicked(void)
 {
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+
     g_mutex_lock(&myMutex);
-    keyPressed = 1;
+    //keyPressed = 1;
+    QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
     rndCountDown = 120;
     g_mutex_unlock(&myMutex);
 }
@@ -379,7 +382,7 @@ static gboolean event_handler(GtkWidget *widget)
 
 static gboolean count_handler(GtkWidget *widget)
 {
-    static guint32 countVal = 0;
+	static guint32 countVal = 0;
     static gchar buf[16];
 
     //if (widget->window == NULL) return FALSE;
@@ -396,7 +399,10 @@ static gboolean count_handler(GtkWidget *widget)
         rndCountDown--;
     else
     {
-        keyPressed = 1;
+    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+
+        //keyPressed = 1;
+        QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
         rndCountDown = g_rand_int_range(myRnd, 30, 120);
     }
     g_mutex_unlock(&myMutex);
@@ -423,13 +429,13 @@ void guiSetPedLed(uint16_t status)
 /*..........................................................................*/
 guint16 guiGetButton(void)
 {
-    guint16 retCode;
-
+    guint16 retCode = 0;
+#if 0
     g_mutex_lock(&myMutex);
     retCode = keyPressed;
     keyPressed = 0;
     g_mutex_unlock(&myMutex);
-
+#endif
     return retCode;
 }
 /*--------------------------------------------------------------------------*/

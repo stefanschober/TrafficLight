@@ -107,7 +107,7 @@ static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e) {
         /*${AOs::TLtraffic::SM::INIT_TL} */
         case Q_ENTRY_SIG: {
             setLight(me, RED);
-            startTimeout(T_10sec);
+            startTimeout(T_2sec); // was 10sec
             status_ = Q_HANDLED();
             break;
         }
@@ -165,7 +165,7 @@ static QState TLtraffic_GREEN_1(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::GREEN::GREEN_1} */
         case Q_ENTRY_SIG: {
-            startTimeout(T_10sec);
+            startTimeout(T_5sec); // was 10s
             status_ = Q_HANDLED();
             break;
         }
@@ -192,7 +192,7 @@ static QState TLtraffic_GREEN_2(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::GREEN::GREEN_2} */
         case Q_ENTRY_SIG: {
-            startTimeout(T_20sec);
+            startTimeout(T_5sec); // was 20s
             status_ = Q_HANDLED();
             break;
         }
@@ -221,7 +221,7 @@ static QState TLtraffic_YELLOW(TLtraffic * const me, QEvt const * const e) {
         /*${AOs::TLtraffic::SM::YELLOW} */
         case Q_ENTRY_SIG: {
             setLight(me, YELLOW);
-            startTimeout(T_5sec);
+            startTimeout(T_2sec); // was 5s
             status_ = Q_HANDLED();
             break;
         }
@@ -277,7 +277,6 @@ static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e) {
         /*${AOs::TLtraffic::SM::RED} */
         case Q_ENTRY_SIG: {
             setLight(me, RED);
-            sendMessage(TL_IS_RED_SIG);
             status_ = Q_HANDLED();
             break;
         }
@@ -297,6 +296,12 @@ static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e) {
 static QState TLtraffic_RED_1(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RED::RED_1} */
+        case Q_ENTRY_SIG: {
+            sendMessage(TL_IS_RED_SIG);
+            status_ = Q_HANDLED();
+            break;
+        }
         /*${AOs::TLtraffic::SM::RED::RED_1::PEDREQUEST} */
         case PEDREQUEST_SIG: {
             status_ = Q_TRAN(&TLtraffic_RED_2);

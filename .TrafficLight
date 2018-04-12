@@ -9,10 +9,13 @@
   <item name="backups">0</item>
  </group>
  <group name="windows">
-  <item id="AOs::TLtraffic::SM">-115,0,1214,566</item>
-  <item id="AOs::TLpedestrian::SM">0,0,1099,703,*</item>
-  <item id="AOs::TLbutton::SM">0,24,1099,703</item>
-  <item id="AOs::TLblinker::SM">459,247,640,480</item>
+  <item id="AOs::TLtraffic::SM">0,0,1099,703</item>
+  <item id="AOs::TLpedestrian::SM">0,24,1099,703</item>
+  <item id="AOs::TLbutton::SM">0,0,1099,703</item>
+  <item id="AOs::TLblinker::SM">0,247,640,480</item>
+  <item id="./Source::trafficlight.h">503,0,596,300</item>
+  <item id="./Source::TLmain.c">0,0,1099,703,*</item>
+  <item id="./Source::TLbutton.c">503,427,596,300</item>
  </group>
  <group name="search">
   <item name="options">2032128</item>

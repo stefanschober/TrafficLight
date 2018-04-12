@@ -42,7 +42,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h>
+#include <stm32f0xx_hal_def.h>
    
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{
@@ -289,7 +289,7 @@ typedef struct
   */ 
 
 /* Include FLASH HAL Extended module */
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_flash_ex.h>  
+#include <stm32f0xx_hal_flash_ex.h>  
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup FLASH_Exported_Functions

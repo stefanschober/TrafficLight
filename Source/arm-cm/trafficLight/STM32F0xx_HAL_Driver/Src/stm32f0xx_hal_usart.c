@@ -142,7 +142,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include <arm-cm/trafficLight/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h>
+#include <stm32f0xx_hal.h>
 
 /** @addtogroup STM32F0xx_HAL_Driver
   * @{

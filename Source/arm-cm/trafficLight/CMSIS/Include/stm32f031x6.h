@@ -119,8 +119,8 @@ typedef enum
   * @}
   */
 
-#include <arm-cm/trafficLight/CMSIS/Include/core_cm0.h>            /* Cortex-M0 processor and core peripherals */
-#include <arm-cm/trafficLight/CMSIS/Include/system_stm32f0xx.h>    /* STM32F0xx System Header */
+#include <core_cm0.h>            /* Cortex-M0 processor and core peripherals */
+#include <system_stm32f0xx.h>    /* STM32F0xx System Header */
 #include <stdint.h>
 
 /** @addtogroup Peripheral_registers_structures

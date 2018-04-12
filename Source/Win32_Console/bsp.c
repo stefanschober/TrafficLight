@@ -50,7 +50,7 @@ Q_DEFINE_THIS_FILE
     static uint8_t const l_clock_tick = 0U;
 #endif
 
-static uint8_t keyPressed = 0;
+// static uint8_t keyPressed = 0;
 
 /*..........................................................................*/
 void QF_onStartup(void) {
@@ -62,11 +62,12 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
+    // static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
+    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
     // QF_TICK_X(0U, &l_clock_tick); /* perform the QF clock tick processing */
     QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
-    QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
+    // QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
 
     if (_kbhit()) { /* any key pressed? */
         int ch = _getch();
@@ -78,7 +79,8 @@ void QF_onClockTick(void) {
                 break;
             case 'p':
             case 'P':
-                keyPressed = 1;
+                // keyPressed = 1;
+            	QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
                 break;
             default:
                 break;
@@ -138,6 +140,7 @@ void BSP_setPedLed(uint16_t status)
     (void)status;
 }
 /*..........................................................................*/
+#if 0
 uint16_t BSP_getButton(void)
 {
     uint16_t retCode;
@@ -147,6 +150,7 @@ uint16_t BSP_getButton(void)
 
     return retCode;
 }
+#endif
 
 /*--------------------------------------------------------------------------*/
 #ifdef Q_SPY /* define QS callbacks */

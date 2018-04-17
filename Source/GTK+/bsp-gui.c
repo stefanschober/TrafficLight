@@ -59,7 +59,7 @@ static void     appThreadReadyCallback (GObject *source_object, GAsyncResult *re
 // static guint8 keyPressed = 0;
 static GMutex myMutex;
 static GRand  *myRnd;
-static guint32 rndCountDown = 0;
+static guint32 rndCountDown = 120;
 GtkWidget       *trafficLights[MaxIdentity][NO_LIGHT][2], *ledWhite, *ledRed;
 static struct {
         uint8_t changed;
@@ -318,14 +318,18 @@ static void appThread(GTask *task, gpointer source_object, gpointer task_data, G
 }
 
 // called when button PEDESTRIAN is clicked
-static void on_btn_ped_clicked(void)
+static void publishBtnEvt(void)
 {
 	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-    g_mutex_lock(&myMutex);
-    //keyPressed = 1;
     QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
+}
+
+static void on_btn_ped_clicked(void)
+{
+    g_mutex_lock(&myMutex);
     rndCountDown = 120;
+    publishBtnEvt();
     g_mutex_unlock(&myMutex);
 }
 
@@ -396,14 +400,13 @@ static gboolean count_handler(GtkWidget *widget)
 
     g_mutex_lock(&myMutex);
     if (0 < rndCountDown)
+    {
         rndCountDown--;
+    }
     else
     {
-    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
-
-        //keyPressed = 1;
-        QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
         rndCountDown = g_rand_int_range(myRnd, 30, 120);
+        publishBtnEvt();
     }
     g_mutex_unlock(&myMutex);
 

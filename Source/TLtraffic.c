@@ -40,6 +40,9 @@ typedef struct {
     QTimeEvt timeEvt;
 } TLtraffic;
 
+/* private: */
+static void TLtraffic_setLight(TLtraffic * const me, eTLlight_t light);
+
 /* protected: */
 static QState TLtraffic_initial(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e);
@@ -54,13 +57,11 @@ static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_RED_1(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_RED_2(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RED_4(TLtraffic * const me, QEvt const * const e);
 /*$enddecl${AOs::TLtraffic} ################################################*/
 
 /* Local objects -----------------------------------------------------------*/
 static TLtraffic l_traffic[N_TL];   /* storage for all TLs */
-
-/* Local functions */
-static void setLight(TLtraffic * const me, eTLlight_t light);
 
 /* Global objects ----------------------------------------------------------*/
 QActive * const AO_TLtraffic[N_TL] = { /* "opaque" pointers to TL AO */
@@ -92,9 +93,30 @@ void TLtraffic_ctor(void) {
 /*$enddef${AOs::TLtraffic_ctor} ############################################*/
 /*$define${AOs::TLtraffic} #################################################*/
 /*${AOs::TLtraffic} ........................................................*/
+/*${AOs::TLtraffic::setLight} ..............................................*/
+static void TLtraffic_setLight(TLtraffic * const me, eTLlight_t light) {
+    me->light = light;
+    BSP_setlight(me->identity, me->light);
+}
+
 /*${AOs::TLtraffic::SM} ....................................................*/
 static QState TLtraffic_initial(TLtraffic * const me, QEvt const * const e) {
     /*${AOs::TLtraffic::SM::initial} */
+    QS_FUN_DICTIONARY(TLtraffic_initial);
+    QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN_2);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN_3);
+    QS_FUN_DICTIONARY(TLtraffic_YELLOW);
+    QS_FUN_DICTIONARY(TLtraffic_YELLOW_1);
+    QS_FUN_DICTIONARY(TLtraffic_YELLOW_2);
+    QS_FUN_DICTIONARY(TLtraffic_RED);
+    QS_FUN_DICTIONARY(TLtraffic_RED_1);
+    QS_FUN_DICTIONARY(TLtraffic_RED_2);
+    QS_FUN_DICTIONARY(TLtraffic_RED_3);
+    QS_FUN_DICTIONARY(TLtraffic_RED_4);
+
     QActive_subscribe((QActive *)me, PL_IS_RED_SIG);
     QActive_subscribe((QActive *)me, STARTNEWCYCLE_SIG);
     QActive_subscribe((QActive *)me, PEDREQUEST_SIG);
@@ -106,7 +128,7 @@ static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::INIT_TL} */
         case Q_ENTRY_SIG: {
-            setLight(me, RED);
+            TLtraffic_setLight(me, RED);
             startTimeout(T_2sec); // was 10sec
             status_ = Q_HANDLED();
             break;
@@ -137,7 +159,7 @@ static QState TLtraffic_GREEN(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::GREEN} */
         case Q_ENTRY_SIG: {
-            setLight(me, GREEN);
+            TLtraffic_setLight(me, GREEN);
             status_ = Q_HANDLED();
             break;
         }
@@ -166,6 +188,7 @@ static QState TLtraffic_GREEN_1(TLtraffic * const me, QEvt const * const e) {
         /*${AOs::TLtraffic::SM::GREEN::GREEN_1} */
         case Q_ENTRY_SIG: {
             startTimeout(T_5sec); // was 10s
+            sendMessage(GLOBAL_START_SIG);
             status_ = Q_HANDLED();
             break;
         }
@@ -220,7 +243,7 @@ static QState TLtraffic_YELLOW(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::YELLOW} */
         case Q_ENTRY_SIG: {
-            setLight(me, YELLOW);
+            TLtraffic_setLight(me, YELLOW);
             startTimeout(T_2sec); // was 5s
             status_ = Q_HANDLED();
             break;
@@ -276,7 +299,7 @@ static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::RED} */
         case Q_ENTRY_SIG: {
-            setLight(me, RED);
+            TLtraffic_setLight(me, RED);
             status_ = Q_HANDLED();
             break;
         }
@@ -331,7 +354,12 @@ static QState TLtraffic_RED_2(TLtraffic * const me, QEvt const * const e) {
         }
         /*${AOs::TLtraffic::SM::RED::RED_2::PL_IS_RED} */
         case PL_IS_RED_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_3);
+            status_ = Q_TRAN(&TLtraffic_RED_1);
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RED::RED_2::STARTNEWCYCLE} */
+        case STARTNEWCYCLE_SIG: {
+            status_ = Q_TRAN(&TLtraffic_RED_4);
             break;
         }
         default: {
@@ -358,7 +386,29 @@ static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e) {
         }
         /*${AOs::TLtraffic::SM::RED::RED_3::PEDREQUEST} */
         case PEDREQUEST_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_1);
+            status_ = Q_TRAN(&TLtraffic_RED_4);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLtraffic_RED);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RED::RED_4} ........................................*/
+static QState TLtraffic_RED_4(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RED::RED_4} */
+        case Q_ENTRY_SIG: {
+            sendMessage(TL_IS_RED_SIG);
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RED::RED_4::PL_IS_RED} */
+        case PL_IS_RED_SIG: {
+            status_ = Q_TRAN(&TLtraffic_RED_3);
             break;
         }
         default: {
@@ -369,10 +419,3 @@ static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e) {
     return status_;
 }
 /*$enddef${AOs::TLtraffic} #################################################*/
-
-/* Local function definitions */
-static void setLight(TLtraffic * const me, eTLlight_t light)
-{
-    me->light = light;
-    BSP_setlight(me->identity, light);
-}

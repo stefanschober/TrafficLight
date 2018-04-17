@@ -29,6 +29,7 @@ enum TLSignals {
     BUTTON_SIG,                 /* published by BSP to notify about pedestrian requests */
     START_BLINK_SIG,
     STOP_BLINK_SIG,
+    OFF_BLINK_SIG,
     MAX_PUBLISH_SIG,
     TIMEOUT_SIG,                /* used for time events */
     MAX_SIG                     /* the last signal */

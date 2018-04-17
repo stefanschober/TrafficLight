@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
     QS_SIG_DICTIONARY(BUTTON_SIG, (void *)0);
     QS_SIG_DICTIONARY(START_BLINK_SIG, (void *)0);
     QS_SIG_DICTIONARY(STOP_BLINK_SIG, (void *)0);
+    QS_SIG_DICTIONARY(OFF_BLINK_SIG, (void *)0);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);
 
     /* initialize publish-subscribe... */
     QF_psInit(subscrSto, Q_DIM(subscrSto));

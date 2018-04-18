@@ -79,6 +79,7 @@ static void readUserButtons(void);
 
     /* event-source identifiers used for tracing */
     static uint8_t const l_SysTick_Handler = 0U;
+    static uint8_t const l_button          = 1U;
 
     enum AppRecords { /* application-specific trace records */
         PHILO_STAT = QS_USER
@@ -106,8 +107,6 @@ void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
 
 static void readUserButtons(void)
 {
-    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
-
     /* get state of the user button */
     /* Perform the debouncing of buttons. The algorithm for debouncing
     * adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
@@ -136,7 +135,7 @@ static void readUserButtons(void)
     debouncedButtons &= currentOR;
     if ((debouncedButtons & 0x01) && ((oldButtons ^ debouncedButtons) & 0x01))
     {
-    	QF_PUBLISH(&buttonEvt, &l_SysTick_Handler); /* publish to all subscribers */
+    	BSP_publishBtnEvt(); /* publish to all subscribers */
     }
     oldButtons = debouncedButtons;
 }
@@ -181,6 +180,7 @@ void BSP_init(int argc, char *argv[]) {
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
+    QS_OBJ_DICTIONARY(&l_button);
 }
 /*..........................................................................*/
 void BSP_terminate(int16_t result) {
@@ -269,15 +269,13 @@ void BSP_setPedLed(uint16_t status)
         BSP_ledOff();
 }
 /*..........................................................................*/
-#if 0
-uint16_t BSP_getButton(void)
+// called when button PEDESTRIAN is clicked
+void BSP_publishBtnEvt(void)
 {
-    uint16_t retCode = keyPressed;
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-    keyPressed = 0;
-    return (retCode);
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
-#endif
 
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {

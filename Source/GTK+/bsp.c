@@ -80,6 +80,7 @@ enum {
     COMMAND_STAT
 };
 static guint const l_clock_tick = 0U;
+static guint const l_button     = 1U;
 #endif
 
 
@@ -111,6 +112,7 @@ void BSP_init(gint argc, gchar *argv[])
     Q_ALLEGE(gpioSetMode(pinTLPedgreen, PI_OUTPUT) == 0);
 #endif
     QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_button); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
 }
 /*..........................................................................*/
@@ -162,19 +164,13 @@ void BSP_setPedLed(guint16 status)
 #endif
 }
 /*..........................................................................*/
-#if 0
-guint16 BSP_getButton(void)
+// called when button PEDESTRIAN is clicked
+void BSP_publishBtnEvt(void)
 {
-    guint16 button;
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-    button = guiGetButton();
-#if defined RASPI
-    button = (button || (!gpioRead(pinUsrButton)));
-#endif
-
-    return button;
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
-#endif
 
 /* QF callbacks ============================================================*/
 /*..........................................................................*/

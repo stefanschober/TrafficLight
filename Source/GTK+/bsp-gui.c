@@ -81,10 +81,7 @@ typedef struct {
 #define APP_ARGS(o) ((appArgs_t *)(o))
 
 #ifdef Q_SPY
-enum {
-    TL_STAT = QS_USER
-};
-static uint8_t const l_clock_tick = 0U;
+static uint8_t const l_button = 0U;
 #endif
 
 
@@ -317,19 +314,11 @@ static void appThread(GTask *task, gpointer source_object, gpointer task_data, G
     g_task_return_int(task, result);
 }
 
-// called when button PEDESTRIAN is clicked
-static void publishBtnEvt(void)
-{
-	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
-
-    QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
-}
-
 static void on_btn_ped_clicked(void)
 {
     g_mutex_lock(&myMutex);
     rndCountDown = 120;
-    publishBtnEvt();
+    BSP_publishBtnEvt();
     g_mutex_unlock(&myMutex);
 }
 
@@ -406,7 +395,7 @@ static gboolean count_handler(GtkWidget *widget)
     else
     {
         rndCountDown = g_rand_int_range(myRnd, 30, 120);
-        publishBtnEvt();
+        BSP_publishBtnEvt();
     }
     g_mutex_unlock(&myMutex);
 

@@ -53,6 +53,7 @@ static struct termios l_tsav; /* structure with saved terminal attributes */
         TL_STAT = QS_USER
     };
     static uint8_t const l_clock_tick = 0U;
+    static uint8_t const l_button     = 1U;
 #endif
 
 /* QF callbacks ============================================================*/
@@ -514,6 +515,7 @@ void BSP_init(int argc, char **argv) {
 
     Q_ALLEGE(QS_INIT((argc > 1) ? argv[1] : ""));
     QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_button); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
 
     /* setup the QS filters... */
@@ -554,16 +556,12 @@ void BSP_setPedLed(uint16_t status)
     (void)status;
 }
 /*..........................................................................*/
-#if 0
-uint16_t BSP_getButton(void)
+// called when button PEDESTRIAN is clicked
+void BSP_publishBtnEvt(void)
 {
-    uint16_t retCode;
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-    retCode = keyPressed;
-    keyPressed = 0;
-
-    return retCode;
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
-#endif
 /*--------------------------------------------------------------------------*/
 

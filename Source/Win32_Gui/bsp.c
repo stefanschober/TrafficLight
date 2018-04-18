@@ -88,7 +88,8 @@ static const DWORD timeDisplayBmp[] = {
         COMMAND_STAT
     };
     static SOCKET l_sock = INVALID_SOCKET;
-    static uint8_t const l_clock_tick = 0U;
+    static uint8_t const l_clock_tick = 0x00U;
+    static uint8_t const l_button     = 0x01U;
 #endif
 
 /* Local functions ---------------------------------------------------------*/
@@ -312,6 +313,7 @@ void BSP_init(int argc, char *argv[]) {
     }
 #endif
     QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_button); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
 }
@@ -367,6 +369,14 @@ void BSP_setlight(eTLidentity_t id, eTLlight_t light)
 void BSP_setPedLed(uint16_t status)
 {
     SegmentDisplay_setSegment(&l_pedLed, 0U, status ? 1 : 0);
+}
+/*..........................................................................*/
+// called when button PEDESTRIAN is clicked
+void BSP_publishBtnEvt(void)
+{
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
 /*..........................................................................*/
 #if 0

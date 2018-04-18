@@ -48,6 +48,7 @@ Q_DEFINE_THIS_FILE
     };
     static uint8_t l_running;
     static uint8_t const l_clock_tick = 0U;
+    static uint8_t const l_button     = 1U;
 #endif
 
 // static uint8_t keyPressed = 0;
@@ -63,7 +64,6 @@ void QF_onCleanup(void) {
 /*..........................................................................*/
 void QF_onClockTick(void) {
     // static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
-    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
     // QF_TICK_X(0U, &l_clock_tick); /* perform the QF clock tick processing */
     QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
@@ -75,13 +75,15 @@ void QF_onClockTick(void) {
         switch (ch)
         {
             case '\33':        // ESC key pressed
+            case 'q':		   // q pressec
+            case 'Q':		   // Q pressed
                 BSP_terminate(0);
                 break;
             case 'p':
             case 'P':
                 // keyPressed = 1;
 				printf("Pedestrian button pressed...\n");
-            	QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
+				BSP_publishBtnEvt(); /* publish to all subscribers */
                 break;
             default:
                 break;
@@ -107,6 +109,7 @@ void BSP_init(int argc, char *argv[]) {
 
     Q_ALLEGE(QS_INIT((argc > 1) ? argv[1] : ""));
     QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_button); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
 }
 /*..........................................................................*/
@@ -141,17 +144,13 @@ void BSP_setPedLed(uint16_t status)
     (void)status;
 }
 /*..........................................................................*/
-#if 0
-uint16_t BSP_getButton(void)
+// called when button PEDESTRIAN is clicked
+void BSP_publishBtnEvt(void)
 {
-    uint16_t retCode;
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-    retCode = keyPressed;
-    keyPressed = 0;
-
-    return retCode;
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
-#endif
 
 /*--------------------------------------------------------------------------*/
 #ifdef Q_SPY /* define QS callbacks */

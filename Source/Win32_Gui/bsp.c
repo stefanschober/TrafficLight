@@ -187,8 +187,6 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 
         /* commands from regular buttons and menus... */
         case WM_COMMAND: {
-            static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
-
             SetFocus(hWnd);
             switch (wParam) {
                 case IDOK:
@@ -199,8 +197,30 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                     PostQuitMessage(0);
                     break;
                 case IDC_PED_BTN:
-                    QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
-                    // keyPressed = 1;
+                	BSP_publishBtnEvt(); /* publish to all subscribers */
+                    break;
+                case IDC_EMRG_BTN:
+                	{
+                		static enum {
+                			SetEm = 0,
+							RelEm
+                		} state = SetEm;
+						BSP_publishEmergencyEvt(); /* publish to all subscribers */
+						switch (state)
+						{
+							case RelEm:
+								state = SetEm;
+								SetDlgItemText(hWnd, IDC_EMRG_BTN, "Emergency");
+								break;
+							case SetEm:
+								state = RelEm;
+								SetDlgItemText(hWnd, IDC_EMRG_BTN, "Release");
+								break;
+							default:
+								break;
+						}
+
+                	}
                     break;
                 default:
                     break;
@@ -377,6 +397,14 @@ void BSP_publishBtnEvt(void)
 	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
     QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+}
+// called when button EMERGENCY is clicked
+void BSP_publishEmergencyEvt(void)
+{
+	static QEvt emergencyEvt = { EM_RELEASE_SIG, 0U, 0U };
+
+    emergencyEvt.sig = ((emergencyEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
+    QF_PUBLISH(&emergencyEvt, &l_button); /* publish to all subscribers */
 }
 /*..........................................................................*/
 #if 0

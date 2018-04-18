@@ -45,6 +45,12 @@ static void TLtraffic_setLight(TLtraffic * const me, eTLlight_t light);
 
 /* protected: */
 static QState TLtraffic_initial(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RUN(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RED_1(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RED_2(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_RED_4(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_GREEN(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_GREEN_1(TLtraffic * const me, QEvt const * const e);
@@ -53,11 +59,7 @@ static QState TLtraffic_GREEN_3(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_YELLOW(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_YELLOW_1(TLtraffic * const me, QEvt const * const e);
 static QState TLtraffic_YELLOW_2(TLtraffic * const me, QEvt const * const e);
-static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e);
-static QState TLtraffic_RED_1(TLtraffic * const me, QEvt const * const e);
-static QState TLtraffic_RED_2(TLtraffic * const me, QEvt const * const e);
-static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e);
-static QState TLtraffic_RED_4(TLtraffic * const me, QEvt const * const e);
+static QState TLtraffic_EMERGENCY(TLtraffic * const me, QEvt const * const e);
 /*$enddecl${AOs::TLtraffic} ################################################*/
 
 /* Local objects -----------------------------------------------------------*/
@@ -103,6 +105,8 @@ static void TLtraffic_setLight(TLtraffic * const me, eTLlight_t light) {
 static QState TLtraffic_initial(TLtraffic * const me, QEvt const * const e) {
     /*${AOs::TLtraffic::SM::initial} */
     QS_FUN_DICTIONARY(TLtraffic_initial);
+    QS_FUN_DICTIONARY(TLtraffic_RUN);
+    QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
     QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
     QS_FUN_DICTIONARY(TLtraffic_GREEN);
     QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
@@ -120,84 +124,216 @@ static QState TLtraffic_initial(TLtraffic * const me, QEvt const * const e) {
     QActive_subscribe((QActive *)me, PL_IS_RED_SIG);
     QActive_subscribe((QActive *)me, STARTNEWCYCLE_SIG);
     QActive_subscribe((QActive *)me, PEDREQUEST_SIG);
-    return Q_TRAN(&TLtraffic_INIT_TL);
+    QActive_subscribe((QActive *)me, EMERGENCY_SIG);
+    QActive_subscribe((QActive *)me, EM_RELEASE_SIG);
+    return Q_TRAN(&TLtraffic_RUN);
 }
-/*${AOs::TLtraffic::SM::INIT_TL} ...........................................*/
-static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e) {
+/*${AOs::TLtraffic::SM::RUN} ...............................................*/
+static QState TLtraffic_RUN(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::INIT_TL} */
+        /*${AOs::TLtraffic::SM::RUN::initial} */
+        case Q_INIT_SIG: {
+            startTimeout(T_5sec); // was 10sec
+            status_ = Q_TRAN(&TLtraffic_INIT_TL);
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RUN::EMERGENCY} */
+        case EMERGENCY_SIG: {
+            status_ = Q_TRAN(&TLtraffic_EMERGENCY);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&QHsm_top);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RUN::RED} ..........................................*/
+static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RUN::RED} */
         case Q_ENTRY_SIG: {
             TLtraffic_setLight(me, RED);
-            startTimeout(T_2sec); // was 10sec
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLtraffic::SM::INIT_TL::TIMEOUT} */
+        /*${AOs::TLtraffic::SM::RUN::RED::initial} */
+        case Q_INIT_SIG: {
+            sendMessage(TL_IS_RED_SIG);
+            status_ = Q_TRAN(&TLtraffic_RED_1);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLtraffic_RUN);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RUN::RED::RED_1} ...................................*/
+static QState TLtraffic_RED_1(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_1::PEDREQUEST} */
+        case PEDREQUEST_SIG: {
+            sendMessage(TL_IS_RED_SIG);
+            status_ = Q_TRAN(&TLtraffic_RED_2);
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_1::STARTNEWCYCLE} */
+        case STARTNEWCYCLE_SIG: {
+            status_ = Q_TRAN(&TLtraffic_RED_3);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLtraffic_RED);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RUN::RED::RED_2} ...................................*/
+static QState TLtraffic_RED_2(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_2::PL_IS_RED} */
+        case PL_IS_RED_SIG: {
+            status_ = Q_TRAN(&TLtraffic_RED_1);
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_2::STARTNEWCYCLE} */
+        case STARTNEWCYCLE_SIG: {
+            status_ = Q_TRAN(&TLtraffic_RED_4);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLtraffic_RED);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RUN::RED::RED_3} ...................................*/
+static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_3} */
+        case Q_ENTRY_SIG: {
+            startTimeout(T_2sec);
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_3::TIMEOUT} */
         case TIMEOUT_SIG: {
-            /*${AOs::TLtraffic::SM::INIT_TL::TIMEOUT::[(0==TL_ID(me))]} */
+            status_ = Q_TRAN(&TLtraffic_GREEN);
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_3::PEDREQUEST} */
+        case PEDREQUEST_SIG: {
+            sendMessage(TL_IS_RED_SIG);
+            status_ = Q_TRAN(&TLtraffic_RED_4);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLtraffic_RED);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RUN::RED::RED_4} ...................................*/
+static QState TLtraffic_RED_4(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RUN::RED::RED_4::PL_IS_RED} */
+        case PL_IS_RED_SIG: {
+            status_ = Q_TRAN(&TLtraffic_RED_3);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLtraffic_RED);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLtraffic::SM::RUN::INIT_TL} ......................................*/
+static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLtraffic::SM::RUN::INIT_TL} */
+        case Q_ENTRY_SIG: {
+            TLtraffic_setLight(me, RED);
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT} */
+        case TIMEOUT_SIG: {
+            /*${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[(0==TL_ID(me))]} */
             if (( 0 ==TL_ID(me) )) {
-                sendMessage(GLOBAL_START_SIG);
                 status_ = Q_TRAN(&TLtraffic_GREEN);
             }
-            /*${AOs::TLtraffic::SM::INIT_TL::TIMEOUT::[else]} */
+            /*${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[else]} */
             else {
                 status_ = Q_TRAN(&TLtraffic_RED);
             }
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLtraffic_RUN);
             break;
         }
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::GREEN} .............................................*/
+/*${AOs::TLtraffic::SM::RUN::GREEN} ........................................*/
 static QState TLtraffic_GREEN(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::GREEN} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN} */
         case Q_ENTRY_SIG: {
+            sendMessage(GLOBAL_START_SIG);
             TLtraffic_setLight(me, GREEN);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLtraffic::SM::GREEN::initial} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN::initial} */
         case Q_INIT_SIG: {
             status_ = Q_TRAN(&TLtraffic_GREEN_1);
             break;
         }
-        /*${AOs::TLtraffic::SM::GREEN::TIMEOUT,PEDREQUEST} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN::TIMEOUT,PEDREQUEST} */
         case TIMEOUT_SIG: /* intentionally fall through */
         case PEDREQUEST_SIG: {
             status_ = Q_TRAN(&TLtraffic_YELLOW);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLtraffic_RUN);
             break;
         }
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::GREEN::GREEN_1} ....................................*/
+/*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_1} ...............................*/
 static QState TLtraffic_GREEN_1(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::GREEN::GREEN_1} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_1} */
         case Q_ENTRY_SIG: {
             startTimeout(T_5sec); // was 10s
-            sendMessage(GLOBAL_START_SIG);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLtraffic::SM::GREEN::GREEN_1::TIMEOUT} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_1::TIMEOUT} */
         case TIMEOUT_SIG: {
             status_ = Q_TRAN(&TLtraffic_GREEN_2);
             break;
         }
-        /*${AOs::TLtraffic::SM::GREEN::GREEN_1::PEDREQUEST} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_1::PEDREQUEST} */
         case PEDREQUEST_SIG: {
             status_ = Q_TRAN(&TLtraffic_GREEN_3);
             break;
@@ -209,11 +345,11 @@ static QState TLtraffic_GREEN_1(TLtraffic * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::GREEN::GREEN_2} ....................................*/
+/*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_2} ...............................*/
 static QState TLtraffic_GREEN_2(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::GREEN::GREEN_2} */
+        /*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_2} */
         case Q_ENTRY_SIG: {
             startTimeout(T_5sec); // was 20s
             status_ = Q_HANDLED();
@@ -226,7 +362,7 @@ static QState TLtraffic_GREEN_2(TLtraffic * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::GREEN::GREEN_3} ....................................*/
+/*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_3} ...............................*/
 static QState TLtraffic_GREEN_3(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
@@ -237,34 +373,34 @@ static QState TLtraffic_GREEN_3(TLtraffic * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::YELLOW} ............................................*/
+/*${AOs::TLtraffic::SM::RUN::YELLOW} .......................................*/
 static QState TLtraffic_YELLOW(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::YELLOW} */
+        /*${AOs::TLtraffic::SM::RUN::YELLOW} */
         case Q_ENTRY_SIG: {
             TLtraffic_setLight(me, YELLOW);
             startTimeout(T_2sec); // was 5s
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLtraffic::SM::YELLOW::initial} */
+        /*${AOs::TLtraffic::SM::RUN::YELLOW::initial} */
         case Q_INIT_SIG: {
             status_ = Q_TRAN(&TLtraffic_YELLOW_1);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLtraffic_RUN);
             break;
         }
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::YELLOW::YELLOW_1} ..................................*/
+/*${AOs::TLtraffic::SM::RUN::YELLOW::YELLOW_1} .............................*/
 static QState TLtraffic_YELLOW_1(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::YELLOW::YELLOW_1::TIMEOUT} */
+        /*${AOs::TLtraffic::SM::RUN::YELLOW::YELLOW_1::TIMEOUT} */
         case TIMEOUT_SIG: {
             sendMessage(STARTNEWCYCLE_SIG);
             status_ = Q_TRAN(&TLtraffic_YELLOW_2);
@@ -277,11 +413,11 @@ static QState TLtraffic_YELLOW_1(TLtraffic * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::YELLOW::YELLOW_2} ..................................*/
+/*${AOs::TLtraffic::SM::RUN::YELLOW::YELLOW_2} .............................*/
 static QState TLtraffic_YELLOW_2(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::YELLOW::YELLOW_2::STARTNEWCYCLE} */
+        /*${AOs::TLtraffic::SM::RUN::YELLOW::YELLOW_2::STARTNEWCYCLE} */
         case STARTNEWCYCLE_SIG: {
             status_ = Q_TRAN(&TLtraffic_RED);
             break;
@@ -293,126 +429,26 @@ static QState TLtraffic_YELLOW_2(TLtraffic * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLtraffic::SM::RED} ...............................................*/
-static QState TLtraffic_RED(TLtraffic * const me, QEvt const * const e) {
+/*${AOs::TLtraffic::SM::RUN::EMERGENCY} ....................................*/
+static QState TLtraffic_EMERGENCY(TLtraffic * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLtraffic::SM::RED} */
+        /*${AOs::TLtraffic::SM::RUN::EMERGENCY} */
         case Q_ENTRY_SIG: {
             TLtraffic_setLight(me, RED);
+            startTimeout(T_30sec); // was 10sec
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLtraffic::SM::RED::initial} */
-        case Q_INIT_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_1);
+        /*${AOs::TLtraffic::SM::RUN::EMERGENCY::TIMEOUT,EM_RELEASE} */
+        case TIMEOUT_SIG: /* intentionally fall through */
+        case EM_RELEASE_SIG: {
+            startTimeout(T_500ms); // was 10sec
+            status_ = Q_TRAN(&TLtraffic_INIT_TL);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
-            break;
-        }
-    }
-    return status_;
-}
-/*${AOs::TLtraffic::SM::RED::RED_1} ........................................*/
-static QState TLtraffic_RED_1(TLtraffic * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${AOs::TLtraffic::SM::RED::RED_1} */
-        case Q_ENTRY_SIG: {
-            sendMessage(TL_IS_RED_SIG);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_1::PEDREQUEST} */
-        case PEDREQUEST_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_2);
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_1::STARTNEWCYCLE} */
-        case STARTNEWCYCLE_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_3);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&TLtraffic_RED);
-            break;
-        }
-    }
-    return status_;
-}
-/*${AOs::TLtraffic::SM::RED::RED_2} ........................................*/
-static QState TLtraffic_RED_2(TLtraffic * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${AOs::TLtraffic::SM::RED::RED_2} */
-        case Q_ENTRY_SIG: {
-            sendMessage(TL_IS_RED_SIG);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_2::PL_IS_RED} */
-        case PL_IS_RED_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_1);
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_2::STARTNEWCYCLE} */
-        case STARTNEWCYCLE_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_4);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&TLtraffic_RED);
-            break;
-        }
-    }
-    return status_;
-}
-/*${AOs::TLtraffic::SM::RED::RED_3} ........................................*/
-static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${AOs::TLtraffic::SM::RED::RED_3} */
-        case Q_ENTRY_SIG: {
-            startTimeout(T_2sec);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_3::TIMEOUT} */
-        case TIMEOUT_SIG: {
-            status_ = Q_TRAN(&TLtraffic_GREEN);
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_3::PEDREQUEST} */
-        case PEDREQUEST_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_4);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&TLtraffic_RED);
-            break;
-        }
-    }
-    return status_;
-}
-/*${AOs::TLtraffic::SM::RED::RED_4} ........................................*/
-static QState TLtraffic_RED_4(TLtraffic * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${AOs::TLtraffic::SM::RED::RED_4} */
-        case Q_ENTRY_SIG: {
-            sendMessage(TL_IS_RED_SIG);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLtraffic::SM::RED::RED_4::PL_IS_RED} */
-        case PL_IS_RED_SIG: {
-            status_ = Q_TRAN(&TLtraffic_RED_3);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&TLtraffic_RED);
+            status_ = Q_SUPER(&TLtraffic_RUN);
             break;
         }
     }

@@ -79,6 +79,8 @@ int main(int argc, char *argv[])
     QS_SIG_DICTIONARY(START_BLINK_SIG, (void *)0);
     QS_SIG_DICTIONARY(STOP_BLINK_SIG, (void *)0);
     QS_SIG_DICTIONARY(OFF_BLINK_SIG, (void *)0);
+    QS_SIG_DICTIONARY(EMERGENCY_SIG, (void *)0);
+    QS_SIG_DICTIONARY(EM_RELEASE_SIG, (void *)0);
     QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);
 
     /* initialize publish-subscribe... */

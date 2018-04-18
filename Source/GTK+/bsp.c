@@ -171,6 +171,14 @@ void BSP_publishBtnEvt(void)
 
     QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
+// called when button EMERGENCY is clicked
+void BSP_publishEmergencyEvt(void)
+{
+	static QEvt emergencyEvt = { EM_RELEASE_SIG, 0U, 0U };
+
+    emergencyEvt.sig = ((emergencyEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
+    QF_PUBLISH(&emergencyEvt, &l_button); /* publish to all subscribers */
+}
 
 /* QF callbacks ============================================================*/
 /*..........................................................................*/

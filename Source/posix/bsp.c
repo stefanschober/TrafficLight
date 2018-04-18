@@ -75,7 +75,6 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
     struct timeval timeout = { 0, 0 };  /* timeout for select() */
     fd_set con; /* FD set representing the console */
 
@@ -99,8 +98,12 @@ void QF_onClockTick(void) {
 			case 'P':
 			case 'p':
 				printf("Pedestrian button pressed...\n");
-				QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
-                // keyPressed = 1;
+				BSP_publishBtnEvt();
+                break;
+			case 'e':
+			case 'E':
+				printf("EMERGENCY button pressed...\n");
+				BSP_publishEmergencyEvt();
                 break;
 			default:
 				break;
@@ -561,6 +564,14 @@ void BSP_publishBtnEvt(void)
 {
 	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+}
+
+void BSP_publishEmergencyEvt(void)
+{
+	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
+
+    buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
     QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
 /*--------------------------------------------------------------------------*/

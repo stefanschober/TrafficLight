@@ -46,12 +46,13 @@ static void TLblinker_setLed(TLblinker * const me, uint16_t ledStatus);
 
 /* protected: */
 static QState TLblinker_initial(TLblinker * const me, QEvt const * const e);
+static QState TLblinker_RUN(TLblinker * const me, QEvt const * const e);
+static QState TLblinker_INIT(TLblinker * const me, QEvt const * const e);
 static QState TLblinker_INACTIVE(TLblinker * const me, QEvt const * const e);
 static QState TLblinker_ACTIVE(TLblinker * const me, QEvt const * const e);
 static QState TLblinker_OFF(TLblinker * const me, QEvt const * const e);
 static QState TLblinker_ON(TLblinker * const me, QEvt const * const e);
 static QState TLblinker_SHUTDOWN(TLblinker * const me, QEvt const * const e);
-static QState TLblinker_INIT(TLblinker * const me, QEvt const * const e);
 /*$enddecl${AOs::TLblinker} ################################################*/
 
 /* Local objects -----------------------------------------------------------*/
@@ -86,6 +87,7 @@ static void TLblinker_setLed(TLblinker * const me, uint16_t ledStatus) {
 static QState TLblinker_initial(TLblinker * const me, QEvt const * const e) {
     /*${AOs::TLblinker::SM::initial} */
     QS_FUN_DICTIONARY(TLblinker_initial);
+    QS_FUN_DICTIONARY(TLblinker_RUN);
     QS_FUN_DICTIONARY(TLblinker_INIT);
     QS_FUN_DICTIONARY(TLblinker_INACTIVE);
     QS_FUN_DICTIONARY(TLblinker_ACTIVE);
@@ -97,54 +99,21 @@ static QState TLblinker_initial(TLblinker * const me, QEvt const * const e) {
     QActive_subscribe((QActive *)me, STOP_BLINK_SIG);
     QActive_subscribe((QActive *)me, OFF_BLINK_SIG);
     QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
-    return Q_TRAN(&TLblinker_INIT);
+    QActive_subscribe((QActive *)me, EMERGENCY_SIG);
+    return Q_TRAN(&TLblinker_RUN);
 }
-/*${AOs::TLblinker::SM::INACTIVE} ..........................................*/
-static QState TLblinker_INACTIVE(TLblinker * const me, QEvt const * const e) {
+/*${AOs::TLblinker::SM::RUN} ...............................................*/
+static QState TLblinker_RUN(TLblinker * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLblinker::SM::INACTIVE} */
-        case Q_ENTRY_SIG: {
-            setLEDon();
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLblinker::SM::INACTIVE::START_BLINK} */
-        case START_BLINK_SIG: {
-            status_ = Q_TRAN(&TLblinker_ACTIVE);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&QHsm_top);
-            break;
-        }
-    }
-    return status_;
-}
-/*${AOs::TLblinker::SM::ACTIVE} ............................................*/
-static QState TLblinker_ACTIVE(TLblinker * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${AOs::TLblinker::SM::ACTIVE} */
-        case Q_ENTRY_SIG: {
-            QTimeEvt_armX(&me->timeEvt, T_250ms, T_250ms);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLblinker::SM::ACTIVE} */
-        case Q_EXIT_SIG: {
-            QTimeEvt_disarm(&me->timeEvt);
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLblinker::SM::ACTIVE::initial} */
+        /*${AOs::TLblinker::SM::RUN::initial} */
         case Q_INIT_SIG: {
-            status_ = Q_TRAN(&TLblinker_OFF);
+            status_ = Q_TRAN(&TLblinker_INIT);
             break;
         }
-        /*${AOs::TLblinker::SM::ACTIVE::STOP_BLINK} */
-        case STOP_BLINK_SIG: {
-            status_ = Q_TRAN(&TLblinker_SHUTDOWN);
+        /*${AOs::TLblinker::SM::RUN::EMERGENCY} */
+        case EMERGENCY_SIG: {
+            status_ = Q_TRAN(&TLblinker_INIT);
             break;
         }
         default: {
@@ -154,17 +123,94 @@ static QState TLblinker_ACTIVE(TLblinker * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLblinker::SM::ACTIVE::OFF} .......................................*/
-static QState TLblinker_OFF(TLblinker * const me, QEvt const * const e) {
+/*${AOs::TLblinker::SM::RUN::INIT} .........................................*/
+static QState TLblinker_INIT(TLblinker * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLblinker::SM::ACTIVE::OFF} */
+        /*${AOs::TLblinker::SM::RUN::INIT} */
         case Q_ENTRY_SIG: {
             setLEDoff();
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLblinker::SM::ACTIVE::OFF::TIMEOUT} */
+        /*${AOs::TLblinker::SM::RUN::INIT::GLOBAL_START} */
+        case GLOBAL_START_SIG: {
+            status_ = Q_TRAN(&TLblinker_INACTIVE);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLblinker_RUN);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLblinker::SM::RUN::INACTIVE} .....................................*/
+static QState TLblinker_INACTIVE(TLblinker * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLblinker::SM::RUN::INACTIVE} */
+        case Q_ENTRY_SIG: {
+            setLEDon();
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLblinker::SM::RUN::INACTIVE::START_BLINK} */
+        case START_BLINK_SIG: {
+            status_ = Q_TRAN(&TLblinker_ACTIVE);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLblinker_RUN);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLblinker::SM::RUN::ACTIVE} .......................................*/
+static QState TLblinker_ACTIVE(TLblinker * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLblinker::SM::RUN::ACTIVE} */
+        case Q_ENTRY_SIG: {
+            QTimeEvt_armX(&me->timeEvt, T_250ms, T_250ms);
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLblinker::SM::RUN::ACTIVE} */
+        case Q_EXIT_SIG: {
+            QTimeEvt_disarm(&me->timeEvt);
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLblinker::SM::RUN::ACTIVE::initial} */
+        case Q_INIT_SIG: {
+            status_ = Q_TRAN(&TLblinker_OFF);
+            break;
+        }
+        /*${AOs::TLblinker::SM::RUN::ACTIVE::STOP_BLINK} */
+        case STOP_BLINK_SIG: {
+            status_ = Q_TRAN(&TLblinker_SHUTDOWN);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&TLblinker_RUN);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLblinker::SM::RUN::ACTIVE::OFF} ..................................*/
+static QState TLblinker_OFF(TLblinker * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLblinker::SM::RUN::ACTIVE::OFF} */
+        case Q_ENTRY_SIG: {
+            setLEDoff();
+            status_ = Q_HANDLED();
+            break;
+        }
+        /*${AOs::TLblinker::SM::RUN::ACTIVE::OFF::TIMEOUT} */
         case TIMEOUT_SIG: {
             status_ = Q_TRAN(&TLblinker_ON);
             break;
@@ -176,17 +222,17 @@ static QState TLblinker_OFF(TLblinker * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLblinker::SM::ACTIVE::ON} ........................................*/
+/*${AOs::TLblinker::SM::RUN::ACTIVE::ON} ...................................*/
 static QState TLblinker_ON(TLblinker * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLblinker::SM::ACTIVE::ON} */
+        /*${AOs::TLblinker::SM::RUN::ACTIVE::ON} */
         case Q_ENTRY_SIG: {
             setLEDon();
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLblinker::SM::ACTIVE::ON::TIMEOUT} */
+        /*${AOs::TLblinker::SM::RUN::ACTIVE::ON::TIMEOUT} */
         case TIMEOUT_SIG: {
             status_ = Q_TRAN(&TLblinker_OFF);
             break;
@@ -198,45 +244,23 @@ static QState TLblinker_ON(TLblinker * const me, QEvt const * const e) {
     }
     return status_;
 }
-/*${AOs::TLblinker::SM::SHUTDOWN} ..........................................*/
+/*${AOs::TLblinker::SM::RUN::SHUTDOWN} .....................................*/
 static QState TLblinker_SHUTDOWN(TLblinker * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLblinker::SM::SHUTDOWN} */
+        /*${AOs::TLblinker::SM::RUN::SHUTDOWN} */
         case Q_ENTRY_SIG: {
             setLEDoff();
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLblinker::SM::SHUTDOWN::OFF_BLINK} */
+        /*${AOs::TLblinker::SM::RUN::SHUTDOWN::OFF_BLINK} */
         case OFF_BLINK_SIG: {
             status_ = Q_TRAN(&TLblinker_INACTIVE);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
-            break;
-        }
-    }
-    return status_;
-}
-/*${AOs::TLblinker::SM::INIT} ..............................................*/
-static QState TLblinker_INIT(TLblinker * const me, QEvt const * const e) {
-    QState status_;
-    switch (e->sig) {
-        /*${AOs::TLblinker::SM::INIT} */
-        case Q_ENTRY_SIG: {
-            setLEDoff();
-            status_ = Q_HANDLED();
-            break;
-        }
-        /*${AOs::TLblinker::SM::INIT::GLOBAL_START} */
-        case GLOBAL_START_SIG: {
-            status_ = Q_TRAN(&TLblinker_INACTIVE);
-            break;
-        }
-        default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLblinker_RUN);
             break;
         }
     }

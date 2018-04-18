@@ -32,7 +32,8 @@
 #define IDC_TL_B                                5001
 #define IDC_TL_PED                              5002
 #define IDC_PED_BTN                             5003
-#define IDC_LED_PED                             5004
+#define IDC_EMRG_BTN                            5004
+#define IDC_LED_PED                             5005
 #define IDC_DIGIT3                              40000
 #define IDC_DIGIT2                              40001
 #define IDC_DIGIT1                              40002

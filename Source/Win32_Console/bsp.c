@@ -85,6 +85,12 @@ void QF_onClockTick(void) {
 				printf("Pedestrian button pressed...\n");
 				BSP_publishBtnEvt(); /* publish to all subscribers */
                 break;
+            case 'e':
+            case 'E':
+                // keyPressed = 1;
+				printf("EMERGENCY button pressed...\n");
+				BSP_publishEmergencyEvt(); /* publish to all subscribers */
+                break;
             default:
                 break;
         }
@@ -149,6 +155,14 @@ void BSP_publishBtnEvt(void)
 {
 	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+}
+
+void BSP_publishEmergencyEvt(void)
+{
+	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
+
+    buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
     QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
 

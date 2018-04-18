@@ -30,6 +30,8 @@ enum TLSignals {
     START_BLINK_SIG,
     STOP_BLINK_SIG,
     OFF_BLINK_SIG,
+    EMERGENCY_SIG,
+    EM_RELEASE_SIG,
     MAX_PUBLISH_SIG,
     TIMEOUT_SIG,                /* used for time events */
     MAX_SIG                     /* the last signal */
@@ -61,6 +63,8 @@ enum TLlight {
 #define T_50ms    _TIMETICKms_(50u)
 #define T_100ms   _TIMETICKms_(100u)
 #define T_250ms   _TIMETICKms_(250u)
+#define T_500ms   _TIMETICKms_(500u)
+#define T_1sec    _TIMETICKms_(1000u)
 #define T_2sec    _TIMETICK_(2u)
 #define T_5sec    _TIMETICK_(5u)
 #define T_10sec   _TIMETICK_(10u)

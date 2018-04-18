@@ -14,6 +14,8 @@ BSP_setlight(me-&gt;identity, me-&gt;light);</code>
    <statechart>
     <initial target="../1">
      <action>QS_FUN_DICTIONARY(TLtraffic_initial);
+QS_FUN_DICTIONARY(TLtraffic_RUN);
+QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
 QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
 QS_FUN_DICTIONARY(TLtraffic_GREEN);
 QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
@@ -30,178 +32,199 @@ QS_FUN_DICTIONARY(TLtraffic_RED_4);
 
 QActive_subscribe((QActive *)me, PL_IS_RED_SIG);
 QActive_subscribe((QActive *)me, STARTNEWCYCLE_SIG);
-QActive_subscribe((QActive *)me, PEDREQUEST_SIG);</action>
-     <initial_glyph conn="12,12,4,0,10">
+QActive_subscribe((QActive *)me, PEDREQUEST_SIG);
+QActive_subscribe((QActive *)me, EMERGENCY_SIG);
+QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
+     <initial_glyph conn="30,4,5,0,32,6">
       <action box="0,-2,10,2"/>
      </initial_glyph>
     </initial>
-    <state name="INIT_TL">
-     <entry>TLtraffic_setLight(me, RED);
-startTimeout(T_2sec); // was 10sec</entry>
-     <tran trig="TIMEOUT">
-      <choice target="../../../4">
-       <guard>else</guard>
-       <choice_glyph conn="34,28,5,3,24">
-        <action box="2,-2,10,2"/>
-       </choice_glyph>
-      </choice>
-      <choice target="../../../2">
-       <guard>( 0 ==TL_ID(me) )</guard>
-       <action>sendMessage(GLOBAL_START_SIG);</action>
-       <choice_glyph conn="34,28,4,3,35,9">
-        <action box="1,9,10,2"/>
-       </choice_glyph>
-      </choice>
-      <tran_glyph conn="22,28,1,-1,12">
-       <action box="0,-2,10,2"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="2,22,20,14">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="GREEN">
-     <entry>TLtraffic_setLight(me, GREEN);</entry>
-     <initial target="../2">
-      <initial_glyph conn="46,54,4,3,5,2">
+    <state name="RUN">
+     <initial target="../3">
+      <action>startTimeout(T_5sec); // was 10sec</action>
+      <initial_glyph conn="16,24,4,0,10">
        <action box="0,-2,10,2"/>
       </initial_glyph>
      </initial>
-     <tran trig="TIMEOUT,PEDREQUEST" target="../../3">
-      <tran_glyph conn="89,71,1,3,12">
+     <tran trig="EMERGENCY" target="../6">
+      <tran_glyph conn="16,96,2,2,-16">
        <action box="0,-2,10,2"/>
       </tran_glyph>
      </tran>
-     <state name="GREEN_1">
-      <entry>startTimeout(T_5sec); // was 10s
-sendMessage(GLOBAL_START_SIG);</entry>
-      <tran trig="TIMEOUT" target="../../3">
-       <tran_glyph conn="65,58,1,3,5">
-        <action box="0,0,10,2"/>
-       </tran_glyph>
-      </tran>
-      <tran trig="PEDREQUEST" target="../../4">
-       <tran_glyph conn="56,63,2,0,4">
+     <state name="RED">
+      <entry>TLtraffic_setLight(me, RED);</entry>
+      <initial target="../1">
+       <action>sendMessage(TL_IS_RED_SIG);</action>
+       <initial_glyph conn="60,20,4,3,8,5">
+        <action box="0,-2,10,2"/>
+       </initial_glyph>
+      </initial>
+      <state name="RED_1">
+       <tran trig="PEDREQUEST" target="../../2">
+        <action>sendMessage(TL_IS_RED_SIG);</action>
+        <tran_glyph conn="83,24,1,3,15">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <tran trig="STARTNEWCYCLE" target="../../3">
+        <tran_glyph conn="75,32,2,0,4">
+         <action box="1,1,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="65,18,18,14"/>
+      </state>
+      <state name="RED_2">
+       <tran trig="PL_IS_RED" target="../../1">
+        <tran_glyph conn="98,28,3,1,-15">
+         <action box="-9,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <tran trig="STARTNEWCYCLE" target="../../4">
+        <tran_glyph conn="108,32,2,0,4">
+         <action box="0,1,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="98,18,18,14"/>
+      </state>
+      <state name="RED_3">
+       <entry>startTimeout(T_2sec);</entry>
+       <tran trig="TIMEOUT" target="../../../4">
+        <tran_glyph conn="73,50,2,0,10">
+         <action box="-3,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <tran trig="PEDREQUEST" target="../../4">
+        <action>sendMessage(TL_IS_RED_SIG);</action>
+        <tran_glyph conn="83,46,1,3,15">
+         <action box="0,0,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="65,36,18,14">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="RED_4">
+       <tran trig="PL_IS_RED" target="../../3">
+        <tran_glyph conn="98,40,3,1,-15">
+         <action box="-9,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="98,36,18,14"/>
+      </state>
+      <state_glyph node="58,14,62,40">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
+     </state>
+     <state name="INIT_TL">
+      <entry>TLtraffic_setLight(me, RED);</entry>
+      <tran trig="TIMEOUT">
+       <choice target="../../../2">
+        <guard>else</guard>
+        <choice_glyph conn="38,40,5,3,20">
+         <action box="2,-2,10,2"/>
+        </choice_glyph>
+       </choice>
+       <choice target="../../../4">
+        <guard>( 0 ==TL_ID(me) )</guard>
+        <choice_glyph conn="38,40,4,3,35,6">
+         <action box="1,9,10,2"/>
+        </choice_glyph>
+       </choice>
+       <tran_glyph conn="26,40,1,-1,12">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="48,53,17,10">
+      <state_glyph node="6,34,20,14">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>
-     <state name="GREEN_2">
-      <entry>startTimeout(T_5sec); // was 20s</entry>
-      <state_glyph node="70,53,16,10">
+     <state name="GREEN">
+      <entry>sendMessage(GLOBAL_START_SIG);
+TLtraffic_setLight(me, GREEN);</entry>
+      <initial target="../2">
+       <initial_glyph conn="47,66,4,3,5,2">
+        <action box="0,-2,10,2"/>
+       </initial_glyph>
+      </initial>
+      <tran trig="TIMEOUT,PEDREQUEST" target="../../5">
+       <tran_glyph conn="90,83,1,3,11">
+        <action box="0,-2,10,2"/>
+       </tran_glyph>
+      </tran>
+      <state name="GREEN_1">
+       <entry>startTimeout(T_5sec); // was 10s</entry>
+       <tran trig="TIMEOUT" target="../../3">
+        <tran_glyph conn="66,70,1,3,5">
+         <action box="0,0,10,2"/>
+        </tran_glyph>
+       </tran>
+       <tran trig="PEDREQUEST" target="../../4">
+        <tran_glyph conn="57,75,2,0,4">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="49,65,17,10">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="GREEN_2">
+       <entry>startTimeout(T_5sec); // was 20s</entry>
+       <state_glyph node="71,65,16,10">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="GREEN_3">
+       <state_glyph node="49,79,16,10"/>
+      </state>
+      <state_glyph node="44,60,46,34">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>
-     <state name="GREEN_3">
-      <state_glyph node="48,67,16,10"/>
-     </state>
-     <state_glyph node="43,48,46,34">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="YELLOW">
-     <entry>TLtraffic_setLight(me, YELLOW);
+     <state name="YELLOW">
+      <entry>TLtraffic_setLight(me, YELLOW);
 startTimeout(T_2sec); // was 5s</entry>
-     <initial target="../1">
-      <initial_glyph conn="115,80,4,2,-4">
-       <action box="0,-2,10,2"/>
-      </initial_glyph>
-     </initial>
-     <state name="YELLOW_1">
-      <tran trig="TIMEOUT" target="../../2">
-       <action>sendMessage(STARTNEWCYCLE_SIG);</action>
-       <tran_glyph conn="115,68,0,2,-8">
+      <initial target="../1">
+       <initial_glyph conn="115,92,4,2,-4">
+        <action box="0,-2,10,2"/>
+       </initial_glyph>
+      </initial>
+      <state name="YELLOW_1">
+       <tran trig="TIMEOUT" target="../../2">
+        <action>sendMessage(STARTNEWCYCLE_SIG);</action>
+        <tran_glyph conn="115,80,0,2,-8">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="108,80,14,8"/>
+      </state>
+      <state name="YELLOW_2">
+       <tran trig="STARTNEWCYCLE" target="../../../2">
+        <tran_glyph conn="114,66,0,2,-12">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="108,66,14,6"/>
+      </state>
+      <state_glyph node="101,60,28,34">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
+     </state>
+     <state name="EMERGENCY">
+      <entry>TLtraffic_setLight(me, RED);
+startTimeout(T_30sec); // was 10sec</entry>
+      <tran trig="TIMEOUT,EM_RELEASE" target="../../3">
+       <action>startTimeout(T_500ms); // was 10sec</action>
+       <tran_glyph conn="16,66,0,2,-18">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="108,68,14,8"/>
+      <state_glyph node="6,66,20,14">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
      </state>
-     <state name="YELLOW_2">
-      <tran trig="STARTNEWCYCLE" target="../../../4">
-       <tran_glyph conn="114,54,0,2,-12">
-        <action box="0,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="108,54,14,6"/>
-     </state>
-     <state_glyph node="101,48,28,34">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
+     <state_glyph node="2,10,132,86"/>
     </state>
-    <state name="RED">
-     <entry>TLtraffic_setLight(me, RED);</entry>
-     <initial target="../1">
-      <initial_glyph conn="60,8,4,3,8,4">
-       <action box="0,-2,10,2"/>
-      </initial_glyph>
-     </initial>
-     <state name="RED_1">
-      <entry>sendMessage(TL_IS_RED_SIG);</entry>
-      <tran trig="PEDREQUEST" target="../../2">
-       <tran_glyph conn="82,12,1,3,16">
-        <action box="0,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <tran trig="STARTNEWCYCLE" target="../../3">
-       <tran_glyph conn="74,20,2,0,4">
-        <action box="1,1,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="64,6,18,14">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state name="RED_2">
-      <entry>sendMessage(TL_IS_RED_SIG);</entry>
-      <tran trig="PL_IS_RED" target="../../1">
-       <tran_glyph conn="98,16,3,1,-16">
-        <action box="-9,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <tran trig="STARTNEWCYCLE" target="../../4">
-       <tran_glyph conn="108,20,2,0,4">
-        <action box="0,1,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="98,6,18,14">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state name="RED_3">
-      <entry>startTimeout(T_2sec);</entry>
-      <tran trig="TIMEOUT" target="../../../2">
-       <tran_glyph conn="72,38,2,0,10">
-        <action box="-3,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <tran trig="PEDREQUEST" target="../../4">
-       <tran_glyph conn="82,34,1,3,16">
-        <action box="0,0,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="64,24,18,14">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state name="RED_4">
-      <entry>sendMessage(TL_IS_RED_SIG);</entry>
-      <tran trig="PL_IS_RED" target="../../3">
-       <tran_glyph conn="98,28,3,1,-16">
-        <action box="-9,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="98,24,18,14">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state_glyph node="58,2,62,40">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
-    </state>
-    <state_diagram size="135,115"/>
+    <state_diagram size="135,123"/>
    </statechart>
   </class>
   <class name="TLpedestrian" superclass="qpc::QActive">
@@ -221,8 +244,9 @@ QF_PUBLISH(evt, me);</code>
 BSP_setlight(PedestrianLight, me-&gt;light);</code>
    </operation>
    <statechart>
-    <initial target="../3">
+    <initial target="../1">
      <action>QS_FUN_DICTIONARY(TLpedestrian_initial);
+QS_FUN_DICTIONARY(TLpedestrian_RUN);
 QS_FUN_DICTIONARY(TLpedestrian_GREEN);
 QS_FUN_DICTIONARY(TLpedestrian_RED);
 QS_FUN_DICTIONARY(TLpedestrian_RED_1);
@@ -235,118 +259,132 @@ QS_FUN_DICTIONARY(TLpedestrian_INIT_WAIT);
 QActive_subscribe((QActive *)me, TL_IS_RED_SIG);
 QActive_subscribe((QActive *)me, BUTTON_SIG);
 QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
-
-TLpedestrian_setLight(me, RED);</action>
-     <initial_glyph conn="8,14,5,3,6">
+QActive_subscribe((QActive *)me, EMERGENCY_SIG);
+QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
+     <initial_glyph conn="16,4,5,0,16,6">
       <action box="0,-2,10,2"/>
      </initial_glyph>
     </initial>
-    <state name="GREEN">
-     <entry>TLpedestrian_setLight(me, GREEN);
-QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_5sec); // was 15s</entry>
-     <tran trig="TIMEOUT" target="../../2">
-      <action>TLpedestrian_sendMessage(me, PL_IS_RED_SIG);</action>
-      <tran_glyph conn="37,14,3,0,-3,12">
-       <action box="0,-2,10,2"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="37,10,15,8">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="RED">
-     <entry>TLpedestrian_setLight(me, RED);
-TLpedestrian_sendMessage(me, OFF_BLINK_SIG);</entry>
-     <exit>TLpedestrian_sendMessage(me, STOP_BLINK_SIG);</exit>
-     <initial target="../5">
-      <initial_glyph conn="16,34,5,3,6">
+    <state name="RUN">
+     <initial target="../4">
+      <initial_glyph conn="10,20,5,3,6">
        <action box="0,-2,10,2"/>
       </initial_glyph>
      </initial>
-     <state name="RED_3">
-      <entry>TLpedestrian_sendMessage(me, PEDREQUEST_SIG);</entry>
-      <tran trig="TL_IS_RED" target="../../4">
-       <tran_glyph conn="44,58,0,2,-6">
-        <action box="-5,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="38,58,12,8">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state name="RED_5">
-      <entry>QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_2sec);
-me-&gt;tlRedCount = 0;</entry>
-      <tran trig="TIMEOUT" target="../../../1">
-       <tran_glyph conn="44,30,0,2,-12">
-        <action box="0,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="38,30,12,8">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state name="RED_2">
-      <exit>TLpedestrian_sendMessage(me, START_BLINK_SIG);</exit>
-      <tran trig="BUTTON" target="../../1">
-       <tran_glyph conn="34,48,1,3,2,13,2">
-        <action box="-1,5,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="22,44,12,8">
-       <exit box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state name="RED_4">
-      <tran trig="TL_IS_RED" target="../../2">
-       <tran_glyph conn="44,44,0,2,-6">
-        <action box="0,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="38,44,12,8"/>
-     </state>
-     <state name="RED_1">
-      <tran trig="GLOBAL_START" target="../../3">
-       <tran_glyph conn="28,38,2,0,6">
-        <action box="-4,2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <tran trig="BUTTON" target="../../6">
-       <action>TLpedestrian_sendMessage(me, START_BLINK_SIG);</action>
-       <tran_glyph conn="22,36,3,3,-4,26,4">
-        <action box="0,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="22,30,12,8"/>
-     </state>
-     <state name="RED_6">
-      <entry>TLpedestrian_sendMessage(me, START_BLINK_SIG);</entry>
-      <tran trig="GLOBAL_START" target="../../1">
-       <tran_glyph conn="34,64,1,3,4">
-        <action box="0,-2,10,2"/>
-       </tran_glyph>
-      </tran>
-      <state_glyph node="22,58,12,8">
-       <entry box="1,2,6,2"/>
-      </state_glyph>
-     </state>
-     <state_glyph node="14,26,38,45">
-      <entry box="1,2,6,2"/>
-      <exit box="1,4,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="INIT_WAIT">
-     <entry>TLpedestrian_setLight(me, RED);</entry>
-     <tran trig="GLOBAL_START" target="../../2">
-      <tran_glyph conn="22,18,2,0,8">
-       <action box="-12,1,12,2"/>
+     <tran trig="EMERGENCY" target="../4">
+      <tran_glyph conn="24,10,0,0,6">
+       <action box="0,-2,10,2"/>
       </tran_glyph>
      </tran>
-     <state_glyph node="14,10,16,8">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
+     <state name="GREEN">
+      <entry>TLpedestrian_setLight(me, GREEN);
+QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_5sec); // was 15s</entry>
+      <tran trig="TIMEOUT" target="../../3">
+       <action>TLpedestrian_sendMessage(me, PL_IS_RED_SIG);</action>
+       <tran_glyph conn="39,20,3,0,-3,12">
+        <action box="0,-2,10,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="39,16,15,8">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
+     </state>
+     <state name="RED">
+      <entry>TLpedestrian_setLight(me, RED);
+TLpedestrian_sendMessage(me, OFF_BLINK_SIG);</entry>
+      <exit>TLpedestrian_sendMessage(me, STOP_BLINK_SIG);</exit>
+      <initial target="../5">
+       <initial_glyph conn="18,40,5,3,6">
+        <action box="0,-2,10,2"/>
+       </initial_glyph>
+      </initial>
+      <state name="RED_3">
+       <entry>TLpedestrian_sendMessage(me, PEDREQUEST_SIG);</entry>
+       <tran trig="TL_IS_RED" target="../../4">
+        <tran_glyph conn="46,64,0,2,-6">
+         <action box="-5,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="40,64,12,8">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="RED_5">
+       <entry>QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_2sec);
+me-&gt;tlRedCount = 0;</entry>
+       <tran trig="TIMEOUT" target="../../../2">
+        <tran_glyph conn="46,36,0,2,-12">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="40,36,12,8">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="RED_2">
+       <exit>TLpedestrian_sendMessage(me, START_BLINK_SIG);</exit>
+       <tran trig="BUTTON" target="../../1">
+        <tran_glyph conn="36,54,1,3,2,13,2">
+         <action box="-1,5,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="24,50,12,8">
+        <exit box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="RED_4">
+       <tran trig="TL_IS_RED" target="../../2">
+        <tran_glyph conn="46,50,0,2,-6">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="40,50,12,8"/>
+      </state>
+      <state name="RED_1">
+       <tran trig="GLOBAL_START" target="../../3">
+        <tran_glyph conn="30,44,2,0,6">
+         <action box="-4,2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <tran trig="BUTTON" target="../../6">
+        <action>TLpedestrian_sendMessage(me, START_BLINK_SIG);</action>
+        <tran_glyph conn="24,42,3,3,-4,26,4">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="24,36,12,8"/>
+      </state>
+      <state name="RED_6">
+       <entry>TLpedestrian_sendMessage(me, START_BLINK_SIG);</entry>
+       <tran trig="GLOBAL_START" target="../../1">
+        <tran_glyph conn="36,70,1,3,4">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="24,64,12,8">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state_glyph node="16,32,38,45">
+       <entry box="1,2,6,2"/>
+       <exit box="1,4,6,2"/>
+      </state_glyph>
+     </state>
+     <state name="INIT_WAIT">
+      <entry>QTimeEvt_disarm(&amp;me-&gt;timeEvt);
+TLpedestrian_setLight(me, RED);</entry>
+      <tran trig="GLOBAL_START" target="../../3">
+       <tran_glyph conn="24,24,2,0,8">
+        <action box="-12,1,12,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="16,16,16,8">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="8,10,50,70"/>
     </state>
-    <state_diagram size="102,75"/>
+    <state_diagram size="108,85"/>
    </statechart>
   </class>
   <class name="TLblinker" superclass="qpc::QActive">
@@ -357,8 +395,9 @@ me-&gt;tlRedCount = 0;</entry>
 BSP_setPedLed(ledStatus);</code>
    </operation>
    <statechart>
-    <initial target="../4">
+    <initial target="../1">
      <action>QS_FUN_DICTIONARY(TLblinker_initial);
+QS_FUN_DICTIONARY(TLblinker_RUN);
 QS_FUN_DICTIONARY(TLblinker_INIT);
 QS_FUN_DICTIONARY(TLblinker_INACTIVE);
 QS_FUN_DICTIONARY(TLblinker_ACTIVE);
@@ -369,83 +408,97 @@ QS_FUN_DICTIONARY(TLblinker_SHUTDOWN);
 QActive_subscribe((QActive *)me, START_BLINK_SIG);
 QActive_subscribe((QActive *)me, STOP_BLINK_SIG);
 QActive_subscribe((QActive *)me, OFF_BLINK_SIG);
-QActive_subscribe((QActive *)me, GLOBAL_START_SIG);</action>
-     <initial_glyph conn="32,10,5,1,-12">
+QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
+QActive_subscribe((QActive *)me, EMERGENCY_SIG);</action>
+     <initial_glyph conn="34,4,4,0,7">
       <action box="0,-2,10,2"/>
      </initial_glyph>
     </initial>
-    <state name="INACTIVE">
-     <entry>setLEDon();</entry>
-     <tran trig="START_BLINK" target="../../2">
-      <tran_glyph conn="14,28,2,0,6">
-       <action box="-4,-2,10,2"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="8,20,12,8">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="ACTIVE">
-     <entry>QTimeEvt_armX(&amp;me-&gt;timeEvt, T_250ms, T_250ms);</entry>
-     <exit>QTimeEvt_disarm(&amp;me-&gt;timeEvt);</exit>
+    <state name="RUN">
      <initial target="../2">
-      <initial_glyph conn="10,38,4,3,6,2">
+      <initial_glyph conn="28,18,5,1,-6">
        <action box="0,-2,10,2"/>
       </initial_glyph>
      </initial>
-     <tran trig="STOP_BLINK" target="../../3">
-      <tran_glyph conn="46,34,0,2,-6">
-       <action box="0,-2,10,2"/>
+     <tran trig="EMERGENCY" target="../2">
+      <tran_glyph conn="42,11,0,1,9,-20">
+       <action box="-11,7,10,2"/>
       </tran_glyph>
      </tran>
-     <state name="OFF">
+     <state name="INIT">
       <entry>setLEDoff();</entry>
-      <tran trig="TIMEOUT" target="../../3">
-       <tran_glyph conn="20,40,0,0,-2,22,2">
-        <action box="0,-2,10,2"/>
+      <tran trig="GLOBAL_START" target="../../3">
+       <tran_glyph conn="16,23,2,0,6">
+        <action box="-4,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="12,40,14,9">
+      <state_glyph node="10,15,12,8">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>
-     <state name="ON">
+     <state name="INACTIVE">
       <entry>setLEDon();</entry>
-      <tran trig="TIMEOUT" target="../../2">
-       <tran_glyph conn="42,49,2,2,2,-22,-2">
-        <action box="0,-2,10,2"/>
+      <tran trig="START_BLINK" target="../../4">
+       <tran_glyph conn="16,37,2,0,6">
+        <action box="-4,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="34,40,14,9">
+      <state_glyph node="10,29,12,8">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>
-     <state_glyph node="8,34,44,20">
-      <entry box="1,2,6,2"/>
-      <exit box="1,4,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="SHUTDOWN">
-     <entry>setLEDoff();</entry>
-     <tran trig="OFF_BLINK" target="../../1">
-      <tran_glyph conn="40,24,3,1,-20">
-       <action box="-8,-2,10,2"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="40,20,12,8">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
-    </state>
-    <state name="INIT">
-     <entry>setLEDoff();</entry>
-     <tran trig="GLOBAL_START" target="../../1">
-      <tran_glyph conn="14,14,2,0,6">
-       <action box="-4,-2,10,2"/>
-      </tran_glyph>
-     </tran>
-     <state_glyph node="8,6,12,8">
-      <entry box="1,2,6,2"/>
-     </state_glyph>
+     <state name="ACTIVE">
+      <entry>QTimeEvt_armX(&amp;me-&gt;timeEvt, T_250ms, T_250ms);</entry>
+      <exit>QTimeEvt_disarm(&amp;me-&gt;timeEvt);</exit>
+      <initial target="../2">
+       <initial_glyph conn="12,47,4,3,6,2">
+        <action box="0,-2,10,2"/>
+       </initial_glyph>
+      </initial>
+      <tran trig="STOP_BLINK" target="../../5">
+       <tran_glyph conn="48,43,0,2,-6">
+        <action box="0,-2,10,2"/>
+       </tran_glyph>
+      </tran>
+      <state name="OFF">
+       <entry>setLEDoff();</entry>
+       <tran trig="TIMEOUT" target="../../3">
+        <tran_glyph conn="22,49,0,0,-2,22,2">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="14,49,14,9">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state name="ON">
+       <entry>setLEDon();</entry>
+       <tran trig="TIMEOUT" target="../../2">
+        <tran_glyph conn="44,58,2,2,2,-22,-2">
+         <action box="0,-2,10,2"/>
+        </tran_glyph>
+       </tran>
+       <state_glyph node="36,49,14,9">
+        <entry box="1,2,6,2"/>
+       </state_glyph>
+      </state>
+      <state_glyph node="10,43,44,20">
+       <entry box="1,2,6,2"/>
+       <exit box="1,4,6,2"/>
+      </state_glyph>
+     </state>
+     <state name="SHUTDOWN">
+      <entry>setLEDoff();</entry>
+      <tran trig="OFF_BLINK" target="../../3">
+       <tran_glyph conn="42,33,3,1,-20">
+        <action box="-8,-2,10,2"/>
+       </tran_glyph>
+      </tran>
+      <state_glyph node="42,29,12,8">
+       <entry box="1,2,6,2"/>
+      </state_glyph>
+     </state>
+     <state_glyph node="8,11,50,55"/>
     </state>
     <state_diagram size="69,69"/>
    </statechart>
@@ -504,6 +557,8 @@ enum TLSignals {
     START_BLINK_SIG,
     STOP_BLINK_SIG,
     OFF_BLINK_SIG,
+    EMERGENCY_SIG,
+    EM_RELEASE_SIG,
     MAX_PUBLISH_SIG,
     TIMEOUT_SIG,                /* used for time events */
     MAX_SIG                     /* the last signal */
@@ -535,6 +590,8 @@ enum TLlight {
 #define T_50ms    _TIMETICKms_(50u) 
 #define T_100ms   _TIMETICKms_(100u) 
 #define T_250ms   _TIMETICKms_(250u) 
+#define T_500ms   _TIMETICKms_(500u) 
+#define T_1sec    _TIMETICKms_(1000u)
 #define T_2sec    _TIMETICK_(2u)
 #define T_5sec    _TIMETICK_(5u)
 #define T_10sec   _TIMETICK_(10u)
@@ -674,6 +731,8 @@ int main(int argc, char *argv[])
     QS_SIG_DICTIONARY(START_BLINK_SIG, (void *)0);
     QS_SIG_DICTIONARY(STOP_BLINK_SIG, (void *)0);
     QS_SIG_DICTIONARY(OFF_BLINK_SIG, (void *)0);
+    QS_SIG_DICTIONARY(EMERGENCY_SIG, (void *)0);
+    QS_SIG_DICTIONARY(EM_RELEASE_SIG, (void *)0);
     QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);
 
     /* initialize publish-subscribe... */

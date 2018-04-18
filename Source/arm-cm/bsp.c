@@ -93,7 +93,7 @@ void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
 
 #ifdef Q_SPY
     {
-        uint32_t tmp = SysTick->CTRL; /* clear CTRL_COUNTFLAG */
+        (void)SysTick->CTRL; /* clear CTRL_COUNTFLAG */
         QS_tickTime_ += QS_tickPeriod_; /* account for the clock rollover */
     }
 #endif
@@ -136,6 +136,10 @@ static void readUserButtons(void)
     if ((debouncedButtons & 0x01) && ((oldButtons ^ debouncedButtons) & 0x01))
     {
     	BSP_publishBtnEvt(); /* publish to all subscribers */
+    }
+    else if ((debouncedButtons & 0x02) && ((oldButtons ^ debouncedButtons) & 0x02))
+    {
+    	BSP_publishEmergencyEvt(); /* publish to all subscribers */
     }
     oldButtons = debouncedButtons;
 }
@@ -274,6 +278,14 @@ void BSP_publishBtnEvt(void)
 {
 	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
+    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+}
+
+void BSP_publishEmergencyEvt(void)
+{
+	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
+
+    buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
     QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
 }
 

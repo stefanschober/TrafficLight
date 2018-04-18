@@ -47,6 +47,7 @@
 static void theApp (GtkApplication* app, gpointer user_data);
 // called when button PEDESTRIAN is clicked
 static void on_btn_ped_clicked(void);
+static void on_btn_emergency_clicked(GtkButton *button, gpointer user_data);
 static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data);
 // timeout
 static gboolean count_handler(GtkWidget *widget);
@@ -80,11 +81,6 @@ typedef struct {
 } appArgs_t;
 #define APP_ARGS(o) ((appArgs_t *)(o))
 
-#ifdef Q_SPY
-static uint8_t const l_button = 0U;
-#endif
-
-
 static void theApp (GtkApplication* app, gpointer user_data)
 {
     GtkWidget       *winTrafficLight;
@@ -92,6 +88,7 @@ static void theApp (GtkApplication* app, gpointer user_data)
     GtkWidget       *lblCounter;
     GtkWidget       *gridTop;
     GtkWidget       *btnPedestrian;
+    GtkWidget       *btnEmergency;
     GtkWidget       *btnQuit;
     PangoAttrList   *lblAttrs;
     GTask           *tlThread;
@@ -104,6 +101,7 @@ static void theApp (GtkApplication* app, gpointer user_data)
 
     // create the buttons
     btnPedestrian = GTK_WIDGET(gtk_button_new_with_mnemonic("_Pedestrian"));
+    btnEmergency  = GTK_WIDGET(gtk_button_new_with_mnemonic("_Emergency"));
     btnQuit       = GTK_WIDGET(gtk_button_new_with_mnemonic("_Quit"));
 
     // create the counting label
@@ -169,6 +167,7 @@ static void theApp (GtkApplication* app, gpointer user_data)
     // bgImage = gtk_image_new_from_file("./Res/background.png");
 
     // put it all together
+    gtk_container_add (GTK_CONTAINER(btnBox), btnEmergency);
     gtk_container_add (GTK_CONTAINER(btnBox), btnQuit);
     gtk_box_pack_start(GTK_BOX(vBox), gridTop, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(vBox), btnBox, TRUE, TRUE, 0);
@@ -181,6 +180,7 @@ static void theApp (GtkApplication* app, gpointer user_data)
 
     // connect the signals
     g_signal_connect(btnPedestrian, "clicked", G_CALLBACK (on_btn_ped_clicked), NULL);
+    g_signal_connect(btnEmergency, "clicked", G_CALLBACK (on_btn_emergency_clicked), NULL);
     g_signal_connect(lblCounter, "draw", G_CALLBACK (on_label_draw), NULL);
 
     g_signal_connect_swapped(btnQuit, "clicked", G_CALLBACK (gtk_main_quit), G_OBJECT(btnQuit));
@@ -319,6 +319,31 @@ static void on_btn_ped_clicked(void)
     g_mutex_lock(&myMutex);
     rndCountDown = 120;
     BSP_publishBtnEvt();
+    g_mutex_unlock(&myMutex);
+}
+
+static void on_btn_emergency_clicked(GtkButton *button, gpointer user_data)
+{
+	static enum {
+		SetEm = 0,
+		RelEm
+	} state = SetEm;
+
+	g_mutex_lock(&myMutex);
+	BSP_publishEmergencyEvt(); /* publish to all subscribers */
+	switch (state)
+	{
+		case RelEm:
+			state = SetEm;
+			gtk_button_set_label(button, "Emergency");
+			break;
+		case SetEm:
+			state = RelEm;
+			gtk_button_set_label(button, "Release");
+			break;
+		default:
+			break;
+	}
     g_mutex_unlock(&myMutex);
 }
 

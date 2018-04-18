@@ -44,6 +44,7 @@ static void TLpedestrian_setLight(TLpedestrian * const me, eTLlight_t light);
 
 /* protected: */
 static QState TLpedestrian_initial(TLpedestrian * const me, QEvt const * const e);
+static QState TLpedestrian_RUN(TLpedestrian * const me, QEvt const * const e);
 static QState TLpedestrian_GREEN(TLpedestrian * const me, QEvt const * const e);
 static QState TLpedestrian_RED(TLpedestrian * const me, QEvt const * const e);
 static QState TLpedestrian_RED_3(TLpedestrian * const me, QEvt const * const e);
@@ -99,6 +100,7 @@ static void TLpedestrian_setLight(TLpedestrian * const me, eTLlight_t light) {
 static QState TLpedestrian_initial(TLpedestrian * const me, QEvt const * const e) {
     /*${AOs::TLpedestrian::SM::initial} */
     QS_FUN_DICTIONARY(TLpedestrian_initial);
+    QS_FUN_DICTIONARY(TLpedestrian_RUN);
     QS_FUN_DICTIONARY(TLpedestrian_GREEN);
     QS_FUN_DICTIONARY(TLpedestrian_RED);
     QS_FUN_DICTIONARY(TLpedestrian_RED_1);
@@ -111,74 +113,95 @@ static QState TLpedestrian_initial(TLpedestrian * const me, QEvt const * const e
     QActive_subscribe((QActive *)me, TL_IS_RED_SIG);
     QActive_subscribe((QActive *)me, BUTTON_SIG);
     QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
-
-    TLpedestrian_setLight(me, RED);
-    return Q_TRAN(&TLpedestrian_INIT_WAIT);
+    QActive_subscribe((QActive *)me, EMERGENCY_SIG);
+    QActive_subscribe((QActive *)me, EM_RELEASE_SIG);
+    return Q_TRAN(&TLpedestrian_RUN);
 }
-/*${AOs::TLpedestrian::SM::GREEN} ..........................................*/
+/*${AOs::TLpedestrian::SM::RUN} ............................................*/
+static QState TLpedestrian_RUN(TLpedestrian * const me, QEvt const * const e) {
+    QState status_;
+    switch (e->sig) {
+        /*${AOs::TLpedestrian::SM::RUN::initial} */
+        case Q_INIT_SIG: {
+            status_ = Q_TRAN(&TLpedestrian_INIT_WAIT);
+            break;
+        }
+        /*${AOs::TLpedestrian::SM::RUN::EMERGENCY} */
+        case EMERGENCY_SIG: {
+            status_ = Q_TRAN(&TLpedestrian_INIT_WAIT);
+            break;
+        }
+        default: {
+            status_ = Q_SUPER(&QHsm_top);
+            break;
+        }
+    }
+    return status_;
+}
+/*${AOs::TLpedestrian::SM::RUN::GREEN} .....................................*/
 static QState TLpedestrian_GREEN(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::GREEN} */
+        /*${AOs::TLpedestrian::SM::RUN::GREEN} */
         case Q_ENTRY_SIG: {
             TLpedestrian_setLight(me, GREEN);
             QTimeEvt_rearm(&me->timeEvt, T_5sec); // was 15s
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::GREEN::TIMEOUT} */
+        /*${AOs::TLpedestrian::SM::RUN::GREEN::TIMEOUT} */
         case TIMEOUT_SIG: {
             TLpedestrian_sendMessage(me, PL_IS_RED_SIG);
             status_ = Q_TRAN(&TLpedestrian_RED);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLpedestrian_RUN);
             break;
         }
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED} ............................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED} .......................................*/
 static QState TLpedestrian_RED(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED} */
+        /*${AOs::TLpedestrian::SM::RUN::RED} */
         case Q_ENTRY_SIG: {
             TLpedestrian_setLight(me, RED);
             TLpedestrian_sendMessage(me, OFF_BLINK_SIG);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED} */
+        /*${AOs::TLpedestrian::SM::RUN::RED} */
         case Q_EXIT_SIG: {
             TLpedestrian_sendMessage(me, STOP_BLINK_SIG);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED::initial} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::initial} */
         case Q_INIT_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED_1);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLpedestrian_RUN);
             break;
         }
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED::RED_3} .....................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED::RED_3} ................................*/
 static QState TLpedestrian_RED_3(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED::RED_3} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_3} */
         case Q_ENTRY_SIG: {
             TLpedestrian_sendMessage(me, PEDREQUEST_SIG);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED::RED_3::TL_IS_RED} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_3::TL_IS_RED} */
         case TL_IS_RED_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED_4);
             break;
@@ -190,18 +213,18 @@ static QState TLpedestrian_RED_3(TLpedestrian * const me, QEvt const * const e) 
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED::RED_5} .....................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED::RED_5} ................................*/
 static QState TLpedestrian_RED_5(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED::RED_5} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_5} */
         case Q_ENTRY_SIG: {
             QTimeEvt_rearm(&me->timeEvt, T_2sec);
             me->tlRedCount = 0;
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED::RED_5::TIMEOUT} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_5::TIMEOUT} */
         case TIMEOUT_SIG: {
             status_ = Q_TRAN(&TLpedestrian_GREEN);
             break;
@@ -213,17 +236,17 @@ static QState TLpedestrian_RED_5(TLpedestrian * const me, QEvt const * const e) 
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED::RED_2} .....................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED::RED_2} ................................*/
 static QState TLpedestrian_RED_2(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED::RED_2} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_2} */
         case Q_EXIT_SIG: {
             TLpedestrian_sendMessage(me, START_BLINK_SIG);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED::RED_2::BUTTON} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_2::BUTTON} */
         case BUTTON_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED_3);
             break;
@@ -235,11 +258,11 @@ static QState TLpedestrian_RED_2(TLpedestrian * const me, QEvt const * const e) 
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED::RED_4} .....................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED::RED_4} ................................*/
 static QState TLpedestrian_RED_4(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED::RED_4::TL_IS_RED} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_4::TL_IS_RED} */
         case TL_IS_RED_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED_5);
             break;
@@ -251,16 +274,16 @@ static QState TLpedestrian_RED_4(TLpedestrian * const me, QEvt const * const e) 
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED::RED_1} .....................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED::RED_1} ................................*/
 static QState TLpedestrian_RED_1(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED::RED_1::GLOBAL_START} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_1::GLOBAL_START} */
         case GLOBAL_START_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED_2);
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED::RED_1::BUTTON} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_1::BUTTON} */
         case BUTTON_SIG: {
             TLpedestrian_sendMessage(me, START_BLINK_SIG);
             status_ = Q_TRAN(&TLpedestrian_RED_6);
@@ -273,17 +296,17 @@ static QState TLpedestrian_RED_1(TLpedestrian * const me, QEvt const * const e) 
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::RED::RED_6} .....................................*/
+/*${AOs::TLpedestrian::SM::RUN::RED::RED_6} ................................*/
 static QState TLpedestrian_RED_6(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::RED::RED_6} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_6} */
         case Q_ENTRY_SIG: {
             TLpedestrian_sendMessage(me, START_BLINK_SIG);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::RED::RED_6::GLOBAL_START} */
+        /*${AOs::TLpedestrian::SM::RUN::RED::RED_6::GLOBAL_START} */
         case GLOBAL_START_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED_3);
             break;
@@ -295,23 +318,24 @@ static QState TLpedestrian_RED_6(TLpedestrian * const me, QEvt const * const e) 
     }
     return status_;
 }
-/*${AOs::TLpedestrian::SM::INIT_WAIT} ......................................*/
+/*${AOs::TLpedestrian::SM::RUN::INIT_WAIT} .................................*/
 static QState TLpedestrian_INIT_WAIT(TLpedestrian * const me, QEvt const * const e) {
     QState status_;
     switch (e->sig) {
-        /*${AOs::TLpedestrian::SM::INIT_WAIT} */
+        /*${AOs::TLpedestrian::SM::RUN::INIT_WAIT} */
         case Q_ENTRY_SIG: {
+            QTimeEvt_disarm(&me->timeEvt);
             TLpedestrian_setLight(me, RED);
             status_ = Q_HANDLED();
             break;
         }
-        /*${AOs::TLpedestrian::SM::INIT_WAIT::GLOBAL_START} */
+        /*${AOs::TLpedestrian::SM::RUN::INIT_WAIT::GLOBAL_START} */
         case GLOBAL_START_SIG: {
             status_ = Q_TRAN(&TLpedestrian_RED);
             break;
         }
         default: {
-            status_ = Q_SUPER(&QHsm_top);
+            status_ = Q_SUPER(&TLpedestrian_RUN);
             break;
         }
     }

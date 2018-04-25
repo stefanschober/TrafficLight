@@ -58,7 +58,7 @@ static LPSTR     l_cmdLine; /* the command line string */
 static SegmentDisplay   l_trafficlights[3];   /* SegmentDisplay to show Philo status */
 static SegmentDisplay   l_pedLed;
 static SegmentDisplay   l_timeDisplay;
-
+static OwnerDrawnButton l_pedBtn;
 // static uint8_t keyPressed = 0;
 
 static const DWORD trafficlightsSeg[MaxIdentity][3] = {
@@ -153,7 +153,14 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
         case WM_CREATE: {
             l_hWnd = hWnd; /* save the window handle */
 
-            /* initialize the traffic lights.        */
+            /* initialize the owner-drawn buttons...
+            * NOTE: must be done *before* the first drawing of the buttons,
+            * so WM_INITDIALOG is too late.
+            */
+            OwnerDrawnButton_init(&l_pedBtn, IDC_PED_BTN,
+                LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_BTN_UP)),
+                LoadBitmap(l_hInst, MAKEINTRESOURCE(IDB_BTN_DWN)),
+                LoadCursor(NULL, IDC_HAND));
             return 0;
         }
 
@@ -242,6 +249,17 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
 
         /* owner-drawn buttons... */
         case WM_DRAWITEM: {
+            LPDRAWITEMSTRUCT pdis = (LPDRAWITEMSTRUCT)lParam;
+            if (IDC_PED_BTN == pdis->CtlID) switch (OwnerDrawnButton_draw(&l_pedBtn,pdis))
+			{
+				case BTN_DEPRESSED:
+					break;
+				case BTN_RELEASED:
+					BSP_publishBtnEvt();
+					break;
+				default:
+					break;
+			}
             return 0;
         }
 

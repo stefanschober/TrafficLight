@@ -6,6 +6,13 @@
    <attribute name="identity" type="eTLidentity_t" visibility="0x02" properties="0x00"/>
    <attribute name="light" type="eTLlight_t" visibility="0x02" properties="0x00"/>
    <attribute name="timeEvt" type="QTimeEvt" visibility="0x02" properties="0x00"/>
+   <attribute name="toGreen1" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toGreen2" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toYellow" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toRed" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toEmergency" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toInitEmergency" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toInit" type="uint32_t" visibility="0x00" properties="0x00"/>
    <operation name="setLight" type="void" visibility="0x02" properties="0x00">
     <parameter name="light" type="eTLlight_t"/>
     <code>me-&gt;light = light;
@@ -41,7 +48,7 @@ QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
     </initial>
     <state name="RUN">
      <initial target="../3">
-      <action>startTimeout(T_5sec); // was 10sec</action>
+      <action>startTimeout(me-&gt;toInit); // was 10sec</action>
       <initial_glyph conn="16,24,4,0,10">
        <action box="0,-2,10,2"/>
       </initial_glyph>
@@ -87,7 +94,7 @@ QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
        <state_glyph node="98,18,18,14"/>
       </state>
       <state name="RED_3">
-       <entry>startTimeout(T_2sec);</entry>
+       <entry>startTimeout(me-&gt;toRed);</entry>
        <tran trig="TIMEOUT" target="../../../4">
         <tran_glyph conn="73,50,2,0,10">
          <action box="-3,-2,10,2"/>
@@ -152,7 +159,7 @@ TLtraffic_setLight(me, GREEN);</entry>
        </tran_glyph>
       </tran>
       <state name="GREEN_1">
-       <entry>startTimeout(T_5sec); // was 10s</entry>
+       <entry>startTimeout(me-&gt;toGreen1); // was 10s</entry>
        <tran trig="TIMEOUT" target="../../3">
         <tran_glyph conn="66,70,1,3,5">
          <action box="0,0,10,2"/>
@@ -168,7 +175,7 @@ TLtraffic_setLight(me, GREEN);</entry>
        </state_glyph>
       </state>
       <state name="GREEN_2">
-       <entry>startTimeout(T_5sec); // was 20s</entry>
+       <entry>startTimeout(me-&gt;toGreen2); // was 20s</entry>
        <state_glyph node="71,65,16,10">
         <entry box="1,2,6,2"/>
        </state_glyph>
@@ -182,7 +189,7 @@ TLtraffic_setLight(me, GREEN);</entry>
      </state>
      <state name="YELLOW">
       <entry>TLtraffic_setLight(me, YELLOW);
-startTimeout(T_2sec); // was 5s</entry>
+startTimeout(me-&gt;toYellow); // was 5s</entry>
       <initial target="../1">
        <initial_glyph conn="115,92,4,2,-4">
         <action box="0,-2,10,2"/>
@@ -211,9 +218,9 @@ startTimeout(T_2sec); // was 5s</entry>
      </state>
      <state name="EMERGENCY">
       <entry>TLtraffic_setLight(me, RED);
-startTimeout(T_30sec); // was 10sec</entry>
+startTimeout(me-&gt;toEmergency); // was 10sec</entry>
       <tran trig="TIMEOUT,EM_RELEASE" target="../../3">
-       <action>startTimeout(T_500ms); // was 10sec</action>
+       <action>startTimeout(me-&gt;toInitEmergency); // was 10sec</action>
        <tran_glyph conn="16,66,0,2,-18">
         <action box="0,-2,10,2"/>
        </tran_glyph>
@@ -232,6 +239,8 @@ startTimeout(T_30sec); // was 10sec</entry>
    <attribute name="timeEvt" type="QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="tlRedCount" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="ledStatus" type="uint16_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toRed" type="uint32_t" visibility="0x00" properties="0x00"/>
+   <attribute name="toGreen" type="uint32_t" visibility="0x00" properties="0x00"/>
    <operation name="sendMessage" type="void" visibility="0x02" properties="0x00">
     <parameter name="msg" type="uint16_t"/>
     <code>QEvt *evt = Q_NEW(QEvt, msg);
@@ -278,7 +287,7 @@ QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
      </tran>
      <state name="GREEN">
       <entry>TLpedestrian_setLight(me, GREEN);
-QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_5sec); // was 15s</entry>
+QTimeEvt_rearm(&amp;me-&gt;timeEvt, me-&gt;toGreen); // was 15s</entry>
       <tran trig="TIMEOUT" target="../../3">
        <action>TLpedestrian_sendMessage(me, PL_IS_RED_SIG);</action>
        <tran_glyph conn="39,20,3,0,-3,12">
@@ -310,7 +319,7 @@ TLpedestrian_sendMessage(me, OFF_BLINK_SIG);</entry>
        </state_glyph>
       </state>
       <state name="RED_5">
-       <entry>QTimeEvt_rearm(&amp;me-&gt;timeEvt, T_2sec);
+       <entry>QTimeEvt_rearm(&amp;me-&gt;timeEvt, me-&gt;toRed);
 me-&gt;tlRedCount = 0;</entry>
        <tran trig="TIMEOUT" target="../../../2">
         <tran_glyph conn="46,36,0,2,-12">
@@ -518,6 +527,14 @@ for (n = 0; n &lt; N_TL; n++)
     me-&gt;identity = (eTLidentity_t)n;
     Q_ENSURE((me-&gt;identity == TrafficLightA) || (me-&gt;identity == TrafficLightB));
     me-&gt;light = RED;
+
+    me-&gt;toInit = T_5sec;
+    me-&gt;toEmergency = T_10sec;
+    me-&gt;toInitEmergency = T_500ms;
+    me-&gt;toRed = T_2sec;
+    me-&gt;toYellow = T_2sec;
+    me-&gt;toGreen1 = T_5sec;
+    me-&gt;toGreen2 = T_5sec;
 }</code>
   </operation>
   <operation name="TLpedestrian_ctor" type="void" visibility="0x00" properties="0x00">
@@ -529,7 +546,10 @@ QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);
 me-&gt;light = RED;
 me-&gt;tlRedCount = 0;
 
-me-&gt;ledStatus = 0;</code>
+me-&gt;ledStatus = 0;
+
+me-&gt;toRed = T_2sec;
+me-&gt;toGreen = T_5sec;</code>
   </operation>
   <operation name="TLblinker_ctor" type="void" visibility="0x00" properties="0x00">
    <code>TLblinker *me = &amp;l_blinker;

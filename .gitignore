@@ -20,3 +20,5 @@ makefile
 */dbg/
 */spy/
 /Posix_Spy/
+*~
+Source/GTK+/resources.c

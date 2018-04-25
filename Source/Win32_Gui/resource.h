@@ -15,6 +15,8 @@
 #define IDB_SEG7                                207
 #define IDB_SEG8                                208
 #define IDB_SEG9                                209
+#define IDB_BTN_UP								301
+#define IDB_BTN_DWN								302
 #define IDD_APPLICATION                         1000
 #define IDB_TL_RED                              1100
 #define IDB_TL_YELLOW                           1200

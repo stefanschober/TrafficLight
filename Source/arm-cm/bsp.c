@@ -116,6 +116,7 @@ static void readUserButtons(void)
     static uint8_t debounceIndex = 0;
     static uint8_t debouncedButtons = 0;
     static uint8_t oldButtons = 0;
+    static uint32_t time2Min = 120ul * BSP_TICKS_PER_SEC;
     uint8_t currentButtons = 0;
     uint8_t currentAND = 0xFFu;
     uint8_t currentOR = 0x00u;
@@ -133,15 +134,20 @@ static void readUserButtons(void)
     }
     debouncedButtons |= currentAND;
     debouncedButtons &= currentOR;
-    if ((debouncedButtons & 0x01) && ((oldButtons ^ debouncedButtons) & 0x01))
+    if ( ((debouncedButtons & 0x01) && ((oldButtons ^ debouncedButtons) & 0x01)) || (0 == time2Min) )
     {
     	BSP_publishBtnEvt(); /* publish to all subscribers */
+    	time2Min = time2Min = 120ul * BSP_TICKS_PER_SEC;
     }
     else if ((debouncedButtons & 0x02) && ((oldButtons ^ debouncedButtons) & 0x02))
     {
     	BSP_publishEmergencyEvt(); /* publish to all subscribers */
     }
     oldButtons = debouncedButtons;
+    if (0 < time2Min)
+    {
+    	time2Min--;
+    }
 }
 
 /* BSP functions ===========================================================*/

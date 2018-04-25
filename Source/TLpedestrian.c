@@ -36,6 +36,8 @@ typedef struct {
 
 /* public: */
     uint16_t ledStatus;
+    uint32_t toRed;
+    uint32_t toGreen;
 } TLpedestrian;
 
 /* private: */
@@ -79,6 +81,9 @@ void TLpedestrian_ctor(void) {
     me->tlRedCount = 0;
 
     me->ledStatus = 0;
+
+    me->toRed = T_2sec;
+    me->toGreen = T_5sec;
 }
 /*$enddef${AOs::TLpedestrian_ctor} #########################################*/
 /*$define${AOs::TLpedestrian} ##############################################*/
@@ -145,7 +150,7 @@ static QState TLpedestrian_GREEN(TLpedestrian * const me, QEvt const * const e) 
         /*${AOs::TLpedestrian::SM::RUN::GREEN} */
         case Q_ENTRY_SIG: {
             TLpedestrian_setLight(me, GREEN);
-            QTimeEvt_rearm(&me->timeEvt, T_5sec); // was 15s
+            QTimeEvt_rearm(&me->timeEvt, me->toGreen); // was 15s
             status_ = Q_HANDLED();
             break;
         }
@@ -219,7 +224,7 @@ static QState TLpedestrian_RED_5(TLpedestrian * const me, QEvt const * const e) 
     switch (e->sig) {
         /*${AOs::TLpedestrian::SM::RUN::RED::RED_5} */
         case Q_ENTRY_SIG: {
-            QTimeEvt_rearm(&me->timeEvt, T_2sec);
+            QTimeEvt_rearm(&me->timeEvt, me->toRed);
             me->tlRedCount = 0;
             status_ = Q_HANDLED();
             break;

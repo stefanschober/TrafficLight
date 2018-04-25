@@ -37,6 +37,8 @@
 #include "bsp.h"
 
 #include <gtk/gtk.h>
+#include <string.h>
+#include <stdlib.h>
 
 // Q_DEFINE_THIS_FILE
 
@@ -48,11 +50,11 @@ static void theApp (GtkApplication* app, gpointer user_data);
 // called when button PEDESTRIAN is clicked
 static void on_btn_ped_clicked(void);
 static void on_btn_emergency_clicked(GtkButton *button, gpointer user_data);
-static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data);
+// static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data);
 // timeout
 static gboolean count_handler(GtkWidget *widget);
 static gboolean event_handler(GtkWidget *widget);
-static gboolean initTrafficLights(GtkWidget *widget);
+// static void getResName(gchar *buf, gchar *res);
 static void     appThread(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable);
 static void     appThreadReadyCallback (GObject *source_object, GAsyncResult *res, gpointer user_data);
 
@@ -61,7 +63,11 @@ static void     appThreadReadyCallback (GObject *source_object, GAsyncResult *re
 static GMutex myMutex;
 static GRand  *myRnd;
 static guint32 rndCountDown = 120;
-GtkWidget       *trafficLights[MaxIdentity][NO_LIGHT][2], *ledWhite, *ledRed;
+static gchar *appName = NULL, *dirName = NULL;
+
+GtkWidget    *trafficLights[MaxIdentity][NO_LIGHT][2], *ledWhite, *ledRed;
+GtkWidget    *digits[3][10];
+
 static struct {
         uint8_t changed;
         eTLlight_t light;
@@ -83,108 +89,90 @@ typedef struct {
 
 static void theApp (GtkApplication* app, gpointer user_data)
 {
-    GtkWidget       *winTrafficLight;
-    GtkWidget       *vBox, *btnBox;
-    GtkWidget       *lblCounter;
-    GtkWidget       *gridTop;
-    GtkWidget       *btnPedestrian;
-    GtkWidget       *btnEmergency;
-    GtkWidget       *btnQuit;
-    PangoAttrList   *lblAttrs;
+	GtkBuilder      *builder;
+	GtkWidget       *winTrafficLight;
+    // GtkWidget       *lblCounter;
     GTask           *tlThread;
-    gchar           *fontName;
+    uint16_t        i, j;
+    gchar           digitId[10];
 
     (void)app;
 
     // initialize the random number generator
     myRnd = g_rand_new();
 
-    // create the buttons
-    btnPedestrian = GTK_WIDGET(gtk_button_new_with_mnemonic("_Pedestrian"));
-    btnEmergency  = GTK_WIDGET(gtk_button_new_with_mnemonic("_Emergency"));
-    btnQuit       = GTK_WIDGET(gtk_button_new_with_mnemonic("_Quit"));
+    // load the ressources
+    builder = gtk_builder_new_from_resource("/com/webasto/trafficLight/trafficLight.xml");
 
-    // create the counting label
-    lblCounter    = GTK_WIDGET(gtk_label_new("0"));
-    gtk_widget_set_hexpand(lblCounter, TRUE);
-    gtk_widget_set_halign(lblCounter, GTK_ALIGN_FILL);
-    // arrange the font appearance for the counting label
-    lblAttrs = pango_attr_list_new();
-    if(g_getenv("OS") && g_str_has_prefix(g_getenv("OS"), "Windows"))
+    // connect the widgets to the application
+    winTrafficLight = GTK_WIDGET(gtk_builder_get_object(builder, "winTrafficLight"));
+    // lblCounter      = GTK_WIDGET(gtk_builder_get_object(builder, "lblCounter"));
+
+    trafficLights[TrafficLightA][RED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOff"));
+    trafficLights[TrafficLightA][YELLOW][0]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlaYellowOff"));
+    trafficLights[TrafficLightA][GREEN][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlaGreenOff"));
+
+    trafficLights[TrafficLightA][RED][1]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOn"));
+    trafficLights[TrafficLightA][YELLOW][1]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlaYellowOn"));
+    trafficLights[TrafficLightA][GREEN][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlaGreenOn"));
+
+    trafficLights[TrafficLightB][RED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlbRedOff"));
+    trafficLights[TrafficLightB][YELLOW][0]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlbYellowOff"));
+    trafficLights[TrafficLightB][GREEN][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlbGreenOff"));
+
+    trafficLights[TrafficLightB][RED][1]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlbRedOn"));
+    trafficLights[TrafficLightB][YELLOW][1]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlbYellowOn"));
+    trafficLights[TrafficLightB][GREEN][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlbGreenOn"));
+
+    trafficLights[PedestrianLight][RED][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "pedRedOff"));
+    trafficLights[PedestrianLight][GREEN][0] = GTK_WIDGET(gtk_builder_get_object(builder, "pedGreenOff"));
+
+    trafficLights[PedestrianLight][RED][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "pedRedOn"));
+    trafficLights[PedestrianLight][GREEN][1] = GTK_WIDGET(gtk_builder_get_object(builder, "pedGreenOn"));
+
+    for (i = 0; i < 3; i++)
     {
-        fontName = "Segoe Script Bold Oblique 32";
+    	for (j = 0; j < 10; j++)
+    	{
+    		switch (i)
+    		{
+				case 2:
+		    		sprintf(digitId, "cntxx%1d", j);
+					break;
+				case 1:
+		    		sprintf(digitId, "cntx%1dx", j);
+					break;
+				case 0:
+				default:
+		    		sprintf(digitId, "cnt%1dxx", j);
+					break;
+    		}
+    		digits[i][j] = GTK_WIDGET(gtk_builder_get_object(builder, digitId));
+    		if (0 == j)
+    		{
+    			gtk_widget_show(digits[i][j]);
+    		}
+    		else
+    		{
+    			gtk_widget_hide(digits[i][j]);
+    		}
+    	}
     }
-    else
-    {
-        fontName = "Purisa Bold 32";
-    }
-    pango_attr_list_change(lblAttrs, pango_attr_font_desc_new(pango_font_description_from_string(fontName)));
-    pango_attr_list_change(lblAttrs, pango_attr_foreground_new(0xfcfc, 0xe9e9, 0x4f4f));
-    pango_attr_list_change(lblAttrs, pango_attr_background_new(0x2020, 0x4a4a, 0x8787));
-    gtk_label_set_attributes(GTK_LABEL(lblCounter), lblAttrs);
-    gtk_label_set_width_chars (GTK_LABEL(lblCounter), 7);
-    gtk_label_set_justify(GTK_LABEL(lblCounter), GTK_JUSTIFY_CENTER);
 
-    // the LED for the pedestrian notification
-    ledRed      = GTK_WIDGET(gtk_image_new_from_file("./Res/LedRed.xpm"));
-    ledWhite    = GTK_WIDGET(gtk_image_new_from_file("./Res/LedWhite.xpm"));
-    gtk_widget_show(ledWhite);
-    gtk_widget_hide(ledRed);
-
-    // create the grid container
-    gridTop = GTK_WIDGET(gtk_grid_new());
-    gtk_grid_set_row_spacing(GTK_GRID(gridTop), 2);
-    gtk_grid_set_column_spacing(GTK_GRID(gridTop), 2);
-
-    // put all UI elements into the grid
-    gtk_grid_attach(GTK_GRID(gridTop), btnPedestrian, 2, 3, 1, 1);
-    gtk_grid_attach(GTK_GRID(gridTop), lblCounter, 1, 0, 2, 3);
-
-    gtk_grid_attach(GTK_GRID(gridTop), ledRed, 2, 4, 1, 1);
-    gtk_grid_attach(GTK_GRID(gridTop), ledWhite, 2, 4, 1, 1);
-
-    initTrafficLights(gridTop);
-
-    // Create the button box for the QUIT button
-    btnBox = GTK_WIDGET(gtk_button_box_new(GTK_ORIENTATION_HORIZONTAL));
-    gtk_button_box_set_layout(GTK_BUTTON_BOX(btnBox), GTK_BUTTONBOX_END);
-
-    // create the VBox to hold the grid and the button box
-    vBox = GTK_WIDGET(gtk_box_new(GTK_ORIENTATION_VERTICAL, 2));
-
-    // create the main window
-    winTrafficLight = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_widget_set_size_request(winTrafficLight, WINDOW_W, WINDOW_H);
-    gtk_window_set_title(GTK_WINDOW(winTrafficLight), "Traffic Light Control");
-    gtk_container_set_border_width(GTK_CONTAINER(winTrafficLight), 10);
-    gtk_window_set_position(GTK_WINDOW(winTrafficLight), GTK_WIN_POS_CENTER);
-    gtk_window_set_resizable(GTK_WINDOW(winTrafficLight), FALSE);
-
-    // create the layout container for the background image
-    // layout = gtk_layout_new(NULL, NULL);
-
-    // create the background image widget
-    // bgImage = gtk_image_new_from_file("./Res/background.png");
-
-    // put it all together
-    gtk_container_add (GTK_CONTAINER(btnBox), btnEmergency);
-    gtk_container_add (GTK_CONTAINER(btnBox), btnQuit);
-    gtk_box_pack_start(GTK_BOX(vBox), gridTop, TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(vBox), btnBox, TRUE, TRUE, 0);
-    // gtk_layout_put(GTK_LAYOUT(layout), bgImage, 0, 0);
-    // gtk_layout_put(GTK_LAYOUT(layout), vBox, 0, 0);
-    gtk_container_add (GTK_CONTAINER(winTrafficLight), vBox /* layout */);
-
-    // ... and bring it to the screen
-    gtk_widget_show_all(winTrafficLight);
+    ledWhite = GTK_WIDGET(gtk_builder_get_object(builder, "LedWhite"));
+    ledRed   = GTK_WIDGET(gtk_builder_get_object(builder, "LedRed"));
 
     // connect the signals
-    g_signal_connect(btnPedestrian, "clicked", G_CALLBACK (on_btn_ped_clicked), NULL);
-    g_signal_connect(btnEmergency, "clicked", G_CALLBACK (on_btn_emergency_clicked), NULL);
-    g_signal_connect(lblCounter, "draw", G_CALLBACK (on_label_draw), NULL);
+    gtk_builder_add_callback_symbol(builder, "on_btn_ped_clicked", G_CALLBACK(on_btn_ped_clicked));
+    gtk_builder_add_callback_symbol(builder, "on_btn_emergency_clicked", G_CALLBACK(on_btn_emergency_clicked));
+    gtk_builder_add_callback_symbol(builder, "on_btn_quit_clicked", G_CALLBACK(gtk_main_quit));
+    gtk_builder_add_callback_symbol(builder, "on_winTrafficLight_destroy", G_CALLBACK(gtk_main_quit));
+    // gtk_builder_add_callback_symbol(builder, "on_label_draw", G_CALLBACK(on_label_draw));
+    gtk_builder_connect_signals(builder, NULL);
+    g_object_unref(builder);
 
-    g_signal_connect_swapped(btnQuit, "clicked", G_CALLBACK (gtk_main_quit), G_OBJECT(btnQuit));
-    g_signal_connect_swapped (winTrafficLight, "destroy", G_CALLBACK (gtk_main_quit), G_OBJECT(winTrafficLight));
+    // ... and bring it to the screen
+    gtk_widget_show(winTrafficLight);
 
     // kick off the statemachine thread
     tlThread = g_task_new(NULL, NULL, appThreadReadyCallback, NULL);
@@ -196,7 +184,7 @@ static void theApp (GtkApplication* app, gpointer user_data)
     }
 
     // start the timer...
-    g_timeout_add(1000, (GSourceFunc)count_handler, (gpointer)lblCounter);
+    g_timeout_add(1000, (GSourceFunc)count_handler, NULL /* (gpointer)lblCounter */);
     g_timeout_add(10, (GSourceFunc)event_handler, (gpointer)NULL);
 
     // and run all of it
@@ -211,7 +199,24 @@ int startGui(int argc, char *argv[])
 
 	appArgs.argc = argc;
 	appArgs.argv = argv;
+	guint16 i = 0, j = 0;
 	
+	appName = strdup(argv[0]);
+	dirName = appName;
+	for (i = 0; '\0' != appName[i]; i++)
+	{
+		if (appName[i] == '\\') appName[i] = '/';
+		if (appName[i] == '/')  j = i;
+	}
+	if (j > 0)
+	{
+		appName[j] = '\0';
+		appName = &appName[j+1];
+	}
+	else
+	{
+		dirName = NULL;
+	}
     app = gtk_application_new ("com.webasto.trafficlight", G_APPLICATION_FLAGS_NONE);
     g_signal_connect (app, "activate", G_CALLBACK (theApp), &appArgs);
     status = g_application_run (G_APPLICATION (app), 1, argv);
@@ -220,79 +225,19 @@ int startGui(int argc, char *argv[])
     return status;
 }
 
-static gboolean initTrafficLights(GtkWidget *widget)
+#if 0
+static void getResName(gchar *buf, gchar *res)
 {
-    eTLidentity_t   id;
-    eTLlight_t      lidx;
-
-    for (id = TrafficLightA; id < MaxIdentity; id++)
-    {
-        guint32 row, col;
-
-        switch(id)
-        {
-            case TrafficLightA:
-                row = 0;
-                col = 0;
-                break;
-            case TrafficLightB:
-                row = 0;
-                col = 3;
-                break;
-            case PedestrianLight:
-                row = 3;
-                col = 1;
-                break;
-            default:
-                break;
-        }
-        for (lidx = RED; lidx < NO_LIGHT; lidx++)
-        {
-            switch(lidx)
-            {
-                case RED:
-                    trafficLights[id][lidx][0] = GTK_WIDGET(gtk_image_new_from_file("./Res/LightOff.xpm"));
-                    trafficLights[id][lidx][1] = GTK_WIDGET(gtk_image_new_from_file("./Res/LightRed.xpm"));
-                    break;
-                case YELLOW:
-                    if (id != PedestrianLight)
-                    {
-                        trafficLights[id][lidx][0] = GTK_WIDGET(gtk_image_new_from_file("./Res/LightOff.xpm"));
-                        trafficLights[id][lidx][1] = GTK_WIDGET(gtk_image_new_from_file("./Res/LightYellow.xpm"));
-                    }
-                    else
-                    {
-                        trafficLights[id][lidx][0] = GTK_WIDGET(0);
-                        trafficLights[id][lidx][1] = GTK_WIDGET(0);
-                    }
-                    break;
-                case GREEN:
-                    trafficLights[id][lidx][0] = GTK_WIDGET(gtk_image_new_from_file("./Res/LightOff.xpm"));
-                    trafficLights[id][lidx][1] = GTK_WIDGET(gtk_image_new_from_file("./Res/LightGreen.xpm"));
-                    break;
-                default:
-                    trafficLights[id][lidx][0] = GTK_WIDGET(0);
-                    trafficLights[id][lidx][1] = GTK_WIDGET(0);
-                    break;
-            }
-            if ((GTK_WIDGET(0) != GTK_WIDGET(trafficLights[id][lidx][0])) && (GTK_WIDGET(0) != GTK_WIDGET(trafficLights[id][lidx][1])))
-            {
-                gtk_grid_attach(GTK_GRID(widget), trafficLights[id][lidx][0], col, row, 1, 1);
-                gtk_grid_attach(GTK_GRID(widget), trafficLights[id][lidx][1], col, row, 1, 1);
-
-                // gtk_misc_set_alignment(GTK_MISC(trafficLights[id][lidx][0]), 1, 0.5);
-                // gtk_misc_set_alignment(GTK_MISC(trafficLights[id][lidx][1]), 1, 0.5);
-
-                gtk_widget_hide(trafficLights[id][lidx][0]);
-                gtk_widget_show(trafficLights[id][lidx][1]);
-
-                row++;
-            }
-        }
-    }
-
-    return TRUE;
+	if (NULL != dirName)
+	{
+		sprintf(buf, "%s/Res/%s", dirName, res);
+	}
+	else
+	{
+		sprintf(buf, "./Res/%s", res);
+	}
 }
+#endif
 
 static void appThreadReadyCallback(GObject *source_object, GAsyncResult *res, gpointer user_data)
 {
@@ -328,25 +273,47 @@ static void on_btn_emergency_clicked(GtkButton *button, gpointer user_data)
 		SetEm = 0,
 		RelEm
 	} state = SetEm;
+	static gchar *btnLabel = NULL;
+	static GtkWidget *btnImage = NULL;
 
 	g_mutex_lock(&myMutex);
 	BSP_publishEmergencyEvt(); /* publish to all subscribers */
+#if 0
 	switch (state)
 	{
 		case RelEm:
 			state = SetEm;
-			gtk_button_set_label(button, "Emergency");
+			if (NULL != btnLabel)
+			{
+				gtk_button_set_label(button, btnLabel);
+				free(btnLabel);
+				btnLabel = NULL;
+			}
+			if (NULL != btnImage)
+			{
+				gtk_button_set_image(button, btnImage);
+				btnImage = NULL;
+			}
 			break;
 		case SetEm:
 			state = RelEm;
+			btnImage = gtk_button_get_image(button);
+			btnLabel = strdup(gtk_button_get_label(button));
 			gtk_button_set_label(button, "Release");
+			if (NULL != btnImage)
+			{
+				gtk_button_set_image(button, btnImage);
+			}
+
 			break;
 		default:
 			break;
 	}
+#endif
     g_mutex_unlock(&myMutex);
 }
 
+#if 0
 static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 {
     GdkRGBA color;
@@ -357,6 +324,7 @@ static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
     cairo_rectangle (cr, 0, 0, gtk_widget_get_allocated_width(widget), gtk_widget_get_allocated_height(widget));
     cairo_fill(cr);
 }
+#endif
 
 static gboolean event_handler(GtkWidget *widget)
 {
@@ -398,19 +366,60 @@ static gboolean event_handler(GtkWidget *widget)
     return TRUE;
 }
 
+static void drawDigits(guint32 cnt, guint flag)
+{
+	guint  i;
+
+	i = cnt / 100;
+	if (flag)
+	{
+		gtk_widget_show(digits[0][i]);
+	}
+	else
+	{
+		gtk_widget_hide(digits[0][i]);
+	}
+	gtk_widget_queue_draw(digits[0][i]);
+
+	cnt %= 100;
+	i = cnt / 10;
+	if (flag)
+	{
+		gtk_widget_show(digits[1][i]);
+	}
+	else
+	{
+		gtk_widget_hide(digits[1][i]);
+	}
+	gtk_widget_queue_draw(digits[1][i]);
+
+	i = cnt % 10;
+	if (flag)
+	{
+		gtk_widget_show(digits[2][i]);
+	}
+	else
+	{
+		gtk_widget_hide(digits[2][i]);
+	}
+	gtk_widget_queue_draw(digits[2][i]);
+}
+
 static gboolean count_handler(GtkWidget *widget)
 {
 	static guint32 countVal = 0;
-    static gchar buf[16];
+    // static gchar buf[16];
 
     //if (widget->window == NULL) return FALSE;
 
+    drawDigits(countVal, FALSE);
     countVal++;
-    if (countVal >= 1000000ul)
+    if (countVal >= 1000ul)
         countVal = 0;
-    g_snprintf(buf, Q_DIM(buf) - 1, "%u", countVal);
-    gtk_label_set_text((GtkLabel *)widget, buf);
-    gtk_widget_queue_draw(widget);
+    drawDigits(countVal, TRUE);
+    // g_snprintf(buf, Q_DIM(buf) - 1, "%u", countVal);
+    // gtk_label_set_text((GtkLabel *)widget, buf);
+    // gtk_widget_queue_draw(widget);
 
     g_mutex_lock(&myMutex);
     if (0 < rndCountDown)

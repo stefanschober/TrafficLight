@@ -38,6 +38,15 @@ typedef struct {
     eTLidentity_t identity;
     eTLlight_t light;
     QTimeEvt timeEvt;
+
+/* public: */
+    uint32_t toGreen1;
+    uint32_t toGreen2;
+    uint32_t toYellow;
+    uint32_t toRed;
+    uint32_t toEmergency;
+    uint32_t toInitEmergency;
+    uint32_t toInit;
 } TLtraffic;
 
 /* private: */
@@ -90,6 +99,14 @@ void TLtraffic_ctor(void) {
         me->identity = (eTLidentity_t)n;
         Q_ENSURE((me->identity == TrafficLightA) || (me->identity == TrafficLightB));
         me->light = RED;
+
+        me->toInit = T_5sec;
+        me->toEmergency = T_10sec;
+        me->toInitEmergency = T_500ms;
+        me->toRed = T_2sec;
+        me->toYellow = T_2sec;
+        me->toGreen1 = T_5sec;
+        me->toGreen2 = T_5sec;
     }
 }
 /*$enddef${AOs::TLtraffic_ctor} ############################################*/
@@ -134,7 +151,7 @@ static QState TLtraffic_RUN(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::RUN::initial} */
         case Q_INIT_SIG: {
-            startTimeout(T_5sec); // was 10sec
+            startTimeout(me->toInit); // was 10sec
             status_ = Q_TRAN(&TLtraffic_INIT_TL);
             break;
         }
@@ -222,7 +239,7 @@ static QState TLtraffic_RED_3(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::RUN::RED::RED_3} */
         case Q_ENTRY_SIG: {
-            startTimeout(T_2sec);
+            startTimeout(me->toRed);
             status_ = Q_HANDLED();
             break;
         }
@@ -324,7 +341,7 @@ static QState TLtraffic_GREEN_1(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_1} */
         case Q_ENTRY_SIG: {
-            startTimeout(T_5sec); // was 10s
+            startTimeout(me->toGreen1); // was 10s
             status_ = Q_HANDLED();
             break;
         }
@@ -351,7 +368,7 @@ static QState TLtraffic_GREEN_2(TLtraffic * const me, QEvt const * const e) {
     switch (e->sig) {
         /*${AOs::TLtraffic::SM::RUN::GREEN::GREEN_2} */
         case Q_ENTRY_SIG: {
-            startTimeout(T_5sec); // was 20s
+            startTimeout(me->toGreen2); // was 20s
             status_ = Q_HANDLED();
             break;
         }
@@ -380,7 +397,7 @@ static QState TLtraffic_YELLOW(TLtraffic * const me, QEvt const * const e) {
         /*${AOs::TLtraffic::SM::RUN::YELLOW} */
         case Q_ENTRY_SIG: {
             TLtraffic_setLight(me, YELLOW);
-            startTimeout(T_2sec); // was 5s
+            startTimeout(me->toYellow); // was 5s
             status_ = Q_HANDLED();
             break;
         }
@@ -436,14 +453,14 @@ static QState TLtraffic_EMERGENCY(TLtraffic * const me, QEvt const * const e) {
         /*${AOs::TLtraffic::SM::RUN::EMERGENCY} */
         case Q_ENTRY_SIG: {
             TLtraffic_setLight(me, RED);
-            startTimeout(T_30sec); // was 10sec
+            startTimeout(me->toEmergency); // was 10sec
             status_ = Q_HANDLED();
             break;
         }
         /*${AOs::TLtraffic::SM::RUN::EMERGENCY::TIMEOUT,EM_RELEASE} */
         case TIMEOUT_SIG: /* intentionally fall through */
         case EM_RELEASE_SIG: {
-            startTimeout(T_500ms); // was 10sec
+            startTimeout(me->toInitEmergency); // was 10sec
             status_ = Q_TRAN(&TLtraffic_INIT_TL);
             break;
         }

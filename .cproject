@@ -57,12 +57,8 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.libs.1466170387" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-								</option>
-								<option id="gnu.c.link.option.paths.1048453861" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32/dbg}&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.libs.1466170387" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
+								<option id="gnu.c.link.option.paths.1048453861" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1745976581" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -72,7 +68,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/posix|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/ports|qspy|Source/posix|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/win32"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -130,12 +127,8 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.690506337" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32/dbg}&quot;"/>
-								</option>
-								<option id="gnu.c.link.option.libs.1709292311" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-								</option>
+								<option id="gnu.c.link.option.paths.690506337" name="Library search path (-L)" superClass="gnu.c.link.option.paths" useByScannerDiscovery="false"/>
+								<option id="gnu.c.link.option.libs.1709292311" name="Libraries (-l)" superClass="gnu.c.link.option.libs" useByScannerDiscovery="false"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1423495708" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -145,7 +138,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/posix|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/ports|qspy|Source/posix|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/win32"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -193,23 +187,20 @@
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1068299358" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="NDEBUG"/>
 									<listOptionValue builtIn="false" value="QWIN_GUI"/>
+									<listOptionValue builtIn="false" value="USE_BUILDER"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1796049120" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.1717056736" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
 								<option id="gnu.c.link.option.ldflags.1236974004" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mwindows -pthread" valueType="string"/>
 								<option id="gnu.c.link.option.userobjs.1315838589" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
-								<option id="gnu.c.link.option.libs.205600929" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-								</option>
+								<option id="gnu.c.link.option.libs.205600929" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<option id="gnu.c.link.option.other.1651445827" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.1680445289" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/gtk+/dbg}&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.paths.1680445289" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.2105689297" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -219,7 +210,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/ports|qspy|Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/gtk+"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -242,7 +234,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808" name="arm-cm" parent="org.eclipse.cdt.build.core.emptycfg" postbuildStep="arm-none-eabi-objcopy -O binary ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.bin" prebuildStep="cp ${ProjDirPath}/Source/arm-cm/trafficlight-qk.ld .">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808" name="arm-cm" parent="org.eclipse.cdt.build.core.emptycfg" postbuildStep="arm-none-eabi-objcopy -O binary ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.bin; arm-none-eabi-objcopy -O ihex ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.hex" prebuildStep="cp ${ProjDirPath}/Source/arm-cm/trafficlight-qk.ld .">
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.1965494482" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.1284897567" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-none-eabi-" valueType="string"/>
@@ -271,10 +263,7 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1256168385" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1606025965" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.libs.1984028228" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="hal"/>
-								</option>
+								<option id="gnu.c.link.option.libs.1984028228" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<option id="gnu.c.link.option.userobjs.971204091" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
 								<option id="gnu.c.link.option.ldflags.225400179" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mcpu=cortex-m0 -specs=nano.specs  -T./trafficlight-qk.ld" valueType="string"/>
 								<option id="gnu.c.link.option.nostdlibs.2042150596" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" value="true" valueType="boolean"/>
@@ -283,10 +272,7 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.1560068963" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/arm-cm/dbg}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/dbg}&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.paths.1560068963" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.129731434" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -300,7 +286,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver|Source/arm-cm/trafficLight/Src|qpc/src|Source/TLbutton.c|qpc/ports|qspy|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/ports|qspy|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/arm-cm"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -356,12 +343,8 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.868914713" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/posix/dbg}&quot;"/>
-								</option>
-								<option id="gnu.c.link.option.libs.1887763123" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-								</option>
+								<option id="gnu.c.link.option.paths.868914713" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
+								<option id="gnu.c.link.option.libs.1887763123" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1955478176" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -371,7 +354,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy|Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/ports|qspy|Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/posix"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -436,12 +420,9 @@
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
 								<option id="gnu.c.link.option.libs.1728829719" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="wsock32"/>
 								</option>
-								<option id="gnu.c.link.option.paths.847671661" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/win32/spy}&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.paths.847671661" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.93892875" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -451,7 +432,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/TLbutton.c|qpc/src|qpc/ports|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/posix|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qpc/ports|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/posix|Source/Win32_Console|qpc/src/qk|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/win32"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -507,17 +489,13 @@
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.c.linker.mingw.base.303612761" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.base">
 								<option id="gnu.c.link.option.ldflags.1933869564" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mwindows -pthread" valueType="string"/>
 								<option id="gnu.c.link.option.userobjs.1120479861" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
-								<option id="gnu.c.link.option.libs.2139312247" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-								</option>
+								<option id="gnu.c.link.option.libs.2139312247" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<option id="gnu.c.link.option.other.830653395" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" valueType="stringList">
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.1968431881" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/gtk+/spy}&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.paths.1968431881" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.196495116" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -527,7 +505,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/TLbutton.c|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|qpc/src|qpc/ports|Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|qpc/src/qs|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Source/TLbutton.c|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|qpc/ports|Source/posix|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qk|Source/arm-cm|qpc/ports/posix|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/gtk+"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -550,7 +529,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814" name="arm-cm_Spy" parent="org.eclipse.cdt.build.core.emptycfg" postbuildStep="arm-none-eabi-objcopy -O binary ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.bin" prebuildStep="cp ${ProjDirPath}/Source/arm-cm/trafficlight-qk.ld .">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814" name="arm-cm_Spy" parent="org.eclipse.cdt.build.core.emptycfg" postbuildStep="arm-none-eabi-objcopy -O binary ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.bin; arm-none-eabi-objcopy -O ihex ${BuildArtifactFileName} ${BuildArtifactFileBaseName}.hex" prebuildStep="cp ${ProjDirPath}/Source/arm-cm/trafficlight-qk.ld .">
 					<folderInfo id="cdt.managedbuild.toolchain.gnu.mingw.base.11070814.804429818.1280386917.915793700.2055002808.1972725814." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.base.395040856" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.base">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.716809563" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="arm-none-eabi-" valueType="string"/>
@@ -581,10 +560,7 @@
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1693082977" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1670529748" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.libs.1760079088" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="hal"/>
-								</option>
+								<option id="gnu.c.link.option.libs.1760079088" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<option id="gnu.c.link.option.userobjs.1126841064" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
 								<option id="gnu.c.link.option.ldflags.402684510" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-mcpu=cortex-m0 -specs=nano.specs  -T./trafficlight-qk.ld" valueType="string"/>
 								<option id="gnu.c.link.option.nostdlibs.501790058" name="No startup or default libs (-nostdlib)" superClass="gnu.c.link.option.nostdlibs" value="true" valueType="boolean"/>
@@ -593,10 +569,7 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.565783184" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/arm-cm/spy}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/Source/arm-cm/spy}&quot;"/>
-								</option>
+								<option id="gnu.c.link.option.paths.565783184" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1222121453" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -610,7 +583,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver|Source/arm-cm/trafficLight/Src|qpc/src|qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/TLbutton.c|qpc/ports|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/src/qs|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/TLbutton.c|qpc/ports|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|Source/arm-cm/trafficLight/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/posix|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_msp_template.c|Source/GTK+|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_tim_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_wakeup_template.c|Source/arm-cm/trafficLight/Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_timebase_rtc_alarm_template.c|qpc/ports/gtk+|Source/arm-cm/trafficLight/Drivers/CMSIS/DSP_Lib|Source/arm-cm/trafficLight/Drivers/CMSIS/Device/ST/STM32F0xx/Source/Templates|qpc/ports/win32|Source/Win32_Gui|Source/Win32_Console|qpc/ports/posix|qtools" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/arm-cm"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -668,12 +642,8 @@
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.paths.608972735" name="Library search path (-L)" superClass="gnu.c.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/TrafficLight/qpc/ports/posix/spy}&quot;"/>
-								</option>
-								<option id="gnu.c.link.option.libs.1694696849" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="qp"/>
-								</option>
+								<option id="gnu.c.link.option.paths.608972735" name="Library search path (-L)" superClass="gnu.c.link.option.paths"/>
+								<option id="gnu.c.link.option.libs.1694696849" name="Libraries (-l)" superClass="gnu.c.link.option.libs"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1657892200" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -683,7 +653,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/TLbutton.c|qpc/src|qpc/ports|Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|qpc/src/qs|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="qspy/source/qspy_tx.c|qspy/source/main.c|qspy/source/getopt.c|qspy/source/be.c|Source/TLbutton.c|qpc/ports|Source/Win32_Console|qpc/ports/win32|qpc/ports/win32/qwin_gui.c|Source/Win32_Gui|qpc/src/qk|Source/GTK+|Source/arm-cm|qpc/ports/gtk+|qtools|qpc/ports/arm-cm" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="qpc/ports/posix"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

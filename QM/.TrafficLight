@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<session version="4.1.2">
+<session version="4.1.3">
  <item name="license">GPL</item>
  <group name="locked"/>
  <group name="settings">
@@ -9,9 +9,10 @@
   <item name="backups">0</item>
  </group>
  <group name="windows">
-  <item id="AOs::TLtraffic::SM">0,0,1023,788,*</item>
-  <item id="AOs::TLpedestrian::SM">-84,109,1107,703</item>
-  <item id="AOs::TLblinker::SM">0,0,1107,703</item>
+  <item id="AOs::TLtraffic::SM">0,0,142,106</item>
+  <item id="AOs::TLpedestrian::SM">142,0,142,106</item>
+  <item id="AOs::TLblinker::SM">284,0,142,106</item>
+  <item id="./Source::TLblinker.c">0,0,1023,788,*</item>
  </group>
  <group name="search">
   <item name="options">2032128</item>

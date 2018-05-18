@@ -317,10 +317,10 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    //static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
+    static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
 
     QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
-    //QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
+    QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
 }
 
 /*..........................................................................*/
@@ -569,19 +569,12 @@ uint8_t QS_onStartup(void const *arg) {
     }
 
     /* set up the QS filters... */
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_OFF(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_OFF(QS_QEP_UNHANDLED);
+    QS_FILTER_OFF(QS_ALL_RECORDS);
 
-    QS_FILTER_OFF(QS_QF_ACTIVE_POST_FIFO);
-    QS_FILTER_OFF(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_PUBLISH);
+    QS_FILTER_ON(QS_SM_RECORDS);
+    QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
+    QS_FILTER_OFF(QS_QEP_IGNORED);
+    QS_FILTER_OFF(QS_QEP_UNHANDLED);
 
     // QS_FILTER_ON(TL_STAT);
     QS_FILTER_ON(COMMAND_STAT);

@@ -14,7 +14,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461" name="Debug" parent="cdt.managedbuild.config.gnu.cross.exe.debug" preannouncebuildStep="Compile resources" prebuildStep="cd ../Res; glib-compile-resources trafficLight.gresource.xml --target=../resources.c --generate-source">
+				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461" name="Debug" parent="cdt.managedbuild.config.gnu.cross.exe.debug" preannouncebuildStep="Generate code from model &amp; compile resources" prebuildStep="make -C ../../QM all; make -C ../Res all">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.1617617221" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.1916919069" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="x86_64-w64-mingw32-" valueType="string"/>
@@ -50,6 +50,7 @@
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
 								<option id="gnu.c.link.option.userobjs.503098918" name="Other objects" superClass="gnu.c.link.option.userobjs" useByScannerDiscovery="false"/>
+								<option id="gnu.c.link.option.noshared.1920631441" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.709271673" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -82,7 +83,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.release.1155968234" name="Release" parent="cdt.managedbuild.config.gnu.cross.exe.release" preannouncebuildStep="Compile resources" prebuildStep="cd ../Res; glib-compile-resources trafficLight.gresource.xml --target=../resources.c --generate-source">
+				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.release.1155968234" name="Release" parent="cdt.managedbuild.config.gnu.cross.exe.release" preannouncebuildStep="Generate code from model &amp; compile resources" prebuildStep="make -C ../../QM all; make -C ../Res all">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.release.1155968234." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.release.679292633" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.release">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.525910816" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="x86_64-w64-mingw32-" valueType="string"/>
@@ -119,6 +120,8 @@
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 								</option>
 								<option id="gnu.c.link.option.userobjs.932946641" name="Other objects" superClass="gnu.c.link.option.userobjs" useByScannerDiscovery="false"/>
+								<option id="gnu.c.link.option.strip.1731889963" name="Omit all symbol information (-s)" superClass="gnu.c.link.option.strip" useByScannerDiscovery="false" value="true" valueType="boolean"/>
+								<option id="gnu.c.link.option.noshared.1218990712" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1478723195" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -151,7 +154,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461.574965632" name="Spy" parent="cdt.managedbuild.config.gnu.cross.exe.debug" preannouncebuildStep="Compile resources" prebuildStep="cd ../Res; glib-compile-resources trafficLight.gresource.xml --target=../resources.c --generate-source">
+				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461.574965632" name="Spy" parent="cdt.managedbuild.config.gnu.cross.exe.debug" preannouncebuildStep="Generate code from model &amp; compile resources" prebuildStep="make -C ../../QM all; make -C ../Res all">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461.574965632." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.1882442984" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.49758418" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="x86_64-w64-mingw32-" valueType="string"/>
@@ -192,6 +195,7 @@
 								<option id="gnu.c.link.option.libs.1546910957" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="wsock32"/>
 								</option>
+								<option id="gnu.c.link.option.noshared.153863668" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1477988754" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

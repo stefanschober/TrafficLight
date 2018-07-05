@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <session version="4.2.1">
- <item name="license">GPL</item>
+ <item name="license"></item>
  <group name="locked"/>
  <group name="settings">
   <item name="tabs">1</item>
@@ -8,11 +8,7 @@
   <item name="grid">3</item>
   <item name="backups">0</item>
  </group>
- <group name="windows">
-  <item id="AOs::TLtraffic::SM">-86,0,886,470</item>
-  <item id="AOs::TLpedestrian::SM">0,0,1140,809,*</item>
-  <item id="AOs::TLblinker::SM">101,119,699,470</item>
- </group>
+ <group name="windows"/>
  <group name="search">
   <item name="options">2032128</item>
   <item name="replace">0</item>

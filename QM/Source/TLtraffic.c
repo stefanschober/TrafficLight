@@ -127,7 +127,7 @@ static QState TLtraffic_initial(TLtraffic * const me, QEvt const * const e) {
     QActive_subscribe((QActive *)me, EMERGENCY_SIG);
     QActive_subscribe((QActive *)me, EM_RELEASE_SIG);
 
-    QS_FUN_DICTIONARY(TLtraffic_initial);
+    QS_FUN_DICTIONARY(&TLtraffic_initial);
 
     QS_FUN_DICTIONARY(&TLtraffic_RUN);
     QS_FUN_DICTIONARY(&TLtraffic_RED);

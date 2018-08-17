@@ -92,7 +92,16 @@ static QState TLblinker_initial(TLblinker * const me, QEvt const * const e) {
     QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
     QActive_subscribe((QActive *)me, EMERGENCY_SIG);
 
-    QS_FUN_DICTIONARY(TLblinker_initial);
+    QS_FUN_DICTIONARY(&TLblinker_initial);
+
+    QS_FUN_DICTIONARY(&TLblinker_RUN);
+    QS_FUN_DICTIONARY(&TLblinker_INIT);
+    QS_FUN_DICTIONARY(&TLblinker_INACTIVE);
+    QS_FUN_DICTIONARY(&TLblinker_ACTIVE);
+    QS_FUN_DICTIONARY(&TLblinker_OFF);
+    QS_FUN_DICTIONARY(&TLblinker_ON);
+    QS_FUN_DICTIONARY(&TLblinker_SHUTDOWN);
+
     return Q_TRAN(&TLblinker_RUN);
 }
 /*${AOs::TLblinker::SM::RUN} ...............................................*/

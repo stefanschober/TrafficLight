@@ -55,12 +55,14 @@ static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data);
 static gboolean count_handler(GtkWidget *widget);
 static gboolean event_handler(GtkWidget *widget);
 // static void getResName(gchar *buf, gchar *res);
-static void     appThread(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable);
-static void     appThreadReadyCallback (GObject *source_object, GAsyncResult *res, gpointer user_data);
+static gpointer appThread(gpointer task_data);
+static void appQuit(void);
 
 // static struct termios l_tsav; /* structure with saved terminal attributes */
 // static guint8 keyPressed = 0;
 static GMutex myMutex;
+static GMutex startMutex;
+static GThread *tlThread;
 static GRand  *myRnd;
 static guint32 rndCountDown = 120;
 static gchar *appName = NULL, *dirName = NULL;
@@ -92,7 +94,6 @@ static void theApp (GtkApplication* app, gpointer user_data)
 	GtkBuilder      *builder;
 	GtkWidget       *winTrafficLight;
     GtkWidget       *lblCounter;
-    GTask           *tlThread;
     //uint16_t        i, j;
     //gchar           digitId[10];
 
@@ -100,6 +101,10 @@ static void theApp (GtkApplication* app, gpointer user_data)
 
     // initialize the random number generator
     myRnd = g_rand_new();
+    g_mutex_lock(&startMutex);
+
+    // kick off the statemachine thread
+    tlThread = g_thread_new(NULL, appThread, user_data);
 
     // load the ressources
     builder = gtk_builder_new_from_resource("/com/webasto/trafficLight/trafficLight.xml");
@@ -167,8 +172,8 @@ static void theApp (GtkApplication* app, gpointer user_data)
     // connect the signals
     gtk_builder_add_callback_symbol(builder, "on_btn_ped_clicked", G_CALLBACK(on_btn_ped_clicked));
     gtk_builder_add_callback_symbol(builder, "on_btn_emergency_clicked", G_CALLBACK(on_btn_emergency_clicked));
-    gtk_builder_add_callback_symbol(builder, "on_btn_quit_clicked", G_CALLBACK(gtk_main_quit));
-    gtk_builder_add_callback_symbol(builder, "on_winTrafficLight_destroy", G_CALLBACK(gtk_main_quit));
+    gtk_builder_add_callback_symbol(builder, "on_btn_quit_clicked", G_CALLBACK(appQuit));
+    gtk_builder_add_callback_symbol(builder, "on_winTrafficLight_destroy", G_CALLBACK(appQuit));
     gtk_builder_add_callback_symbol(builder, "on_label_draw", G_CALLBACK(on_label_draw));
     gtk_builder_connect_signals(builder, NULL);
     g_object_unref(builder);
@@ -176,20 +181,12 @@ static void theApp (GtkApplication* app, gpointer user_data)
     // ... and bring it to the screen
     gtk_widget_show(winTrafficLight);
 
-    // kick off the statemachine thread
-    tlThread = g_task_new(NULL, NULL, appThreadReadyCallback, NULL);
-    if ((GTask *)(0) != tlThread)
-    {
-		g_task_set_task_data(tlThread, user_data, NULL);
-        g_task_set_return_on_cancel (tlThread, TRUE);
-        g_task_run_in_thread (tlThread, appThread);
-    }
-
     // start the timer...
     g_timeout_add(1000, (GSourceFunc)count_handler, (gpointer)lblCounter);
     g_timeout_add(10, (GSourceFunc)event_handler, (gpointer)NULL);
 
     // and run all of it
+    g_mutex_unlock(&startMutex);
     gtk_main();
 }
 
@@ -241,24 +238,16 @@ static void getResName(gchar *buf, gchar *res)
 }
 #endif
 
-static void appThreadReadyCallback(GObject *source_object, GAsyncResult *res, gpointer user_data)
+static gpointer  appThread(gpointer task_data)
 {
-    (void)source_object;
-    (void)res;
-    (void)user_data;
+    g_mutex_lock(&startMutex);
+    g_mutex_unlock(&startMutex);
+    return main_gui(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
 }
 
-static void appThread(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable)
+static void appQuit(void)
 {
-    guint32 result;
-
-    (void)source_object;
-    (void)task_data;
-    (void)cancellable;
-
-    result = (guint32)main_gui(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
-
-    g_task_return_int(task, result);
+    gtk_main_quit();
 }
 
 static void on_btn_ped_clicked(void)

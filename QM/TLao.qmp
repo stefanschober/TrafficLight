@@ -24,7 +24,7 @@ QActive_subscribe((QActive *)me, PEDREQUEST_SIG);
 QActive_subscribe((QActive *)me, EMERGENCY_SIG);
 QActive_subscribe((QActive *)me, EM_RELEASE_SIG);
 
-QS_FUN_DICTIONARY(TLtraffic_initial);</action>
+QS_FUN_DICTIONARY(&amp;TLtraffic_initial);</action>
     <initial_glyph conn="30,4,5,0,32,6">
      <action box="0,-2,10,2"/>
     </initial_glyph>
@@ -243,7 +243,7 @@ QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
 QActive_subscribe((QActive *)me, EMERGENCY_SIG);
 QActive_subscribe((QActive *)me, EM_RELEASE_SIG);
 
-QS_FUN_DICTIONARY(TLpedestrian_initial);</action>
+QS_FUN_DICTIONARY(&amp;TLpedestrian_initial);</action>
     <initial_glyph conn="16,4,5,0,16,6">
      <action box="0,-2,10,2"/>
     </initial_glyph>
@@ -377,7 +377,7 @@ TLpedestrian_setLight(me, RED);</entry>
    <code>Q_ASSERT((ledStatus == ledON) || (ledStatus == ledOFF));
 BSP_setPedLed(ledStatus);</code>
   </operation>
-  <statechart>
+  <statechart properties="QS_FUN_DICT">
    <initial target="../1">
     <action>QActive_subscribe((QActive *)me, START_BLINK_SIG);
 QActive_subscribe((QActive *)me, STOP_BLINK_SIG);
@@ -385,7 +385,7 @@ QActive_subscribe((QActive *)me, OFF_BLINK_SIG);
 QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
 QActive_subscribe((QActive *)me, EMERGENCY_SIG);
 
-QS_FUN_DICTIONARY(TLblinker_initial);</action>
+QS_FUN_DICTIONARY(&amp;TLblinker_initial);</action>
     <initial_glyph conn="34,4,4,0,7">
      <action box="0,-2,10,2"/>
     </initial_glyph>

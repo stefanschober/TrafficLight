@@ -110,7 +110,7 @@ static QState TLpedestrian_initial(TLpedestrian * const me, QEvt const * const e
     QActive_subscribe((QActive *)me, EMERGENCY_SIG);
     QActive_subscribe((QActive *)me, EM_RELEASE_SIG);
 
-    QS_FUN_DICTIONARY(TLpedestrian_initial);
+    QS_FUN_DICTIONARY(&TLpedestrian_initial);
 
     QS_FUN_DICTIONARY(&TLpedestrian_RUN);
     QS_FUN_DICTIONARY(&TLpedestrian_GREEN);

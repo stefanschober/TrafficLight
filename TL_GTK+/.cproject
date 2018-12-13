@@ -35,7 +35,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Users\schobers\Projects\TrafficLight\QM\Source&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.461554785" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.misc.other.1186209968" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows -ffunction-sections -fdata-sections -pthread" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.1186209968" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mconsole -ffunction-sections -fdata-sections -pthread -fno-pie" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1048565227" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.28489209" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
@@ -43,7 +43,7 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.2030060987" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 							</tool>
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.cross.c.linker.1083911269" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.ldflags.960177233" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-mwindows -pthread" valueType="string"/>
+								<option id="gnu.c.link.option.ldflags.960177233" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-mconsole -pthread -no-pie" valueType="string"/>
 								<option id="gnu.c.link.option.other.1543116692" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
@@ -51,6 +51,11 @@
 								</option>
 								<option id="gnu.c.link.option.userobjs.503098918" name="Other objects" superClass="gnu.c.link.option.userobjs" useByScannerDiscovery="false"/>
 								<option id="gnu.c.link.option.noshared.1920631441" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.libs.1776466668" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="wsock32"/>
+									<listOptionValue builtIn="false" value="gdi32"/>
+									<listOptionValue builtIn="false" value="user32"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.709271673" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -104,7 +109,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Users\schobers\Projects\Misc\TrafficLight\Source&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\schobers\Projects\TrafficLight\QM\Source&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.misc.other.1811280012" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows -ffunction-sections -fdata-sections -pthread" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.1811280012" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mconsole -ffunction-sections -fdata-sections -pthread -fno-pie" valueType="string"/>
 								<option id="gnu.c.compiler.option.dialect.std.2073490831" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1697502923" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -113,7 +118,7 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.1507520270" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 							</tool>
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.cross.c.linker.1711077082" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.ldflags.1356957555" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-mwindows -pthread" valueType="string"/>
+								<option id="gnu.c.link.option.ldflags.1356957555" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-mconsole -pthread -no-pie" valueType="string"/>
 								<option id="gnu.c.link.option.other.1349283178" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 									<listOptionValue builtIn="false" value="--cref"/>
@@ -122,6 +127,11 @@
 								<option id="gnu.c.link.option.userobjs.932946641" name="Other objects" superClass="gnu.c.link.option.userobjs" useByScannerDiscovery="false"/>
 								<option id="gnu.c.link.option.strip.1731889963" name="Omit all symbol information (-s)" superClass="gnu.c.link.option.strip" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="gnu.c.link.option.noshared.1218990712" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="false" valueType="boolean"/>
+								<option id="gnu.c.link.option.libs.1850201554" superClass="gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="wsock32"/>
+									<listOptionValue builtIn="false" value="gdi32"/>
+									<listOptionValue builtIn="false" value="user32"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1478723195" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -157,7 +167,7 @@
 				<configuration artifactExtension="exe" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461.574965632" name="Spy" parent="cdt.managedbuild.config.gnu.cross.exe.debug" preannouncebuildStep="Generate code from model &amp; compile resources" prebuildStep="make -C ../../QM all; make -C ../Res all">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1383707461.574965632." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.1882442984" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
-							<option id="cdt.managedbuild.option.gnu.cross.prefix.49758418" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="x86_64-w64-mingw32-" valueType="string"/>
+							<option id="cdt.managedbuild.option.gnu.cross.prefix.49758418" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" useByScannerDiscovery="false" value="x86_64-w64-mingw32-" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.1086794463" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
 							<builder buildPath="${workspace_loc:/TrafficLight_Win}/Debug" id="cdt.managedbuild.builder.gnu.cross.1715413311" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags gtk+-3.0`" id="cdt.managedbuild.tool.gnu.cross.c.compiler.1672763727" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
@@ -177,7 +187,7 @@
 									<listOptionValue builtIn="false" value="&quot;C:\Users\schobers\Projects\TrafficLight\QM\Source&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.714556191" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.misc.other.269966764" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mwindows -ffunction-sections -fdata-sections -pthread" valueType="string"/>
+								<option id="gnu.c.compiler.option.misc.other.269966764" name="Other flags" superClass="gnu.c.compiler.option.misc.other" useByScannerDiscovery="false" value="-c -fmessage-length=0 -mconsole -ffunction-sections -fdata-sections -pthread -fno-pie" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1237466321" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.1987992197" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
@@ -185,15 +195,17 @@
 								<option id="gnu.cpp.compiler.option.debugging.level.1992806377" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 							</tool>
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.cross.c.linker.1931113557" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker">
-								<option id="gnu.c.link.option.ldflags.1640325618" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-mwindows -pthread" valueType="string"/>
+								<option id="gnu.c.link.option.ldflags.1640325618" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="-mconsole -pthread -no-pie" valueType="string"/>
 								<option id="gnu.c.link.option.other.220900017" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-Map='${CWD}/${BuildArtifactFileBaseName}.map'"/>
 									<listOptionValue builtIn="false" value="--cref"/>
 									<listOptionValue builtIn="false" value="--gc-sections"/>
 								</option>
-								<option id="gnu.c.link.option.userobjs.1688647969" name="Other objects" superClass="gnu.c.link.option.userobjs"/>
-								<option id="gnu.c.link.option.libs.1546910957" name="Libraries (-l)" superClass="gnu.c.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="wsock32"/>
+								<option id="gnu.c.link.option.userobjs.1688647969" name="Other objects" superClass="gnu.c.link.option.userobjs" useByScannerDiscovery="false"/>
+								<option id="gnu.c.link.option.libs.1546910957" name="Libraries (-l)" superClass="gnu.c.link.option.libs" useByScannerDiscovery="false" valueType="libs">
+									<listOptionValue builtIn="false" value="wsock32"/>
+									<listOptionValue builtIn="false" value="gdi32"/>
+									<listOptionValue builtIn="false" value="user32"/>
 								</option>
 								<option id="gnu.c.link.option.noshared.153863668" name="No shared libraries (-static)" superClass="gnu.c.link.option.noshared" useByScannerDiscovery="false" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1477988754" superClass="cdt.managedbuild.tool.gnu.c.linker.input">

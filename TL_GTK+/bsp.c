@@ -72,8 +72,7 @@ enum inputPins {
 
 #ifdef Q_SPY
 #include "qspy.h"
-static GSocketConnection *connection = NULL;
-static GSocket           *socket = NULL;
+static guint8            l_running = 0;
 
 enum {
     TL_STAT = QS_USER,
@@ -183,7 +182,7 @@ void BSP_publishEmergencyEvt(void)
 /* QF callbacks ============================================================*/
 /*..........................................................................*/
 void QF_onStartup(void) {
-    QF_setTickRate(BSP_TICKS_PER_SEC); /* set the desired tick rate */
+    QF_setTickRate(BSP_TICKS_PER_SEC, 30); /* set the desired tick rate */
 }
 /*..........................................................................*/
 void QF_onCleanup(void) {
@@ -209,6 +208,7 @@ void Q_onAssert(gchar const * const module, gint loc) {
 #ifdef Q_SPY /* define QS callbacks */
 
 #include <gio/gio.h>
+static GSocket *socket = NULL;
 
 /*
 * In this demo, the QS software tracing output is sent out of the application
@@ -228,11 +228,12 @@ void Q_onAssert(gchar const * const module, gint loc) {
 static gpointer idleThread(gpointer par) {/* signature for CreateThread() */
     (void)par;
 
-    while (socket != NULL) {
-        guint16  nBytes;
+    l_running = (uint8_t)1;
+    while ((socket != NULL) || (l_running != 0)) {
+        guint16  nBytes = 256;
         guchar   const *block;
 
-
+#if defined QSPY_NET
         /* try to receive bytes from the QS socket... */
         nBytes = QS_rxGetNfree();
         if (nBytes > 0U) {
@@ -254,28 +255,35 @@ static gpointer idleThread(gpointer par) {/* signature for CreateThread() */
         QS_rxParse();  /* parse all the received bytes */
 
         nBytes = 1024U;
+#endif
         QF_CRIT_ENTRY(dummy);
         block = QS_getBlock(&nBytes);
         QF_CRIT_EXIT(dummy);
 
         if (block != (gpointer)0) {
+#if defined QSPY_NET
             g_socket_send(socket, (gchar const *)block, nBytes, NULL, NULL);
+#else
+            QSPY_parse(block, nBytes);
+#endif
         }
-        g_usleep(20000);   /* sleep for a while */
+        g_usleep(10000);   /* sleep for a while */
     }
     return NULL; /* return success */
 }
 /*..........................................................................*/
 uint8_t QS_onStartup(void const *arg) {
-    static guint8 qsBuf[1024];  /* buffer for QS output */
+    static guint8 qsBuf[2 * 1024];  /* buffer for QS output */
     static guint8 qsRxBuf[100]; /* buffer for QS receive channel */
+
+    QS_initBuf(qsBuf, sizeof(qsBuf));
+    QS_rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+
+#if defined QSPY_NET
     gchar const *hostName, *src, **splitSrc;
     guint16 port         = 6601; /* default QSPY server port */
     GError           *err = NULL;
     GSocketClient *client = g_socket_client_new();
-
-    QS_initBuf(qsBuf, sizeof(qsBuf));
-    QS_rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
 
     src = (arg == NULL) ? "localhost" : (char const *)arg;
     splitSrc = (gchar const **)g_strsplit(src, ":", 2);
@@ -297,6 +305,30 @@ uint8_t QS_onStartup(void const *arg) {
 
     /* Set the socket to non-blocking mode. */
     g_socket_set_blocking(socket, FALSE);
+
+#else
+
+    /* here 'arg' is ignored, but this command-line parameter can be used
+    * to setup the QSP_config(), to set up the QS filters, or for any
+    * other purpose.
+    */
+    (void)arg;
+
+    QSPY_config(QP_VERSION,         // version
+                QS_OBJ_PTR_SIZE,    // objPtrSize
+                QS_FUN_PTR_SIZE,    // funPtrSize
+                QS_TIME_SIZE,       // tstampSize
+                Q_SIGNAL_SIZE,      // sigSize,
+                QF_EVENT_SIZ_SIZE,  // evtSize
+                QF_EQUEUE_CTR_SIZE, // queueCtrSize
+                QF_MPOOL_CTR_SIZE,  // poolCtrSize
+                QF_MPOOL_SIZ_SIZE,  // poolBlkSize
+                QF_TIMEEVT_CTR_SIZE,// tevtCtrSize
+                (void *)0,          // matFile,
+                (void *)0,          // mscFile
+                (QSPY_CustParseFun)0); // no customized parser function
+
+#endif
 
     /* set up the QS filters... */
     QS_FILTER_ON(QS_QEP_STATE_ENTRY);
@@ -322,23 +354,47 @@ uint8_t QS_onStartup(void const *arg) {
 }
 /*..........................................................................*/
 void QS_onCleanup(void) {
+#if defined QSPY_NET
     if (connection != NULL) {
 		g_socket_close(socket, NULL);
 		socket = NULL;
         g_object_unref(connection);
         connection = NULL;
     }
+#else
+    l_running = (uint8_t)0;
+    QSPY_stop();
+#endif
 }
 /*..........................................................................*/
 void QS_onFlush(void) {
-    guint16 nBytes = 1000;
+#if defined QSPY_NET
+#  define NBYTES    1000
+#else
+#  define NBYTES    1024
+#endif
+    guint16 nBytes = NBYTES;
     guint8 const *block;
 
-    if (socket) while ((block = QS_getBlock(&nBytes)) != (uint8_t *)0) {
-        g_socket_send(socket, (char const *)block, nBytes, NULL, NULL);
-        nBytes = 1000;
+    for (; socket || l_running;) {
+        QF_CRIT_ENTRY(dummy);
+        block = QS_getBlock(&nBytes);
+        QF_CRIT_EXIT(dummy);
+
+        if (block != (uint8_t const *)0) {
+#if defined QSPY_NET
+            g_socket_send(socket, (char const *)block, nBytes, NULL, NULL);
+#else
+            QSPY_parse(block, nBytes);
+#endif
+            nBytes = NBYTES;
+        }
+        else {
+            break;
+        }
     }
     g_usleep(50000);
+#undef NBYTES
 }
 /*..........................................................................*/
 QSTimeCtr QS_onGetTime(void) {

@@ -250,12 +250,12 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
         /* owner-drawn buttons... */
         case WM_DRAWITEM: {
             LPDRAWITEMSTRUCT pdis = (LPDRAWITEMSTRUCT)lParam;
-            if (IDC_PED_BTN == pdis->CtlID) switch (OwnerDrawnButton_draw(&l_pedBtn,pdis))
+            if (IDC_PED_BTN == pdis->CtlID) switch (OwnerDrawnButton_draw(&l_pedBtn, pdis))
 			{
 				case BTN_DEPRESSED:
 					break;
 				case BTN_RELEASED:
-					BSP_publishBtnEvt();
+					// BSP_publishBtnEvt();
 					break;
 				default:
 					break;
@@ -310,7 +310,7 @@ static void WriteTime(DWORD t)
 }
 /*..........................................................................*/
 void QF_onStartup(void) {
-    QF_setTickRate(BSP_TICKS_PER_SEC); /* set the desired tick rate */
+    QF_setTickRate(BSP_TICKS_PER_SEC, 30); /* set the desired tick rate */
 }
 /*..........................................................................*/
 void QF_onCleanup(void) {
@@ -455,10 +455,12 @@ uint16_t BSP_getButton(void)
 * is actually performed. In other words, the rest of the application does NOT
 * need to change in any way to produce QS output.
 */
+static uint8_t l_running;
 
 /*..........................................................................*/
 static DWORD WINAPI idleThread(LPVOID par) {/* signature for CreateThread() */
     (void)par;
+#if defined QSPY_NET
     while (l_sock != INVALID_SOCKET) {
         uint16_t nBytes;
         uint8_t const *block;
@@ -491,13 +493,30 @@ static DWORD WINAPI idleThread(LPVOID par) {/* signature for CreateThread() */
         if (block != (uint8_t *)0) {
             send(l_sock, (char const *)block, nBytes, 0);
         }
-        Sleep(20); /* sleep for xx milliseconds */
     }
+#else
+    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
+    l_running = (uint8_t)1;
+    while (l_running) {
+        uint16_t nBytes = 256;
+        uint8_t const *block;
+
+        QF_CRIT_ENTRY(dummy);
+        block = QS_getBlock(&nBytes);
+        QF_CRIT_EXIT(dummy);
+        if (block != (uint8_t *)0) {
+            QSPY_parse(block, nBytes);
+        }
+    }
+#endif
+    Sleep(10U);  /* wait for a clock tick */
     return (DWORD)0; /* return success */
 }
 /*..........................................................................*/
 uint8_t QS_onStartup(void const *arg) {
-    static uint8_t qsBuf[1024];  /* buffer for QS output */
+    static uint8_t qsBuf[2 * 1024];  /* buffer for QS output */
+
+#if defined QSPY_NET
     static uint8_t qsRxBuf[100]; /* buffer for QS receive channel */
     static WSADATA wsaData;
     char hostName[64];
@@ -567,7 +586,30 @@ uint8_t QS_onStartup(void const *arg) {
         QS_EXIT();
         return (uint8_t)0; /* failure */
     }
+#else
+    QS_initBuf(qsBuf, sizeof(qsBuf));
 
+    /* here 'arg' is ignored, but this command-line parameter can be used
+    * to setup the QSP_config(), to set up the QS filters, or for any
+    * other purpose.
+    */
+    (void)arg;
+
+    QSPY_config(QP_VERSION,         // version
+                QS_OBJ_PTR_SIZE,    // objPtrSize
+                QS_FUN_PTR_SIZE,    // funPtrSize
+                QS_TIME_SIZE,       // tstampSize
+                Q_SIGNAL_SIZE,      // sigSize,
+                QF_EVENT_SIZ_SIZE,  // evtSize
+                QF_EQUEUE_CTR_SIZE, // queueCtrSize
+                QF_MPOOL_CTR_SIZE,  // poolCtrSize
+                QF_MPOOL_SIZ_SIZE,  // poolBlkSize
+                QF_TIMEEVT_CTR_SIZE,// tevtCtrSize
+                (void *)0,          // matFile,
+                (void *)0,          // mscFile
+                (QSPY_CustParseFun)0); // no customized parser function
+
+#endif
     /* set up the QS filters... */
     QS_FILTER_OFF(QS_ALL_RECORDS);
 
@@ -585,20 +627,45 @@ uint8_t QS_onStartup(void const *arg) {
 }
 /*..........................................................................*/
 void QS_onCleanup(void) {
+#if defined QSPY_NET
     if (l_sock != INVALID_SOCKET) {
         closesocket(l_sock);
         l_sock = INVALID_SOCKET;
     }
     WSACleanup();
+#else
+    l_running = (uint8_t)0;
+    QSPY_stop();
+#endif
 }
 /*..........................................................................*/
+
 void QS_onFlush(void) {
-    uint16_t nBytes = 1000;
+#if defined QSPY_NET
+#  define NBYTES    1000
+#else
+#  define NBYTES    1024
+#endif
+    uint16_t nBytes = NBYTES;
     uint8_t const *block;
-    while ((block = QS_getBlock(&nBytes)) != (uint8_t *)0) {
-        send(l_sock, (char const *)block, nBytes, 0);
-        nBytes = 1000;
+
+    for (;;) {
+        QF_CRIT_ENTRY(dummy);
+        block = QS_getBlock(&nBytes);
+        QF_CRIT_EXIT(dummy);
+        if (block != (uint8_t const *)0) {
+#if defined QSPY_NET
+            send(l_sock, (char const *)block, nBytes, 0);
+#else
+            QSPY_parse(block, nBytes);
+#endif
+            nBytes = NBYTES;
+        }
+        else {
+            break;
+        }
     }
+#undef NBYTES
 }
 /*..........................................................................*/
 QSTimeCtr QS_onGetTime(void) {
@@ -634,5 +701,7 @@ void QSPY_onPrintLn(void) {
     fputs(QSPY_line, stdout);
     fputc('\n', stdout);
 }
+
 #endif /* Q_SPY */
 /*--------------------------------------------------------------------------*/
+

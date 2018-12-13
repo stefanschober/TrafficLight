@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<session version="4.2.1">
- <item name="license"></item>
+<session version="4.3.1">
+ <item name="license">GPL</item>
  <group name="locked"/>
  <group name="settings">
   <item name="tabs">1</item>

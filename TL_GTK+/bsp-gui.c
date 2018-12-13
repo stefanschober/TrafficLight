@@ -242,7 +242,7 @@ static gpointer  appThread(gpointer task_data)
 {
     g_mutex_lock(&startMutex);
     g_mutex_unlock(&startMutex);
-    return main_gui(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
+    return (gpointer)main_gui(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
 }
 
 static void appQuit(void)

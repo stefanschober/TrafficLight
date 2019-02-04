@@ -1,0 +1,30 @@
+/* XPM */
+static char *LedWhite[] = {
+/* columns rows colors chars-per-pixel */
+"24 23 1 1 ",
+"  c white",
+/* pixels */
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        ",
+"                        "
+};

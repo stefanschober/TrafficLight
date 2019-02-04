@@ -195,7 +195,7 @@
 			<locationURI>PARENT-2-PROJECT_LOC/qpc/include/stdint_c.h</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/gtk+</name>
+			<name>qpc/ports/posix</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
@@ -240,34 +240,34 @@
 			<locationURI>PARENT-2-PROJECT_LOC/qtools/qspy/source/qspy.c</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/gtk+/dbg</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>qpc/ports/gtk+/qep_port.h</name>
+			<name>qpc/ports/posix/README.txt</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/gtk+/qep_port.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/README.txt</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/gtk+/qf_port.c</name>
+			<name>qpc/ports/posix/qep_port.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/gtk+/qf_port.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qep_port.h</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/gtk+/qf_port.h</name>
+			<name>qpc/ports/posix/qf_port.c</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/gtk+/qf_port.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qf_port.c</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/gtk+/qs_port.h</name>
+			<name>qpc/ports/posix/qf_port.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/gtk+/qs_port.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qf_port.h</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/gtk+/spy</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
+			<name>qpc/ports/posix/qs_port.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qs_port.c</locationURI>
+		</link>
+		<link>
+			<name>qpc/ports/posix/qs_port.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qs_port.h</locationURI>
 		</link>
 		<link>
 			<name>qpc/src/qf/qep_hsm.c</name>
@@ -353,16 +353,6 @@
 			<name>qpc/src/qs/qutest.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/qpc/src/qs/qutest.c</locationURI>
-		</link>
-		<link>
-			<name>qpc/ports/gtk+/dbg/libqp.a</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/gtk+/dbg/libqp.a</locationURI>
-		</link>
-		<link>
-			<name>qpc/ports/gtk+/spy/libqp.a</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/gtk+/spy/libqp.a</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -112,21 +112,26 @@ static void readUserButtons(void)
     * adapted from the book "Embedded Systems Dictionary" by Jack Ganssle
     * and Michael Barr, page 71.
     */
-    static uint8_t debounceBuffer[5] = {0, 0, 0, 0, 0};;
+    static uint8_t debounceBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     static uint8_t debounceIndex = 0;
     static uint8_t debouncedButtons = 0;
-    static uint8_t oldButtons = 0;
+    static uint8_t chgButtons = 0;
     static uint32_t time2Min = 120ul * BSP_TICKS_PER_SEC;
     uint8_t currentButtons = 0;
     uint8_t currentAND = 0xFFu;
     uint8_t currentOR = 0x00u;
     uint8_t n;
 
+    if (0 < time2Min)
+    {
+    	time2Min--;
+    }
+
+    chgButtons = debouncedButtons;
     if (READ_UserBtn())
         currentButtons |= 0x01u;
     debounceBuffer[debounceIndex++] = currentButtons;
-    if (debounceIndex >= ARRAY_SIZE(debounceBuffer))
-        debounceIndex = 0;
+    debounceIndex &= (0x08 - 1);
     for (n = 0; n < ARRAY_SIZE(debounceBuffer); n++)
     {
         currentAND &= debounceBuffer[n];
@@ -134,32 +139,35 @@ static void readUserButtons(void)
     }
     debouncedButtons |= currentAND;
     debouncedButtons &= currentOR;
-    if ( ((debouncedButtons & 0x01) && ((oldButtons ^ debouncedButtons) & 0x01)) || (0 == time2Min) )
+    chgButtons ^= debouncedButtons;
+    if ( (debouncedButtons & chgButtons & 0x01) || (0 == time2Min) )
     {
-    	BSP_publishBtnEvt(); /* publish to all subscribers */
+    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+
+        QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
     	time2Min = 120ul * BSP_TICKS_PER_SEC;
     }
-    else if ((debouncedButtons & 0x02) && ((oldButtons ^ debouncedButtons) & 0x02))
+    else if (debouncedButtons & chgButtons & 0x02)
     {
-    	BSP_publishEmergencyEvt(); /* publish to all subscribers */
-    }
-    oldButtons = debouncedButtons;
-    if (0 < time2Min)
-    {
-    	time2Min--;
+    	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
+
+        buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
+        QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
     }
 }
 
 /* BSP functions ===========================================================*/
-void BSP_init(int argc, char *argv[]) {
-    (void)argc;
-    (void)argv;
-
+void BSP_HW_init(void) {
     /* NOTE: SystemInit() has been already called from the startup code
     *  but SystemCoreClock needs to be updated
     */
-    SystemCoreClockUpdate();
     hal_init();
+    SystemCoreClockUpdate();
+}
+/*..........................................................................*/
+void BSP_init(int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
 
 #if 0
     /* enable GPIOA clock port for the LED LD2 */
@@ -223,22 +231,22 @@ void BSP_setlight(eTLidentity_t id, eTLlight_t light)
     switch(id)
     {
         case TrafficLightA:
-            gpio = TL_A_RED_GPIO_Port;
-            IDCs[0] = TL_A_RED_Pin;
-            IDCs[1] = TL_A_YLW_Pin;
-            IDCs[2] = TL_A_GRN_Pin;
+            gpio = PIN_A_RED_GPIO_Port;
+            IDCs[0] = PIN_A_RED_Pin;
+            IDCs[1] = PIN_A_YLW_Pin;
+            IDCs[2] = PIN_A_GRN_Pin;
             break;
         case TrafficLightB:
-            gpio = TL_B_RED_GPIO_Port;
-            IDCs[0] = TL_B_RED_Pin;
-            IDCs[1] = TL_B_YLW_Pin;
-            IDCs[2] = TL_B_GRN_Pin;
+            gpio = PIN_B_RED_GPIO_Port;
+            IDCs[0] = PIN_B_RED_Pin;
+            IDCs[1] = PIN_B_YLW_Pin;
+            IDCs[2] = PIN_B_GRN_Pin;
             break;
         case PedestrianLight:
-            gpio = TL_P_RED_GPIO_Port;
-            IDCs[0] = TL_P_RED_Pin;
+            gpio = PIN_P_RED_GPIO_Port;
+            IDCs[0] = PIN_P_RED_Pin;
             IDCs[1] = 0xFFFFu;
-            IDCs[2] = TL_P_GRN_Pin;
+            IDCs[2] = PIN_P_GRN_Pin;
             break;
         default:
             IDCs[0] = 0xFFFF;
@@ -278,22 +286,6 @@ void BSP_setPedLed(uint16_t status)
     else
         BSP_ledOff();
 }
-/*..........................................................................*/
-// called when button PEDESTRIAN is clicked
-void BSP_publishBtnEvt(void)
-{
-	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
-
-    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
-}
-
-void BSP_publishEmergencyEvt(void)
-{
-	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
-
-    buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
-    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
-}
 
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
@@ -306,7 +298,7 @@ void QF_onStartup(void) {
     * Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     * DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     */
-    NVIC_SetPriority(SysTick_IRQn,   SYSTICK_PRIO);
+    HAL_NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIO, 0);
     /* ... */
 
     /* enable IRQs... */

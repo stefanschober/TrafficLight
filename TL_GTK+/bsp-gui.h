@@ -20,8 +20,8 @@
 #define bsp_gui_h
 
 void guiSetLight(eTLidentity_t id, eTLlight_t light);
-void guiSetPedLed(guint16 status);
-guint16 guiGetButton(void);
+void guiSetPedLed(uint16_t status);
+uint16_t guiGetButton(void);
 
 int startGui(int argc, char *argv[]);
 int main_gui(int argc, char *argv[]);

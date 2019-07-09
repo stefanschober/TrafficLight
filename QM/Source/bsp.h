@@ -21,6 +21,7 @@
 
 #define BSP_TICKS_PER_SEC    100U
 
+void BSP_HW_init(void);
 void BSP_init(int argc, char *argv[]);
 void BSP_terminate(int16_t result);
 

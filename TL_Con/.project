@@ -196,7 +196,7 @@
 			<locationURI>copy_PARENT11/qpc/include/stdint_c.h</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/win32</name>
+			<name>qpc/ports/posix</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
@@ -241,24 +241,24 @@
 			<locationURI>copy_PARENT11/qtools/qspy/source/qspy.c</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/win32/qep_port.h</name>
+			<name>qpc/ports/posix/qep_port.h</name>
 			<type>1</type>
-			<locationURI>copy_PARENT11/qpc/ports/win32/qep_port.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qep_port.h</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/win32/qf_port.c</name>
+			<name>qpc/ports/posix/qf_port.c</name>
 			<type>1</type>
-			<locationURI>copy_PARENT11/qpc/ports/win32/qf_port.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qf_port.c</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/win32/qf_port.h</name>
+			<name>qpc/ports/posix/qf_port.h</name>
 			<type>1</type>
-			<locationURI>copy_PARENT11/qpc/ports/win32/qf_port.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qf_port.h</locationURI>
 		</link>
 		<link>
-			<name>qpc/ports/win32/qs_port.h</name>
+			<name>qpc/ports/posix/qs_port.h</name>
 			<type>1</type>
-			<locationURI>copy_PARENT11/qpc/ports/win32/qs_port.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/qpc/ports/posix/qs_port.h</locationURI>
 		</link>
 		<link>
 			<name>qpc/src/qf/qep_hsm.c</name>

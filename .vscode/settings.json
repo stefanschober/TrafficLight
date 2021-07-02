@@ -1,0 +1,18 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/Source",
+    "cmake.buildDirectory": "${workspaceFolder}/Build/Pico_Make",
+    "cmake.configureArgs": [
+        "-DCONFIG_PICO=TRUE",
+        "-DCONFIG_KERNEL_QK=OFF",
+        "-DCONFIG_KERNEL_QV=ON",
+        "-DTARGET=trafficlight",
+        "-DCMAKE_BUILD_TYPE=Debug"
+    ],
+    "cmake.cacheInit": null,
+    "cmake.clearOutputBeforeBuild": false,
+    "cmake.ignoreKitEnv": true,
+    "cmake.generator": "Unix Makefiles",
+    "cmake.configureEnvironment": {
+        "PICO_SDK_PATH": "/home/stefan/Projects/pico/pico-sdk"
+    },
+}

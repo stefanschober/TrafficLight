@@ -35,16 +35,8 @@
 #include "trafficlight.h"
 #include "bsp.h"
 #include <stdio.h>
+#include "RP2040.h"
 #include "pico/stdlib.h"
-#include "pico/time.h"
-#include "hardware/gpio.h"
-#include "hardware/clocks.h"
-#include "hardware/watchdog.h"
-#include "hardware/exception.h"
-#include "hardware/structs/systick.h"
-#include "hardware/address_mapped.h"
-#include "hardware/regs/addressmap.h"
-#include "hardware/regs/m0plus.h"
 
 
 /* add other drivers if necessary... */
@@ -56,27 +48,11 @@ Q_DEFINE_THIS_FILE
 #error "No real time kernel (neither KERNEL_QV nor KERNEL_QK) is defined. Aborting!"
 #endif
 
-#if __ARM_ARCH == 6
-#warning "__ARM_ARCH == 6"
-#elif __ARM_ARCH == 7
-#warning "__ARM_ARCH == 7"
-#else
+#if !(__ARM_ARCH == 6 || __ARM_ARCH == 7)
 #error "unknown ARM architecture found. Aborting!"
 #endif
 
-/*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-* Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
-* DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
-*/
-enum KernelAwareISRs {
-    GPIOPORTA_PRIO = QF_AWARE_ISR_CMSIS_PRI, /* see NOTE00 */
-    /* ... */
-    MAX_KERNEL_AWARE_CMSIS_PRI /* keep always last */
-};
-/* "kernel-aware" interrupts should not overlap the PendSV priority */
-// Q_ASSERT_COMPILE(MAX_KERNEL_AWARE_CMSIS_PRI <= (0xFF >>(8-__NVIC_PRIO_BITS)));
-
-void HAL_SYSTICK_Callback(void);
+void SysTick_Handler(void);
 static void readUserButtons(void);
 
 /* Local-scope defines -----------------------------------------------------*/
@@ -122,11 +98,8 @@ enum {
     PIN_LAST_GPIO
 };
 
-static exception_handler_t origSysTick_hdl = (void *)0;
-uint32_t SystemCoreClock = 125000000ul;
-
 /* ISRs used in the application ==========================================*/
-void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
+void SysTick_Handler(void) {   /* system clock tick ISR */
 #ifdef KERNEL_QK
     QK_ISR_ENTRY();   /* inform QK about entering an ISR */
 #endif
@@ -199,28 +172,19 @@ static void readUserButtons(void)
     }
 }
 
-static void SysTick_Config(uint32_t f)
-{
-    systick_hw->csr  = 0x00ul;
-    systick_hw->cvr  = 0x00ul;
-    systick_hw->rvr  = f;
-    systick_hw->csr  = 0x06ul;
-    systick_hw->csr |= 0x01ul;
-}
-
 /* BSP functions ===========================================================*/
 void BSP_HW_init(void) {
-    uint8_t gpio;
-
     stdio_init_all();
-    clocks_init();
+}
 
-    SystemCoreClock = clock_get_hz(clk_sys);
+/*..........................................................................*/
+void BSP_init(int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
 
-    origSysTick_hdl = exception_get_vtable_handler(SYSTICK_EXCEPTION);
-    exception_set_exclusive_handler(SYSTICK_EXCEPTION, HAL_SYSTICK_Callback);
-    
-    for (gpio = PICO_FIRST_PORT; gpio < PIN_LAST_GPIO; gpio++)
+    SystemCoreClockUpdate();
+
+    for (uint8_t gpio = PICO_FIRST_PORT; gpio < PIN_LAST_GPIO; gpio++)
     {
         gpio_init(gpio);
         gpio_set_dir(gpio, GPIO_OUT);
@@ -234,11 +198,6 @@ void BSP_HW_init(void) {
     // unpressed, it uses internal pull ups. Otherwise when unpressed, the input will
     // be floating.
     gpio_pull_up(PIN_BUTTON_Pin);
-}
-/*..........................................................................*/
-void BSP_init(int argc, char *argv[]) {
-    (void)argc;
-    (void)argv;
 
    /* initialize the QS software tracing... */
     if (QS_INIT((void *)0) == 0U) {
@@ -269,55 +228,29 @@ void BSP_ledOff(void) {
     gpio_put(LED_LD2, 0);
 }
 /*..........................................................................*/
-static void trafficLights(uint16_t l1, uint16_t l2)
-{
-
-}
-
 void BSP_setlight(eTLidentity_t id, eTLlight_t light)
 {
     uint32_t offMask, onMask;
-    // switch off all lights of the chosen TL
+    static uint8_t shiftmasks[MaxIdentity] = {PIN_A_RED_Pin, PIN_B_RED_Pin, PIN_P_RED_Pin};
 
-    offMask = (id == PedestrianLight) ? 0x03 : 0x07u;
+    Q_ASSERT(light < NO_LIGHT && id < MaxIdentity);
+    offMask = ((id == PedestrianLight) ? 0x03 : 0x07u) << shiftmasks[id];
     switch(light)
     {
         case RED:
-            onMask = 0x01u;
+            onMask = 0x01u << shiftmasks[id];
             break;
-        
         case YELLOW:
-            onMask = 0x02u;
+            onMask = 0x02u << shiftmasks[id];
             break;
-        
         case RED_YELLOW:
-            onMask = 0x03u;
+            onMask = 0x03u << shiftmasks[id];
             break;
-        
         case GREEN:
-            onMask = (id == PedestrianLight) ? 0x02u : 0x04u;
+            onMask = (id == PedestrianLight ? 0x02 : 0x04u) << shiftmasks[id];
             break;
-
         default:
-            offMask = 0;
             onMask = 0;
-    }
-    
-    switch(id)
-    {
-        case TrafficLightA:
-            onMask <<= PIN_A_RED_Pin;
-            offMask <<= PIN_A_RED_Pin;
-            break;
-
-        case TrafficLightB:
-            onMask <<= PIN_B_RED_Pin;
-            offMask <<= PIN_B_RED_Pin;
-            break;
-
-        case PedestrianLight:
-            onMask <<= PIN_P_RED_Pin;
-            offMask <<= PIN_P_RED_Pin;
             break;
     }
 
@@ -336,19 +269,26 @@ void BSP_setPedLed(uint16_t status)
 
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
+    /* assing all priority bits for preemption-prio. and none to sub-prio. */
+    NVIC_SetPriorityGrouping(0U);
+
     /* set up the SysTick timer to fire at BSP_TICKS_PER_SEC rate */
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
 
-    /* set priorities of ALL ISRs used in the system, see NOTE00
+    /* set priorities of ALL ISRs used in the system, see NOTE1
     *
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     * Assign a priority to EVERY ISR explicitly by calling NVIC_SetPriority().
     * DO NOT LEAVE THE ISR PRIORITIES AT THE DEFAULT VALUE!
     */
-   gpio_put(PICO_DEFAULT_LED_PIN, 1);
+    NVIC_SetPriority(SysTick_IRQn, QF_AWARE_ISR_CMSIS_PRI);
     /* ... */
 
     /* enable IRQs... */
+#ifdef Q_SPY
+//    NVIC_EnableIRQ(USART3_IRQn); /* UART interrupt used for QS-RX */
+#endif
+   gpio_put(PICO_DEFAULT_LED_PIN, 1);
 }
 /*..........................................................................*/
 void QF_onCleanup(void) {
@@ -392,7 +332,7 @@ void QV_onIdle(void) { /* called with interrupts enabled */
     * The trick with BOOT(0) is it gets the part to run the System Loader
     * instead of your broken code. When done disconnect BOOT0, and start over.
     */
-    //__WFI(); /* Wait-For-Interrupt */
+    __WFI(); /* Wait-For-Interrupt */
 #endif
 }
 
@@ -408,11 +348,11 @@ void Q_onAssert(char const *module, int loc) {
 #ifndef NDEBUG
     BSP_wait4SW1();
 #endif
-    watchdog_reboot(0, 0, 10);
+    NVIC_SystemReset();
     
     while(1)
     {
-        sleep_ms(100);
+        // should never happen
     }
 }
 

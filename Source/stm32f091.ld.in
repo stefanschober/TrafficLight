@@ -1,0 +1,61 @@
+/*****************************************************************************
+* Product: Linker script for TLE9844-2Q, GNU-ARM linker
+*****************************************************************************/
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+OUTPUT_ARCH(arm)
+ENTRY(Reset_Handler) /* entry Point */
+
+// CMake configuration section
+#cmakedefine NO_LIBINIT
+#cmakedefine STACKSIZE @STACKSIZE@
+#cmakedefine HEAPSIZE @HEAPSIZE@
+#cmakedefine MCU_FLASH_SIZE @MCU_FLASH_SIZE@
+#if defined MCU_FLASH_SIZE
+#   define FLASHSIZE MCU_FLASH_SIZE
+#else
+#   define FLASHSIZE (1024 * 32)
+#endif
+
+
+// Preprocessor definitions
+FLASHSTART = 0x8000000;
+RAMSIZE    = (1024 *  32); //  32kBytes of RAM
+RAMSTART   = 0x20000000;
+EEPSIZE    = 4k;
+ 
+#if (defined(STACKSIZE) && (STACKSIZE > 0))
+  __stacksize = STACKSIZE;
+#endif
+#if (defined(HEAPSIZE) && (HEAPSIZE > 0))
+  __heapsize = HEAPSIZE;
+#endif
+
+NADSIZE  = 4;
+RAMEND   = (RAMSTART   + RAMSIZE);
+CODESIZE = (FLASHSIZE  - EEPSIZE - NADSIZE);
+EEPSTART = (FLASHSTART + CODESIZE);
+NADSTART = (FLASHSTART + FLASHSIZE - NADSIZE);
+
+MEMORY { /* memory map of Infineon TLE9844 */
+    FLASH(rx) : ORIGIN = FLASHSTART, LENGTH = CODESIZE
+    EEPROM(r) : ORIGIN = EEPSTART,   LENGTH = EEPSIZE
+    NADROM(r) : ORIGIN = NADSTART,   LENGTH = NADSIZE
+    RAM(rwx)  : ORIGIN = RAMSTART,   LENGTH = RAMSIZE
+}
+
+REGION_ALIAS("R_NADROM", NADROM);
+
+REGION_ALIAS("R_VECTOR", FLASH);
+REGION_ALIAS("R_TEXT",   FLASH);
+REGION_ALIAS("R_RODATA", FLASH);
+REGION_ALIAS("R_ARRAYS", FLASH);
+REGION_ALIAS("R_EEPROM", EEPROM);
+
+REGION_ALIAS("R_DATA",   RAM);
+REGION_ALIAS("R_BSS",    RAM);
+REGION_ALIAS("R_NOINIT", RAM);
+REGION_ALIAS("R_HEAP",   RAM);
+REGION_ALIAS("R_STACK",  RAM);
+REGION_ALIAS("R_EXIDX",  RAM);
+
+INCLUDE "stm32f091_sect.ld";

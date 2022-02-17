@@ -4,14 +4,14 @@
 * @ingroup qf
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-03
+* Last updated for version 6.9.4
+* Last updated on  2021-09-16
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -52,6 +52,7 @@ Q_DEFINE_THIS_MODULE("qf_defer")
 
 /****************************************************************************/
 /**
+* @protected @memberof QActive
 * @description
 * This function is part of the event deferral support. An active object
 * uses this function to defer an event @p e to the QF-supported native
@@ -81,8 +82,6 @@ bool QActive_defer(QActive const * const me, QEQueue * const eq,
     bool status = QEQueue_post(eq, e, 0U, me->prio);
     QS_CRIT_STAT_
 
-    (void)me; /* unused parameter */
-
     QS_BEGIN_PRE_(QS_QF_ACTIVE_DEFER, me->prio)
         QS_TIME_PRE_();      /* time stamp */
         QS_OBJ_PRE_(me);     /* this active object */
@@ -96,6 +95,7 @@ bool QActive_defer(QActive const * const me, QEQueue * const eq,
 
 /****************************************************************************/
 /**
+* @protected @memberof QActive
 * @description
 * This function is part of the event deferral support. An active object
 * uses this function to recall a deferred event from a given QF
@@ -171,6 +171,7 @@ bool QActive_recall(QActive * const me, QEQueue * const eq) {
 
 /****************************************************************************/
 /**
+* @protected @memberof QActive
 * @description
 * This function is part of the event deferral support. An active object
 * can use this function to flush a given QF event queue. The function makes
@@ -190,8 +191,6 @@ uint_fast16_t QActive_flushDeferred(QActive const * const me,
 {
     QEvt const *e = QEQueue_get(eq, me->prio);
     uint_fast16_t n = 0U;
-
-    (void)me; /* unused parameter */
 
     for (; e != (QEvt *)0; e = QEQueue_get(eq, me->prio)) {
         QF_gc(e); /* garbage collect */

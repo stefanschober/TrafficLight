@@ -27,7 +27,6 @@
             "intelliSenseMode": "${default}",
             "cStandard": "${default}",
             "cppStandard": "${default}",
-            "compilerPath": "${default}",
             "configurationProvider": "ms-vscode.cmake-tools"
         }
     ],

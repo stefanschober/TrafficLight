@@ -4,14 +4,14 @@
 * @brief ::QMPool implementatin (Memory Pool)
 * @cond
 ******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-03
+* Last updated for version 6.9.4
+* Last updated on  2021-09-16
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -52,6 +52,7 @@ Q_DEFINE_THIS_MODULE("qf_mem")
 
 /****************************************************************************/
 /**
+* @public @memberof QMPool
 * @description
 * Initialize a fixed block-size memory pool by providing it with the pool
 * memory to manage, size of this memory, and the block size.
@@ -97,8 +98,8 @@ void QMPool_init(QMPool * const me, void * const poolSto,
     * and the blockSize must not be too close to the top of the dynamic range
     */
     Q_REQUIRE_ID(100, (poolSto != (void *)0)
-              && (poolSize >= sizeof(QFreeBlock))
-              && ((blockSize + sizeof(QFreeBlock)) > blockSize));
+            && (poolSize >= (uint_fast32_t)sizeof(QFreeBlock))
+            && ((uint_fast16_t)(blockSize + sizeof(QFreeBlock)) > blockSize));
 
     me->free_head = poolSto;
 
@@ -136,6 +137,7 @@ void QMPool_init(QMPool * const me, void * const poolSto,
 
 /****************************************************************************/
 /**
+* @public @memberof QMPool
 * @description
 * Recycle a memory block to the fixed block-size memory pool.
 *
@@ -183,6 +185,7 @@ void QMPool_put(QMPool * const me, void *b, uint_fast8_t const qs_id) {
 
 /****************************************************************************/
 /**
+* @public @memberof QMPool
 * @description
 * The function allocates a memory block from the pool and returns a pointer
 * to the block back to the caller.
@@ -280,6 +283,7 @@ void *QMPool_get(QMPool * const me, uint_fast16_t const margin,
 
 /****************************************************************************/
 /**
+* @public @memberof QMPool
 * @description
 * This function obtains the minimum number of free blocks in the given
 * event pool since this pool has been initialized by a call to QF_poolInit().

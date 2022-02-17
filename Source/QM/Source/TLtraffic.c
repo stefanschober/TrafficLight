@@ -296,7 +296,7 @@ static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e) {
         case TIMEOUT_SIG: {
             /*.${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[(0==TL_ID(me))]} */
             if (( 0 ==TL_ID(me) )) {
-                status_ = Q_TRAN(&TLtraffic_GREEN);
+                status_ = Q_TRAN(&TLtraffic_RED_YELLOW_1);
             }
             /*.${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[else]} */
             else {

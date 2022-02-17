@@ -3,16 +3,32 @@
     "cmake.buildDirectory": "${workspaceFolder}/Build/Pico_Make",
     "cmake.configureArgs": [
         "-DCONFIG_PICO=TRUE",
-        "-DCONFIG_KERNEL_QK=OFF",
-        "-DCONFIG_KERNEL_QV=ON",
+        "-DCONFIG_PICO_CMSIS=TRUE",
+        "-DCONFIG_KERNEL_QK=TRUE",
+        "-DCONFIG_KERNEL_QV=FALSE",
         "-DTARGET=trafficlight",
-        "-DCMAKE_BUILD_TYPE=Debug"
+        "-DCONFIG_DEBUG=FALSE"
     ],
-    "cmake.cacheInit": null,
     "cmake.clearOutputBeforeBuild": false,
     "cmake.ignoreKitEnv": true,
     "cmake.generator": "Unix Makefiles",
     "cmake.configureEnvironment": {
         "PICO_SDK_PATH": "/home/stefan/Projects/pico/pico-sdk"
     },
+    "cmake.statusbar.advanced": {
+        "debug": {
+            "visibility": "hidden"
+        },
+        "launch": {
+            "visibility": "hidden"
+        },
+        "build": {
+            "visibility": "hidden"
+        },
+        "buildTarget": {
+            "visibility": "hidden"
+        }
+    },
+    "cmake.buildBeforeRun": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

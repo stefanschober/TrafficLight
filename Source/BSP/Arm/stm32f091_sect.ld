@@ -1,0 +1,156 @@
+/*****************************************************************************
+* Product: Linker script for TLE9844-2Q, GNU-ARM linker
+*****************************************************************************/
+
+PROVIDE(__stacksize = 0x0200);
+PROVIDE(__heapsize  = 0x0000);
+
+SECTIONS {
+    .isr_vector : {        /* the vector table goes FIRST into ROM */
+    	__rom_start = .;
+        KEEP(*(.vectors)) /* vector table */
+        . = ALIGN(4);
+    } >R_VECTOR
+
+    .text : {              /* code and constants */
+        . = ALIGN(4);
+        KEEP (*(.init))
+        *(.text)           /* .text sections (code) */
+        *(.text*)          /* .text* sections (code) */
+        KEEP (*(.fini))
+        . = ALIGN(4);
+    } >R_TEXT
+    
+    .rodata : {
+        *(.rodata)         /* .rodata sections (constants, strings, etc.) */
+        *(.const)
+        *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
+        *(.const*)
+    } > R_RODATA
+    
+    .preinit_array : {
+        PROVIDE_HIDDEN (__preinit_array_start = .);
+        KEEP (*(.preinit_array*))
+        PROVIDE_HIDDEN (__preinit_array_end = .);
+    } >R_ARRAYS
+
+    .init_array : {
+        PROVIDE_HIDDEN (__init_array_start = .);
+        KEEP (*(SORT(.init_array.*)))
+        KEEP (*(.init_array*))
+        PROVIDE_HIDDEN (__init_array_end = .);
+    } >R_ARRAYS
+
+    .fini_array : {
+        PROVIDE_HIDDEN (__fini_array_start = .);
+        KEEP (*(.fini_array*))
+        KEEP (*(SORT(.fini_array.*)))
+        PROVIDE_HIDDEN (__fini_array_end = .);
+    } >R_ARRAYS
+
+    .eepar  : {
+    	PROVIDE(__eeprom_start = .);
+        PROVIDE(__eepar_start = .);
+        *(.parameter)
+		*(.parameter*)
+        PROVIDE(__eepar_end = .);
+    } >R_EEPROM
+    
+    .eevar ALIGN(512) : {
+        PROVIDE(__eevar_start = .);
+        *(.profile)
+		*(.profile*)
+        *(.eoldata)
+		*(.eoldata*)
+		. = ALIGN(4);
+        PROVIDE(__eevar_end = .);
+		PROVIDE(__eeprom_end = .);
+    } >R_EEPROM
+    
+	.noinit (NOLOAD) : {
+        PROVIDE(__noinit_start = .);
+        *(.noinit)
+        *(.noinit*)
+        . = ALIGN(4);
+        PROVIDE(__noinit_end = .);
+    } >R_NOINIT
+    
+	.nacnad  : {
+		KEEP(*(.nacnad))
+	} >R_NADROM
+
+    .data :  {
+        PROVIDE(__data_start = .);
+        *(.data)           /* .data sections */
+        *(.data*)          /* .data* sections */
+        . = ALIGN(4);
+        PROVIDE(__data_end__ = .);
+    } >R_DATA AT >R_RODATA
+
+    .bss (NOLOAD) : {
+        PROVIDE(__bss_start__ = .);
+        *(.bss)
+        *(.bss*)
+        *(COMMON)
+        . = ALIGN(4);
+        PROVIDE(_ebss = .);         /* define a global symbol at bss end */
+    } >R_BSS
+
+    .ARM.exidx   : {
+        PROVIDE(__exidx_start = .);
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+        PROVIDE(__exidx_end = .);
+    } >R_EXIDX
+
+    .heap (NOLOAD) : {
+        PROVIDE(__heap_start = .);
+        ASSERT((RAMEND > ABSOLUTE(__heap_start + __heapsize + __stacksize)), "Error no space left for the heap/stack");
+        *(.heap)
+        *(.heap*)
+        . = . + (((. - __heap_start) >= __heapsize) ? 0 : (__heapsize - (. - __heap_start)));
+        PROVIDE(__heap_end = .);
+    } >R_HEAP
+    
+    .stack (NOLOAD) : {
+        PROVIDE(__stack_start = .);
+        ASSERT((RAMEND > ABSOLUTE(__stack_start + __stacksize)), "Error: no space left for the stack");
+        . = . + __stacksize;
+    } > R_STACK
+    PROVIDE(__stack_end = RAMEND);
+    
+    /* Remove information from the standard libraries */
+    /DISCARD/ : {
+        libc.a ( * )
+        libm.a ( * )
+        libgcc.a ( * )
+    }
+}
+
+PROVIDE ( _etext = ADDR(.fini_array) + SIZEOF(.fini_array) );            /* global symbols at end of code */
+
+PROVIDE (__data_load = LOADADDR (.data));
+PROVIDE (_sidata = __data_load);
+PROVIDE (_sdata = ADDR(.data));
+PROVIDE (_edata = ADDR(.data) + SIZEOF(.data));
+PROVIDE (_sbss = ADDR(.bss));
+PROVIDE ( end = ADDR(.bss) + SIZEOF(.bss) );
+PROVIDE ( _end = ABSOLUTE(_ebss) );
+PROVIDE ( __end__ = end );
+PROVIDE (__bss_end__ = end);
+PROVIDE (_ebss = end);
+PROVIDE (__initial_sp = __stack_end);
+PROVIDE (_estack = __stack_end);
+
+PROVIDE ( Image$$ROM$$Base     = ORIGIN(R_TEXT) );
+PROVIDE ( Image$$ROM$$Limit    = ORIGIN(R_EEPROM) );
+PROVIDE ( Image$$EEPROM$$Base  = ORIGIN(R_EEPROM) );
+PROVIDE ( Image$$EEPROM$$Limit = ORIGIN(R_EEPROM) + LENGTH(R_EEPROM) );
+
+PROVIDE ( Image$$RAM$$ZI$$Base   = ADDR(.bss) );
+PROVIDE ( Image$$RAM$$ZI$$Length = SIZEOF(.bss) );
+PROVIDE ( Image$$RAM$$ZI$$Limit  = ADDR(.bss) + SIZEOF(.bss) );
+
+PROVIDE ( Image$$RAM$$RW$$Base   = ADDR(.data) );
+PROVIDE ( Image$$RAM$$RW$$Length = SIZEOF(.data) );
+PROVIDE ( Image$$RAM$$RW$$Limit  = ADDR(.data) + SIZEOF(.data) );
+PROVIDE ( Load$$RAM$$RW$$Base    = LOADADDR(.data) );

@@ -42,6 +42,15 @@
 
 Q_DEFINE_THIS_FILE
 
+// plausibility checks
+#if !defined(KERNEL_QV) && !defined(KERNEL_QK)
+#error "No real time kernel (neither KERNEL_QV nor KERNEL_QK) is defined. Aborting!"
+#endif
+
+#if !(__ARM_ARCH == 6 || __ARM_ARCH == 7)
+#error "unknown ARM architecture found. Aborting!"
+#endif
+
 extern void hal_init(void);
 
 /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CAUTION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -89,7 +98,9 @@ static void readUserButtons(void);
 
 /* ISRs used in the application ==========================================*/
 void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
+#ifdef KERNEL_QK
     QK_ISR_ENTRY();   /* inform QK about entering an ISR */
+#endif
 
 #ifdef Q_SPY
     {
@@ -102,7 +113,9 @@ void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
     QACTIVE_POST(the_Ticker0, 0, &l_SysTick_Handler); /* post to Ticker0 */
 
     readUserButtons();
+#ifdef KERNEL_QK
     QK_ISR_EXIT();             /* inform QK about exiting an ISR */
+#endif
 }
 
 static void readUserButtons(void)
@@ -307,8 +320,11 @@ void QF_onStartup(void) {
 void QF_onCleanup(void) {
 }
 /*..........................................................................*/
+#if defined KERNEL_QK
 void QK_onIdle(void) { /* called with interrupts enabled */
-
+#elif defined KERNEL_QV
+void QV_onIdle(void) { /* called with interrupts enabled */
+#endif
     /* toggle an LED on and then off (not enough LEDs, see NOTE01) */
     QF_INT_DISABLE();
     //GPIOA->BSRR |= (LED_LD2);        /* turn LED[n] on  */
@@ -342,7 +358,7 @@ void QK_onIdle(void) { /* called with interrupts enabled */
     * The trick with BOOT(0) is it gets the part to run the System Loader
     * instead of your broken code. When done disconnect BOOT0, and start over.
     */
-    //__WFI(); /* Wait-For-Interrupt */
+    __WFI(); /* Wait-For-Interrupt */
 #endif
 }
 

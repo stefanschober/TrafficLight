@@ -81,7 +81,7 @@ else()
     # MCU based settings (size of flash memory)
     if(NOT MCU)
         message(WARNING "No MCU specified. Setting MCU to TLE9844_2QX!")
-        set(MCU TLE9844_2QX)
+        set(MCU STM32F091xC)
     endif()
 
     # no GUI on embedded target
@@ -193,7 +193,6 @@ target_compile_definitions(${TGT}
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
 )
-
 add_custom_target(${TGT}Hex ALL
     COMMAND ${MKHEX} ${MKHEX_ARGS}
     COMMAND ${MKSIZE} ${MKSIZE_ARGS}

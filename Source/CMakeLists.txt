@@ -28,6 +28,7 @@ option(CONFIG_KERNEL_QV "set to ON, if the QV micro kernel shall be configured. 
 option(CONFIG_KERNEL_QK "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
 option(CONFIG_CONSOLE   "set to ON, if Linux console output shall be configured. (default: OFF)" OFF)
 option(CONFIG_PICO      "set to ON, if Raspberry Pi Pico system shall be configured. (default: OFF)" OFF)
+option(CONFIG_PICO_CMSIS "set to ON, if Raspberry Pi Pico system shall use CMSIS APIs. (default: ON)" ON)
 option(CONFIG_CORTEX_M0 "set to ON, if an ARM Cortex-M0 target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_CORTEX_M0plus "set to ON, if an ARM Cortex-M0+ target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_CORTEX_M3 "set to ON, if an ARM Cortex-M3 target system shall be configured. (default: OFF)" OFF)
@@ -35,7 +36,14 @@ option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be c
 option(CONFIG_RASPI     "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO  "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
 option(CONFIG_PIGPIO    "set to ON, if the PIGPIO server on the Raspberry Pi shall be used. (default: OFF)" OFF)
-option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls" OFF)
+option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
+option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
+
+if(CONFIG_DEBUG)
+    set(CMAKE_BUILD_TYPE "Debug")
+else()
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 if(CONFIG_UNIT_TEST)
 	set(CONFIG_QSPY ON CACHE BOOL "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" FORCE)
@@ -70,15 +78,26 @@ if(NOT SW_VERSION)
     set(SW_VERSION "1.0.0" CACHE STRING "Software Version")
 endif()
 
+# default image/project name is usc2
+# Give a special name via -DIMAGE=<image>
+# the main project
+project(${PROJECT_NAME}
+    VERSION ${SW_VERSION}
+    DESCRIPTION "Trafficlight project"
+    LANGUAGES C CXX ASM)
+
+# update the module search path
 # update the module search path
 if(MSYS OR WINDOWS OR WIN32)
+    message(STATUS "setting CMAKE_MODULE_PATH for MS-Windows..")
     string(REPLACE "\\" "/" HOME_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
-    set(CMAKE_MODULE_PATH "${HOME_PATH}/cmake;${CMAKE_SOURCE_DIR}/cmake;${CMAKE_SOURCE_DIR};${CMAKE_MODULE_PATH}")
+    set(CMAKE_MODULE_PATH "${HOME_PATH}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH}")
 else()
-    set(CMAKE_MODULE_PATH $ENV{HOME}/cmake;${CMAKE_SOURCE_DIR}/cmake;${CMAKE_SOURCE_DIR};${CMAKE_MODULE_PATH})
-    message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}; PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}; CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+    message(STATUS "setting CMAKE_MODULE_PATH for non Windows..")
+    # message(STATUS "set(CMAKE_MODULE_PATH '$ENV{HOME}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH}')")
+    set(CMAKE_MODULE_PATH "$ENV{HOME}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH}")
 endif()
-message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+# message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
 # setup Raspberry Pi Pico SDK
 if(CONFIG_PICO)
@@ -89,14 +108,6 @@ if(CONFIG_PICO)
     set(PICO_PLATFORM rp2040)
     include(pico_sdk_import)
 endif()
-
-# default image/project name is usc2
-# Give a special name via -DIMAGE=<image>
-# the main project
-project(${PROJECT_NAME}
-    VERSION ${SW_VERSION}
-    DESCRIPTION "Trafficlight project"
-    LANGUAGES C CXX ASM)
 
 # set C-C++ standards
 set(CMAKE_C_STANDARD 11)
@@ -121,14 +132,28 @@ if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
 
-add_executable(systicktst systicktst.c)
-pico_enable_stdio_usb(systicktst TRUE)
-pico_enable_stdio_uart(systicktst FALSE)
+if(CONFIG_PICO)
+    add_executable(systicktst systicktst.c)
+    pico_enable_stdio_usb(systicktst TRUE)
+    pico_enable_stdio_uart(systicktst FALSE)
 
-pico_add_extra_outputs(systicktst)
-target_link_libraries(systicktst pico_stdlib pico_time hardware_exception)
+    pico_add_extra_outputs(systicktst)
+    target_link_libraries(systicktst pico_stdlib pico_time hardware_exception cmsis_core)
+    target_compile_definitions(systicktst
+        PUBLIC
+            PICO_CMSIS_RENAME_EXCEPTIONS=1
+    #        PICO_NO_RAM_VECTOR_TABLE=1
+    )
+    target_compile_options(systicktst
+        PUBLIC
+            -O0
+            -g3
+    )
+    #pico_set_binary_type(systicktst no_flash)
+    pico_set_binary_type(systicktst default)
+endif()
 
-add_library(${QPLIB} OBJECT "")
+add_library(${QPLIB} STATIC "")
 
 # set the default file names for parameter and profile data
 # the files are in binary format and need to have
@@ -230,6 +255,8 @@ message(STATUS
     CONFIG_RASPI                = ${CONFIG_RASPI}
     CONFIG_RASPI_IO             = ${CONFIG_RASPI_IO}
     CONFIG_PIGPIO               = ${CONFIG_PIGPIO}
+
+    CONFIG_DEBUG                = ${CONFIG_DEBUG}
     
  System information:
     CMAKE_VERSION               = ${CMAKE_VERSION}
@@ -247,13 +274,14 @@ message(STATUS
     CMAKE_CXX_FLAGS             = ${CMAKE_CXX_FLAGS}
 
     CMAKE_ASM_COMPILER          = ${CMAKE_ASM_COMPILER}
-    CMAKE_ASM_FLAGS             = ${CMAKE_ASM_FLAGS}
-
-Target information for target ${TGT}
-    TGT_COMPILE_OPTS            = ${TGT_COMPILE_OPTS}
-    TGT_COMPILE_DEFS            = ${TGT_COMPILE_DEFS}
-    TGT_INCLUDES                = ${TGT_INCLUDES}
-    TGT_LINK_OPTS               = ${TGT_LINK_OPTS}
-    TGT_LINK_LIBS               = ${TGT_LINK_LIBS}
-    TGT_SOURCES                 = ${TGT_SOURCES}"
+    CMAKE_ASM_FLAGS             = ${CMAKE_ASM_FLAGS}"
 )
+
+# Target information for target ${TGT}
+#    TGT_COMPILE_OPTS            = ${TGT_COMPILE_OPTS}
+#    TGT_COMPILE_DEFS            = ${TGT_COMPILE_DEFS}
+#    TGT_INCLUDES                = ${TGT_INCLUDES}
+#    TGT_LINK_OPTS               = ${TGT_LINK_OPTS}
+#    TGT_LINK_LIBS               = ${TGT_LINK_LIBS}
+#    TGT_SOURCES                 = ${TGT_SOURCES}"
+#)

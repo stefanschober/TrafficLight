@@ -132,9 +132,9 @@ QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
          <action box="2,-2,10,2"/>
         </choice_glyph>
        </choice>
-       <choice target="../../../4">
+       <choice target="../../../7">
         <guard>( 0 ==TL_ID(me) )</guard>
-        <choice_glyph conn="38,38,4,3,59,6">
+        <choice_glyph conn="38,38,4,3,30,6">
          <action box="1,9,10,2"/>
         </choice_glyph>
        </choice>
@@ -234,11 +234,11 @@ startTimeout(me-&gt;toEmergency); // was 10sec</entry>
       <entry>startTimeout(me-&gt;toRdYlw);
 TLtraffic_setLight(me, RED_YELLOW);</entry>
       <tran trig="TIMEOUT" target="../../4">
-       <tran_glyph conn="56,78,2,0,4">
+       <tran_glyph conn="56,76,2,0,6">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="44,60,22,18">
+      <state_glyph node="44,60,22,16">
        <entry box="1,2,6,2"/>
       </state_glyph>
      </state>

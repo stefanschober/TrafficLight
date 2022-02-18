@@ -1,11 +1,11 @@
-# BSP/Windows
+# ./ports/posix-qk
 set(_src "")
 set(_inc ${CMAKE_CURRENT_SOURCE_DIR})
-list(APPEND _src bsp.c)
-target_sources(${TGT} PRIVATE ${_src})
+list(APPEND _src qf_port.c)
+if(CONFIG_QSPY)
+    list(APPEND _src qs_port.c)
+endif()
+target_sources(${QPLIB} PRIVATE ${_src})
 target_include_directories(${QPLIB} PUBLIC ${_inc})
 listIncludes(${CMAKE_CURRENT_SOURCE_DIR} ${_inc})
 listModules(${CMAKE_CURRENT_SOURCE_DIR} ${_src})
-
-unset(_src)
-

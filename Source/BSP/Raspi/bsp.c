@@ -125,25 +125,25 @@ void BSP_terminate(gint16 result) {
 #endif
 }
 /*..........................................................................*/
-void BSP_setlight(eTLidentity_t id, eTLlight_t light)
+void BSP_setlight(eTLidentity_t id, uint8_t light)
 {
     guiSetLight(id, light);
 #if defined RASPI
     switch(id)
     {
         case TrafficLightA:
-            gpioWrite(pinTLAred,     light == RED    ? 1 : 0);
-            gpioWrite(pinTLAyellow,  light == YELLOW ? 1 : 0);
-            gpioWrite(pinTLAgreen,   light == GREEN  ? 1 : 0);
+            gpioWrite(pinTLAred,     light & RED    ? 1 : 0);
+            gpioWrite(pinTLAyellow,  light & YELLOW ? 1 : 0);
+            gpioWrite(pinTLAgreen,   light & GREEN  ? 1 : 0);
             break;
         case TrafficLightB:
-            gpioWrite(pinTLBred,     light == RED    ? 1 : 0);
-            gpioWrite(pinTLByellow,  light == YELLOW ? 1 : 0);
-            gpioWrite(pinTLBgreen,   light == GREEN  ? 1 : 0);
+            gpioWrite(pinTLBred,     light & RED    ? 1 : 0);
+            gpioWrite(pinTLByellow,  light & YELLOW ? 1 : 0);
+            gpioWrite(pinTLBgreen,   light & GREEN  ? 1 : 0);
             break;
         case PedestrianLight:
-            gpioWrite(pinTLPedred,   light == RED    ? 1 : 0);
-            gpioWrite(pinTLPedgreen, light == GREEN  ? 1 : 0);
+            gpioWrite(pinTLPedred,   light & RED    ? 1 : 0);
+            gpioWrite(pinTLPedgreen, light & GREEN  ? 1 : 0);
            break;
         default:
             break;

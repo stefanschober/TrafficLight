@@ -65,12 +65,18 @@ static GRand  *myRnd;
 static guint32 rndCountDown = 120;
 static gchar *appName = NULL, *dirName = NULL;
 
-GtkWidget    *trafficLights[MaxIdentity][NO_LIGHT][2], *ledWhite, *ledRed;
+GtkWidget    *trafficLights[MaxIdentity][MAX_LIGHT][2], *ledWhite, *ledRed;
 GtkWidget    *digits[3][10];
 
+enum idxLight {
+    idxRED = 0,
+    idxYELLOW,
+    idxGREEN,
+    idxMax
+};
 static struct {
         uint8_t changed;
-        eTLlight_t light;
+        uint8_t light;
 } setLight[MaxIdentity] = {
                            {0, NO_LIGHT},
                            {0, NO_LIGHT},
@@ -108,27 +114,27 @@ static void theApp (GtkApplication* app, gpointer user_data)
     winTrafficLight = GTK_WIDGET(gtk_builder_get_object(builder, "winTrafficLight"));
     lblCounter      = GTK_WIDGET(gtk_builder_get_object(builder, "lblCounter"));
 
-    trafficLights[TrafficLightA][RED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOff"));
-    trafficLights[TrafficLightA][YELLOW][0]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlaYellowOff"));
-    trafficLights[TrafficLightA][GREEN][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlaGreenOff"));
+    trafficLights[TrafficLightA][idxRED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOff"));
+    trafficLights[TrafficLightA][idxYELLOW][0]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlaYellowOff"));
+    trafficLights[TrafficLightA][idxGREEN][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlaGreenOff"));
 
-    trafficLights[TrafficLightA][RED][1]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOn"));
-    trafficLights[TrafficLightA][YELLOW][1]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlaYellowOn"));
-    trafficLights[TrafficLightA][GREEN][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlaGreenOn"));
+    trafficLights[TrafficLightA][idxRED][1]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOn"));
+    trafficLights[TrafficLightA][idxYELLOW][1]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlaYellowOn"));
+    trafficLights[TrafficLightA][idxGREEN][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlaGreenOn"));
 
-    trafficLights[TrafficLightB][RED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlbRedOff"));
-    trafficLights[TrafficLightB][YELLOW][0]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlbYellowOff"));
-    trafficLights[TrafficLightB][GREEN][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlbGreenOff"));
+    trafficLights[TrafficLightB][idxRED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlbRedOff"));
+    trafficLights[TrafficLightB][idxYELLOW][0]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlbYellowOff"));
+    trafficLights[TrafficLightB][idxGREEN][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlbGreenOff"));
 
-    trafficLights[TrafficLightB][RED][1]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlbRedOn"));
-    trafficLights[TrafficLightB][YELLOW][1]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlbYellowOn"));
-    trafficLights[TrafficLightB][GREEN][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlbGreenOn"));
+    trafficLights[TrafficLightB][idxRED][1]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlbRedOn"));
+    trafficLights[TrafficLightB][idxYELLOW][1]  = GTK_WIDGET(gtk_builder_get_object(builder, "tlbYellowOn"));
+    trafficLights[TrafficLightB][idxGREEN][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "tlbGreenOn"));
 
-    trafficLights[PedestrianLight][RED][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "pedRedOff"));
-    trafficLights[PedestrianLight][GREEN][0] = GTK_WIDGET(gtk_builder_get_object(builder, "pedGreenOff"));
+    trafficLights[PedestrianLight][idxRED][0]   = GTK_WIDGET(gtk_builder_get_object(builder, "pedRedOff"));
+    trafficLights[PedestrianLight][idxGREEN][0] = GTK_WIDGET(gtk_builder_get_object(builder, "pedGreenOff"));
 
-    trafficLights[PedestrianLight][RED][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "pedRedOn"));
-    trafficLights[PedestrianLight][GREEN][1] = GTK_WIDGET(gtk_builder_get_object(builder, "pedGreenOn"));
+    trafficLights[PedestrianLight][idxRED][1]   = GTK_WIDGET(gtk_builder_get_object(builder, "pedRedOn"));
+    trafficLights[PedestrianLight][idxGREEN][1] = GTK_WIDGET(gtk_builder_get_object(builder, "pedGreenOn"));
 
 #if 0
     for (i = 0; i < 3; i++)
@@ -330,9 +336,7 @@ static void on_label_draw(GtkWidget *widget, cairo_t *cr, gpointer data)
 
 static gboolean event_handler(GtkWidget *widget)
 {
-    eTLlight_t light, lidx;
     eTLidentity_t id;
-    guint8    led;
     (void)widget;
 
     if (g_mutex_trylock(&myMutex))
@@ -341,13 +345,15 @@ static gboolean event_handler(GtkWidget *widget)
         {
             if (setLight[id].changed)
             {
+                uint8_t light, n;
+
                 light = setLight[id].light;
-                for (lidx = RED; lidx < NO_LIGHT; lidx++)
+                for (n = idxRED; n < idxMax; n++)
                 {
-                    if ((GTK_WIDGET(0) != trafficLights[id][lidx][0]) && (GTK_WIDGET(0) != trafficLights[id][lidx][1]))
+                    if ((GTK_WIDGET(0) != trafficLights[id][n][0]) && (GTK_WIDGET(0) != trafficLights[id][n][1]))
                     {
-                        gtk_widget_hide(trafficLights[id][lidx][lidx == light ? 0 : 1]);
-                        gtk_widget_show(trafficLights[id][lidx][lidx == light ? 1 : 0]);
+                        gtk_widget_hide(trafficLights[id][n][(light & (1u << n)) ? 0 : 1]);
+                        gtk_widget_show(trafficLights[id][n][(light & (1u << n)) ? 1 : 0]);
                     }
                 }
                 setLight[id].changed = 0;
@@ -356,9 +362,8 @@ static gboolean event_handler(GtkWidget *widget)
 
         if (setLed.changed)
         {
-            led = setLed.status;
-            gtk_widget_hide(led ? ledWhite : ledRed);
-            gtk_widget_show(led ? ledRed : ledWhite);
+            gtk_widget_hide(setLed.status ? ledWhite : ledRed);
+            gtk_widget_show(setLed.status ? ledRed : ledWhite);
 
             setLed.changed = 0;
         }
@@ -441,7 +446,7 @@ static gboolean count_handler(GtkWidget *widget)
 }
 
 /*..........................................................................*/
-void guiSetLight(eTLidentity_t id, eTLlight_t light)
+void guiSetLight(eTLidentity_t id, uint8_t light)
 {
     g_mutex_lock(&myMutex);
     setLight[id].light = light;

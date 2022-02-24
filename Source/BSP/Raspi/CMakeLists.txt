@@ -1,7 +1,10 @@
 # BSP/Raspi
 set(_src "")
 set(_inc ${CMAKE_CURRENT_SOURCE_DIR})
-list(APPEND _src bsp.c bsp-gui.c)
+list(APPEND _src bsp.c)
+if(CONFIG_GUI)
+    list(APPEND _src bsp-gui.c resources.c)
+endif()
 target_sources(${TGT} PRIVATE ${_src})
 target_include_directories(${TGT} PRIVATE ${_inc})
 listIncludes(${CMAKE_CURRENT_SOURCE_DIR} ${_inc})

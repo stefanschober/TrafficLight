@@ -4,7 +4,7 @@
  <package name="AOs" stereotype="0x02">
   <class name="TLtraffic" superclass="qpc::QActive">
    <attribute name="identity" type="eTLidentity_t" visibility="0x02" properties="0x00"/>
-   <attribute name="light" type="eTLlight_t" visibility="0x02" properties="0x00"/>
+   <attribute name="light" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="timeEvt" type="QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="toGreen1" type="uint32_t" visibility="0x00" properties="0x00"/>
    <attribute name="toGreen2" type="uint32_t" visibility="0x00" properties="0x00"/>
@@ -15,7 +15,7 @@
    <attribute name="toInit" type="uint32_t" visibility="0x00" properties="0x00"/>
    <attribute name="toRdYlw" type="uint32_t" visibility="0x00" properties="0x00"/>
    <operation name="setLight" type="void" visibility="0x02" properties="0x00">
-    <parameter name="light" type="eTLlight_t"/>
+    <parameter name="light" type="uint8_t"/>
     <code>me-&gt;light = light;
 BSP_setlight(me-&gt;identity, me-&gt;light);</code>
    </operation>
@@ -248,7 +248,7 @@ TLtraffic_setLight(me, RED_YELLOW);</entry>
    </statechart>
   </class>
   <class name="TLpedestrian" superclass="qpc::QActive">
-   <attribute name="light" type="eTLlight_t" visibility="0x02" properties="0x00"/>
+   <attribute name="light" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="timeEvt" type="QTimeEvt" visibility="0x02" properties="0x00"/>
    <attribute name="tlRedCount" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="ledStatus" type="uint16_t" visibility="0x00" properties="0x00"/>
@@ -261,7 +261,7 @@ Q_ASSERT(evt != (void *)0);
 QF_PUBLISH(evt, me);</code>
    </operation>
    <operation name="setLight" type="void" visibility="0x02" properties="0x00">
-    <parameter name="light" type="eTLlight_t"/>
+    <parameter name="light" type="uint8_t"/>
     <code>me-&gt;light = light;
 BSP_setlight(PedestrianLight, me-&gt;light);</code>
    </operation>
@@ -653,23 +653,28 @@ enum TLSignals {
     MAX_SIG                     /* the last signal */
 };
 
-typedef enum TLidentity eTLidentity_t;
-typedef enum TLlight    eTLlight_t;
-
-enum TLidentity {
+typedef enum TLidentity {
     TrafficLightA = 0,
     TrafficLightB,
     PedestrianLight,
     MaxIdentity
-};
+} eTLidentity_t;
 
-enum TLlight {
+#if 0
+typedef enum TLlight {
     RED = 0,
     RED_YELLOW,
     YELLOW,
     GREEN,
     NO_LIGHT
-};
+} eTLlight_t;
+#endif
+#define NO_LIGHT   0x00u
+#define RED        0x01u
+#define YELLOW     0x02u
+#define GREEN      0x04u
+#define RED_YELLOW (RED | YELLOW)
+#define MAX_LIGHT  3 // Red, Yellow, Green
 
 #define _TIMETICK_(t)    ((t) * (BSP_TICKS_PER_SEC))
 #define _TIMETICKms_(t)  ((_TIMETICK_(t) / 1000u) ? (_TIMETICK_(t) / 1000u) : 1u)
@@ -905,7 +910,7 @@ void BSP_HW_init(void);
 void BSP_init(int argc, char *argv[]);
 void BSP_terminate(int16_t result);
 
-void BSP_setlight(eTLidentity_t id, eTLlight_t light);
+void BSP_setlight(eTLidentity_t id, uint8_t light);
 void BSP_setPedLed(uint16_t status);
 void BSP_publishBtnEvt(void);
 void BSP_publishEmergencyEvt(void);

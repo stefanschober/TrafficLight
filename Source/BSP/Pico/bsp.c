@@ -228,23 +228,19 @@ void BSP_ledOff(void) {
     gpio_put(LED_LD2, 0);
 }
 /*..........................................................................*/
-void BSP_setlight(eTLidentity_t id, eTLlight_t light)
+void BSP_setlight(eTLidentity_t id, uint8_t light)
 {
     uint32_t offMask, onMask;
     static uint8_t shiftmasks[MaxIdentity] = {PIN_A_RED_Pin, PIN_B_RED_Pin, PIN_P_RED_Pin};
 
-    Q_ASSERT(light < NO_LIGHT && id < MaxIdentity);
+    Q_ASSERT(light <= GREEN && id < MaxIdentity);
     offMask = ((id == PedestrianLight) ? 0x03 : 0x07u) << shiftmasks[id];
     switch(light)
     {
         case RED:
-            onMask = 0x01u << shiftmasks[id];
-            break;
         case YELLOW:
-            onMask = 0x02u << shiftmasks[id];
-            break;
         case RED_YELLOW:
-            onMask = 0x03u << shiftmasks[id];
+            onMask = light << shiftmasks[id];
             break;
         case GREEN:
             onMask = (id == PedestrianLight ? 0x02 : 0x04u) << shiftmasks[id];

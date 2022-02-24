@@ -30,7 +30,7 @@ typedef struct {
     QActive super;
 
 /* private: */
-    eTLlight_t light;
+    uint8_t light;
     QTimeEvt timeEvt;
     uint8_t tlRedCount;
 
@@ -42,7 +42,7 @@ typedef struct {
 
 /* private: */
 static void TLpedestrian_sendMessage(TLpedestrian * const me, uint16_t msg);
-static void TLpedestrian_setLight(TLpedestrian * const me, eTLlight_t light);
+static void TLpedestrian_setLight(TLpedestrian * const me, uint8_t light);
 
 /* protected: */
 static QState TLpedestrian_initial(TLpedestrian * const me, void const * const par);
@@ -98,7 +98,7 @@ static void TLpedestrian_sendMessage(TLpedestrian * const me, uint16_t msg) {
 }
 
 /*.${AOs::TLpedestrian::setLight} ..........................................*/
-static void TLpedestrian_setLight(TLpedestrian * const me, eTLlight_t light) {
+static void TLpedestrian_setLight(TLpedestrian * const me, uint8_t light) {
     me->light = light;
     BSP_setlight(PedestrianLight, me->light);
 }

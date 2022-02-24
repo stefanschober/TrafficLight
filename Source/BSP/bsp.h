@@ -25,7 +25,7 @@ void BSP_HW_init(void);
 void BSP_init(int argc, char *argv[]);
 void BSP_terminate(int16_t result);
 
-void BSP_setlight(eTLidentity_t id, eTLlight_t light);
+void BSP_setlight(eTLidentity_t id, uint8_t light);
 void BSP_setPedLed(uint16_t status);
 void BSP_publishBtnEvt(void);
 void BSP_publishEmergencyEvt(void);

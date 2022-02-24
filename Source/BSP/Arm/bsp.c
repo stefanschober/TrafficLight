@@ -96,6 +96,16 @@ static void readUserButtons(void);
 
 #endif
 
+uint16_t const lightPins[MaxIdentity][MAX_LIGHT] = {
+    {PIN_A_RED_Pin, PIN_A_YLW_Pin, PIN_A_GRN_Pin},
+    {PIN_B_RED_Pin, PIN_B_YLW_Pin, PIN_B_GRN_Pin},
+    {PIN_P_RED_Pin, 0xFFFFu,       PIN_P_GRN_Pin}
+};
+
+GPIO_TypeDef * const lightGpios[MaxIdentity] = {
+    PIN_A_RED_GPIO_Port, PIN_B_RED_GPIO_Port, PIN_P_RED_GPIO_Port
+};
+
 /* ISRs used in the application ==========================================*/
 void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
 #ifdef KERNEL_QK
@@ -235,61 +245,18 @@ void BSP_ledOff(void) {
     HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 }
 /*..........................................................................*/
-void BSP_setlight(eTLidentity_t id, eTLlight_t light)
+void BSP_setlight(eTLidentity_t id, uint8_t light)
 {
-    GPIO_TypeDef *gpio = NULL;
-    uint16_t IDCs[3], curlight;
+    
     uint8_t n;
+    GPIO_TypeDef *gpio = lightGpios[id];
 
-    switch(id)
+    Q_ASSERT(light <= GREEN && id < MaxIdentity);
+    for (n = NO_LIGHT; n < MAX_LIGHT; n++)
     {
-        case TrafficLightA:
-            gpio = PIN_A_RED_GPIO_Port;
-            IDCs[0] = PIN_A_RED_Pin;
-            IDCs[1] = PIN_A_YLW_Pin;
-            IDCs[2] = PIN_A_GRN_Pin;
-            break;
-        case TrafficLightB:
-            gpio = PIN_B_RED_GPIO_Port;
-            IDCs[0] = PIN_B_RED_Pin;
-            IDCs[1] = PIN_B_YLW_Pin;
-            IDCs[2] = PIN_B_GRN_Pin;
-            break;
-        case PedestrianLight:
-            gpio = PIN_P_RED_GPIO_Port;
-            IDCs[0] = PIN_P_RED_Pin;
-            IDCs[1] = 0xFFFFu;
-            IDCs[2] = PIN_P_GRN_Pin;
-            break;
-        default:
-            IDCs[0] = 0xFFFF;
-            IDCs[1] = 0xFFFF;
-            IDCs[2] = 0xFFFF;
-            break;
+        if (0xFFFFu != lightPins[id][n])
+            HAL_GPIO_WritePin(gpio, lightPins[id][n], (light & (1u << n) ? GPIO_PIN_SET : GPIO_PIN_RESET));
     }
-    switch(light)
-    {
-        case RED:
-            curlight = IDCs[0];
-            break;
-        case YELLOW:
-            curlight = IDCs[1];
-            break;
-        case GREEN:
-            curlight = IDCs[2];
-            break;
-        default:
-            curlight = 0xFFFFu;
-            break;
-
-    }
-    for (n = 0; n < 3; n++)
-    {
-        if (0xFFFFu != IDCs[n])
-            HAL_GPIO_WritePin(gpio, IDCs[n], GPIO_PIN_RESET);
-    }
-    if (curlight != 0xFFFFu)
-        HAL_GPIO_WritePin(gpio, curlight, GPIO_PIN_SET);
 }
 /*..........................................................................*/
 void BSP_setPedLed(uint16_t status)

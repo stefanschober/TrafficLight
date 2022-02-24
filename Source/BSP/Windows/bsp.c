@@ -62,13 +62,13 @@ static SegmentDisplay   l_timeDisplay;
 static OwnerDrawnButton l_pedBtn;
 // static uint8_t keyPressed = 0;
 
-static const DWORD trafficlightsSeg[MaxIdentity][3] = {
+static const DWORD trafficlightsSeg[MaxIdentity][MAX_LIGHT] = {
     { IDC_RED_A, IDC_YELLOW_A, IDC_GREEN_A },
     { IDC_RED_B, IDC_YELLOW_B, IDC_GREEN_B },
     { IDC_RED_P, 0xFFFFu,      IDC_GREEN_P }
 };
 static const DWORD idLedPed[] = { IDC_LED_PED };
-static const DWORD trafficlightsBmp[NO_LIGHT + 1] = {
+static const DWORD trafficlightsBmp[MAX_LIGHT + 1] = {
     IDB_TL_OFF, IDB_TL_RED, IDB_TL_YELLOW, IDB_TL_GREEN
 };
 static const DWORD ledBmp[2] = {
@@ -383,20 +383,16 @@ void BSP_terminate(int16_t result)
     EndDialog(l_hWnd, result);
 }
 /*..........................................................................*/
-void BSP_setlight(eTLidentity_t id, eTLlight_t light)
+void BSP_setlight(eTLidentity_t id, uint8_t light)
 {
-    eTLlight_t  n;
+    uint8_t  n;
 
-    for (n = RED; n < NO_LIGHT; n++)
+    // printf("set id %d to %d\n", id, light);
+    for (n = 0; n < MAX_LIGHT; n++)
     {
         if (0xFFFFu != trafficlightsSeg[id][n])
         {
-            UINT lidx = 0U;
-
-            if (light == n)
-            {
-                lidx = 1u + (UINT)light;
-            }
+            UINT lidx = (light & (0x01u << n) ? (n + 1u) : 0U);
             SegmentDisplay_setSegment(&l_trafficlights[id], n, lidx);
         }
     }

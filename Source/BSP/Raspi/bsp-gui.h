@@ -19,7 +19,7 @@
 #ifndef bsp_gui_h
 #define bsp_gui_h
 
-void guiSetLight(eTLidentity_t id, eTLlight_t light);
+void guiSetLight(eTLidentity_t id, uint8_t light);
 void guiSetPedLed(guint16 status);
 guint16 guiGetButton(void);
 

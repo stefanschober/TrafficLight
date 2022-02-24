@@ -36,7 +36,7 @@ typedef struct {
 
 /* private: */
     eTLidentity_t identity;
-    eTLlight_t light;
+    uint8_t light;
     QTimeEvt timeEvt;
 
 /* public: */
@@ -51,7 +51,7 @@ typedef struct {
 } TLtraffic;
 
 /* private: */
-static void TLtraffic_setLight(TLtraffic * const me, eTLlight_t light);
+static void TLtraffic_setLight(TLtraffic * const me, uint8_t light);
 
 /* protected: */
 static QState TLtraffic_initial(TLtraffic * const me, void const * const par);
@@ -118,7 +118,7 @@ int16_t TLtraffic_ctor(void) {
 /*.$define${AOs::TLtraffic} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv*/
 /*.${AOs::TLtraffic} .......................................................*/
 /*.${AOs::TLtraffic::setLight} .............................................*/
-static void TLtraffic_setLight(TLtraffic * const me, eTLlight_t light) {
+static void TLtraffic_setLight(TLtraffic * const me, uint8_t light) {
     me->light = light;
     BSP_setlight(me->identity, me->light);
 }

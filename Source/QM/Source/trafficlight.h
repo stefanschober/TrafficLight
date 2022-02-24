@@ -37,23 +37,28 @@ enum TLSignals {
     MAX_SIG                     /* the last signal */
 };
 
-typedef enum TLidentity eTLidentity_t;
-typedef enum TLlight    eTLlight_t;
-
-enum TLidentity {
+typedef enum TLidentity {
     TrafficLightA = 0,
     TrafficLightB,
     PedestrianLight,
     MaxIdentity
-};
+} eTLidentity_t;
 
-enum TLlight {
+#if 0
+typedef enum TLlight {
     RED = 0,
     RED_YELLOW,
     YELLOW,
     GREEN,
     NO_LIGHT
-};
+} eTLlight_t;
+#endif
+#define NO_LIGHT   0x00u
+#define RED        0x01u
+#define YELLOW     0x02u
+#define GREEN      0x04u
+#define RED_YELLOW (RED | YELLOW)
+#define MAX_LIGHT  3 // Red, Yellow, Green
 
 #define _TIMETICK_(t)    ((t) * (BSP_TICKS_PER_SEC))
 #define _TIMETICKms_(t)  ((_TIMETICK_(t) / 1000u) ? (_TIMETICK_(t) / 1000u) : 1u)

@@ -5,6 +5,7 @@ endif()
 
 #default port is WIN32
 set(PORT win32)
+set(MCU Host-CPU)
 
 # additional compile definitions
 target_compile_definitions(${TGT}

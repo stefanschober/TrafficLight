@@ -23,7 +23,7 @@
 Q_DEFINE_THIS_FILE
 
 #define startTimeout(timeout)    QTimeEvt_rearm(&me->timeEvt, timeout)
-#define sendMessage(msg)         { QEvt *e = Q_NEW(QEvt, msg); QF_PUBLISH(e, me); }
+#define sendMessage(msg)         { QEvt *e = Q_NEW(QEvt, msg); QF_PUBLISH(e, (QActive *)me); }
 /* helper macro to provide the ID of Philo "me_" */
 #define TL_ID(me_)    ((eTLidentity_t)((me_) - l_traffic))
 

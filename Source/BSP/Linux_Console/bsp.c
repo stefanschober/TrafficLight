@@ -48,13 +48,6 @@ Q_DEFINE_THIS_FILE
 static struct termios l_tsav; /* structure with saved terminal attributes */
 // static uint8_t keyPressed = 0;
 
-#ifdef Q_SPY
-    enum {
-        TL_STAT = QS_USER
-    };
-    static uint8_t const l_clock_tick = 0U;
-#endif
-
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
     struct termios tio;   /* modified terminal attributes */
@@ -78,9 +71,9 @@ void QF_onClockTick(void) {
     struct timeval timeout = { 0, 0 };  /* timeout for select() */
     fd_set con; /* FD set representing the console */
 
-    //QF_TICK_X(0U, &l_clock_tick); /* perform the QF clock tick processing */
-    QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
-    //QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
+    //QF_TICK_X(0U, &l_SysTick_Handler); /* perform the QF clock tick processing */
+    QACTIVE_POST(the_Ticker0, 0, &l_SysTick_Handler); /* post to Ticker0 */
+    //QF_PUBLISH(&tickEvt, &l_SysTick_Handler); /* publish to all subscribers */
 
     FD_ZERO(&con);
     FD_SET(0, &con);
@@ -98,7 +91,7 @@ void QF_onClockTick(void) {
 			case 'P':
 			case 'p':
 				printf("Pedestrian button pressed...\n");
-				QF_PUBLISH(&buttonEvt, &l_clock_tick); /* publish to all subscribers */
+				QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
                 // keyPressed = 1;
                 break;
 			default:
@@ -485,8 +478,6 @@ void QS_onCommand(uint8_t cmdId, uint32_t param1,
 }
 /*..........................................................................*/
 void QSPY_onPrintLn(void) {
-    fputs(QSPY_line, stdout);
-    fputc('\n', stdout);
 }
 
 //****************************************************************************
@@ -517,7 +508,8 @@ void BSP_init(int argc, char **argv) {
            QP_versionStr);
 
     Q_ALLEGE(QS_INIT((argc > 1) ? argv[1] : ""));
-    QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_SysTick_Handler); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_Button_Handler); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
 
     /* setup the QS filters... */

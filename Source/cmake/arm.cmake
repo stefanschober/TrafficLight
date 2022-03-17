@@ -73,9 +73,9 @@ message(STATUS "ARM port set to ${PORT}")
 if(CONFIG_PICO)
     pico_enable_stdio_usb(${TGT} TRUE)
     pico_enable_stdio_uart(${TGT} TRUE)
-
     pico_add_extra_outputs(${TGT})
 
+    set(MCU RP2040)
     set(INCFILE armgnu)
 else()
     # MCU based settings (size of flash memory)
@@ -172,9 +172,19 @@ else()
         message(FATAL_ERROR "Unknown Compiler/Toolset ${CMAKE_C_COMPILER_ID}")
     endif()
 
-    # create the real scatter file from the template (*.sct.in)
-    message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
-    configure_file(${SCATTER_IN} ${SCATTER_OUT})
+    if(NOT CONFIG_PICO)
+        # create the real scatter file from the template (*.sct.in)
+        message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
+        configure_file(${SCATTER_IN} ${SCATTER_OUT})
+    endif()
+
+    target_compile_definitions(${TGT}
+        PUBLIC
+            $<UPPER_CASE:${IMAGE}>
+            ${MCU}
+            FLASHSIZE=${MCU_FLASH_SIZE}
+            STACKSIZE=${STACKSIZE}
+    )
 endif()
 
 # include toolchain specific options/settings
@@ -183,11 +193,6 @@ include(${INCFILE})
 # set project/target related compiler #define macros
 target_compile_definitions(${TGT}
     PUBLIC
-        $<UPPER_CASE:${IMAGE}>
-        ${MCU}
-        FLASHSIZE=${MCU_FLASH_SIZE}
-        STACKSIZE=${STACKSIZE}
-    
         $<$<BOOL:${CONFIG_KERNEL_QK}>:KERNEL_QK=1>
         $<$<BOOL:${CONFIG_KERNEL_QV}>:KERNEL_QV=1>
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>

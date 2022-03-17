@@ -21,6 +21,27 @@
 
 #define BSP_TICKS_PER_SEC    1000U
 
+#ifdef Q_SPY
+    enum {
+        TL_STAT = QS_USER,
+        PHILO_STAT,
+        COMMAND_STAT
+    };
+    enum AppRecords
+    { /* application-specific trace records */
+        TL_APP = QS_USER
+    };
+
+     typedef struct std_sender_id {
+         uint8_t prio;
+     } StdSenderId_t;
+#else
+    typedef uint8_t StdSenderId_t;
+#endif
+extern StdSenderId_t const l_SysTick_Handler,
+                           l_Button_Handler;
+
+// function prototypes
 void BSP_HW_init(void);
 void BSP_init(int argc, char *argv[]);
 void BSP_terminate(int16_t result);

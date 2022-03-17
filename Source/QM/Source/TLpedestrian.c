@@ -94,7 +94,7 @@ void TLpedestrian_ctor(void) {
 static void TLpedestrian_sendMessage(TLpedestrian * const me, uint16_t msg) {
     QEvt *evt = Q_NEW(QEvt, msg);
     Q_ASSERT(evt != (void *)0);
-    QF_PUBLISH(evt, me);
+    QF_PUBLISH(evt, (QActive *)me);
 }
 
 /*.${AOs::TLpedestrian::setLight} ..........................................*/

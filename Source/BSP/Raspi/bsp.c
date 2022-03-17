@@ -69,18 +69,6 @@ enum inputPins {
 
 // static struct termios l_tsav; /* structure with saved terminal attributes */
 
-#ifdef Q_SPY
-#include "qspy.h"
-
-enum {
-    TL_STAT = QS_USER,
-    COMMAND_STAT
-};
-static guint const l_clock_tick = 0U;
-static guint const l_button     = 1U;
-#endif
-
-
 int main (gint argc, gchar *argv[])
 {
     return startGui(argc, argv);
@@ -112,8 +100,8 @@ void BSP_init(gint argc, gchar *argv[])
     Q_ALLEGE(gpioSetMode(pinTLPedred,   PI_OUTPUT) == 0);
     Q_ALLEGE(gpioSetMode(pinTLPedgreen, PI_OUTPUT) == 0);
 #endif
-    QS_OBJ_DICTIONARY(&l_clock_tick); /* must be called *after* QF_init() */
-    QS_OBJ_DICTIONARY(&l_button); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_SysTick_Handler); /* must be called *after* QF_init() */
+    QS_OBJ_DICTIONARY(&l_Button_Handler); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
 }
 /*..........................................................................*/
@@ -170,7 +158,7 @@ void BSP_publishBtnEvt(void)
 {
 	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-    QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+    QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
 }
 // called when button EMERGENCY is clicked
 void BSP_publishEmergencyEvt(void)
@@ -178,7 +166,7 @@ void BSP_publishEmergencyEvt(void)
 	static QEvt emergencyEvt = { EM_RELEASE_SIG, 0U, 0U };
 
     emergencyEvt.sig = ((emergencyEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
-    QF_PUBLISH(&emergencyEvt, &l_button); /* publish to all subscribers */
+    QF_PUBLISH(&emergencyEvt, &l_Button_Handler); /* publish to all subscribers */
 }
 
 /* QF callbacks ============================================================*/
@@ -196,8 +184,8 @@ void QF_onCleanup(void) {
 void QF_onClockTick(void) {
     //static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
 
-    QACTIVE_POST(the_Ticker0, 0, &l_clock_tick); /* post to Ticker0 */
-    //QF_PUBLISH(&tickEvt, &l_clock_tick); /* publish to all subscribers */
+    QACTIVE_POST(the_Ticker0, 0, &l_SysTick_Handler); /* post to Ticker0 */
+    //QF_PUBLISH(&tickEvt, &l_SysTick_Handler); /* publish to all subscribers */
 }
 /*..........................................................................*/
 void Q_onAssert(gchar const * const module, gint loc) {
@@ -231,8 +219,6 @@ void QS_onCommand(guint8 cmdId,
 }
 /*..........................................................................*/
 void QSPY_onPrintLn(void) {
-    fputs(QSPY_line, stderr);
-    fputc('\n', stderr);
 }
 #endif /* Q_SPY */
 /*--------------------------------------------------------------------------*/

@@ -1,5 +1,6 @@
 #default port is posix
 set(PORT posix)
+set(MCU Host-CPU)
 
 # additional compile definitions
 target_compile_definitions(${TGT}

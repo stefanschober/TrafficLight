@@ -77,15 +77,17 @@ else()
     set(QPLIB "qpclib-qv" CACHE STRING "The QPC library for the QV real time kernel" FORCE)
 endif()
 
-if(NOT PROJECT_NAME)
-    set(PROJECT_NAME trafficlight)
+if(NOT PROJECT_NAME AND NOT TARGET)
+    set(PROJECT_NAME "trafficlight")
+elseif(NOT PROJECT_NAME)
+    set(PROJECT_NAME ${TARGET})
 endif()
 
 if(NOT TARGET)
-    set(TARGET ${PROJECT_NAME})
+    set(TGT ${PROJECT_NAME})
+else()
+    set(TGT ${TARGET})
 endif()
-set(TGT ${TARGET})
-set(PROJECT_NAME ${TGT})
 if(NOT IMAGE)
     set(IMAGE ${TGT})
 endif()
@@ -263,6 +265,7 @@ message(STATUS
     CONFIG_CORTEX_M3            = ${CONFIG_CORTEX_M3}
     CONFIG_CORTEX_M4            = ${CONFIG_CORTEX_M4}
     CONFIG_PICO                 = ${CONFIG_PICO}
+    MCU                         = ${MCU}
 
     CONFIG_RASPI                = ${CONFIG_RASPI}
     CONFIG_RASPI_IO             = ${CONFIG_RASPI_IO}

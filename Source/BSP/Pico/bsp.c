@@ -74,8 +74,8 @@ static void readUserButtons(void);
     QSTimeCtr QS_tickPeriod_;
 
     /* event-source identifiers used for tracing */
-    static uint8_t const l_SysTick_Handler = 0U;
-    static uint8_t const l_button          = 1U;
+    static uint8_t const l_SysTick_Handler = 1U;
+    static uint8_t const l_Button_Handler  = 2U;
 
     enum AppRecords { /* application-specific trace records */
         PHILO_STAT = QS_USER
@@ -160,7 +160,7 @@ static void readUserButtons(void)
     {
     	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
 
-        QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+        QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
     	time2Min = 120ul * BSP_TICKS_PER_SEC;
     }
     else if (debouncedButtons & chgButtons & 0x02)
@@ -168,7 +168,7 @@ static void readUserButtons(void)
     	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
 
         buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
-        QF_PUBLISH(&buttonEvt, &l_button); /* publish to all subscribers */
+        QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
     }
 }
 
@@ -204,7 +204,7 @@ void BSP_init(int argc, char *argv[]) {
         Q_ERROR();
     }
     QS_OBJ_DICTIONARY(&l_SysTick_Handler);
-    QS_OBJ_DICTIONARY(&l_button);
+    QS_OBJ_DICTIONARY(&l_Button_Handler);
 }
 /*..........................................................................*/
 void BSP_terminate(int16_t result) {

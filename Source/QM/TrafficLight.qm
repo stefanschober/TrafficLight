@@ -258,7 +258,7 @@ TLtraffic_setLight(me, RED_YELLOW);</entry>
     <parameter name="msg" type="uint16_t"/>
     <code>QEvt *evt = Q_NEW(QEvt, msg);
 Q_ASSERT(evt != (void *)0);
-QF_PUBLISH(evt, me);</code>
+QF_PUBLISH(evt, (QActive *)me);</code>
    </operation>
    <operation name="setLight" type="void" visibility="0x02" properties="0x00">
     <parameter name="light" type="uint8_t"/>
@@ -721,7 +721,7 @@ $declare(AOs::AO_TLblinker)
 Q_DEFINE_THIS_FILE
 
 #define startTimeout(timeout)    QTimeEvt_rearm(&amp;me-&gt;timeEvt, timeout)
-#define sendMessage(msg)         { QEvt *e = Q_NEW(QEvt, msg); QF_PUBLISH(e, me); }
+#define sendMessage(msg)         { QEvt *e = Q_NEW(QEvt, msg); QF_PUBLISH(e, (QActive *)me); }
 /* helper macro to provide the ID of Philo &quot;me_&quot; */
 #define TL_ID(me_)    ((eTLidentity_t)((me_) - l_traffic))
 
@@ -906,6 +906,27 @@ $define(AOs::TLblinker)</text>
 
 #define BSP_TICKS_PER_SEC    1000U
 
+#ifdef Q_SPY
+    enum {
+        TL_STAT = QS_USER,
+        PHILO_STAT,
+        COMMAND_STAT
+    };
+    enum AppRecords
+    { /* application-specific trace records */
+        TL_APP = QS_USER
+    };
+
+     typedef struct std_sender_id {
+         uint8_t prio;
+     } StdSenderId_t;
+#else
+    typedef uint8_t StdSenderId_t;
+#endif
+extern StdSenderId_t const l_SysTick_Handler,
+                           l_Button_Handler;
+
+// function prototypes
 void BSP_HW_init(void);
 void BSP_init(int argc, char *argv[]);
 void BSP_terminate(int16_t result);

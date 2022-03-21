@@ -1,0 +1,16 @@
+kind: pipeline
+name: default
+tye: docker
+platform:
+- os: linux
+- arch: amd64
+
+steps:
+- name: test
+    image: localhost/crosscompile:arch
+    commands:
+    - buildprj -p Linux
+    when:
+        event:
+        -push
+

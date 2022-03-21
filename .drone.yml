@@ -4,7 +4,12 @@ tye: docker
 
 steps:
 - name: test
-  image: localhost/crosscompile:arch
+  image: docker.io/library/archlinux
   commands:
-  - buildprj -p Linux
+  - echo "check_certificate = off" >> /root/.wgetrc
+  - echo "--insecure" >> /root/.curlrc
+  - pacman-key --init && pacman-key --populate archlinux
+  - pacman -Syyu --noconfirm
+  - echo "Running in Alpine"
+  - exit 0
 

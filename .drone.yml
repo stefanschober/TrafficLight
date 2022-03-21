@@ -6,11 +6,11 @@ workspace:
     path: /project
 
 steps:
-- name: clone
-  image: alpine/git
-  commands:
-  - git clone ssh://git@troja:2222/stefan/TrafficLight.git .
-  - git checkout master
+#- name: clone
+#  image: alpine/git
+#  commands:
+#  - git clone ssh://git@troja:2222/stefan/TrafficLight.git .
+#  - git checkout master
   
 - name: test
   image: docker.io/library/archlinux

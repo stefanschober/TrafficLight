@@ -6,7 +6,7 @@ workspace:
     path: /project
 
 steps:
-- name clone:
+- name: clone
   image: alpine/git
   commands:
   - git clone ssh://git@troja:2222/stefan/TrafficLight.git .

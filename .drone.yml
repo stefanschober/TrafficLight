@@ -6,7 +6,7 @@ platform:
 - arch: amd64
 
 steps:
-    name: test
+- name: test
     image: localhost/crosscompile:arch
     commands:
     - buildprj -p Linux

@@ -7,7 +7,4 @@ steps:
   image: localhost/crosscompile:arch
   commands:
   - buildprj -p Linux
-  when:
-    event:
-    -push
 

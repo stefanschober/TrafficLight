@@ -1,12 +1,13 @@
 pipeline {
-    agent any
-
+    agent {
+        docker { image 'docker.io/library/archlinux:latest' }
+    }
     stages {
-        stage('Do nothing') {
+        stage('Test') {
             steps {
-                sh '/bin/true'
+                sh 'bash --version'
+                echo 'in container'
             }
         }
     }
 }
-

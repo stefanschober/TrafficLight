@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'localhost/crosscompile:latest' }
+        docker { image 'localhost/alpine:latest' }
     }
     stages {
         stage('Test') {

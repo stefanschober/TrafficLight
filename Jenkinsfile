@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                buildprj -p Gnu MinGW Linux
+                sh 'buildprj -p Gnu MinGW'
             }
         }
     }

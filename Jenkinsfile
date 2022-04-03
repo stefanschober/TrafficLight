@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'localhost/alpine:latest'
+            image 'localhost/crosscompile:latest'
             args '--entrypoint='
         }
     }

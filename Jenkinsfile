@@ -1,11 +1,10 @@
 pipeline {
     agent {
-        docker { image 'localhost/archlinux:latest' }
+        docker { image 'localhost/alpine:latest' }
     }
     stages {
         stage('Test') {
             steps {
-                sh '--version'
                 echo 'in container'
             }
         }

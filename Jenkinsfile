@@ -1,6 +1,9 @@
 pipeline {
     agent {
-        docker { image 'localhost/alpine:latest' }
+        docker {
+            image 'localhost/alpine:latest'
+            args '--entrypoint='
+        }
     }
     stages {
         stage('Test') {

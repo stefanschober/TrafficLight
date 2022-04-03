@@ -1,11 +1,11 @@
 pipeline {
     agent {
-        docker { image 'localhost/alpine:latest' }
+        docker { image 'localhost/crosscompile:latest' }
     }
     stages {
         stage('Test') {
             steps {
-                echo 'in container'
+                buildprj -p Gnu MinGW Linux
             }
         }
     }

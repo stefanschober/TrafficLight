@@ -1,9 +1,8 @@
 pipeline {
-        agent any
-        environment {
-            CMAKE_GENERATOR = 'Unix Makefiles'
-            SRC_DIR = './Source'
-        }
+    agent any
+    environment {
+        CMAKE_GENERATOR = 'Unix Makefiles'
+        SRC_DIR = './Source'
     }
     stages {
         stage('build_cmake') {

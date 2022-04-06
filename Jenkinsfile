@@ -1,16 +1,29 @@
 pipeline {
-    agent {
-        docker {
-            image 'localhost/crosscompile:latest'
-            args '--entrypoint='
+        agent any
+        environment {
+            CMAKE_GENERATOR = 'Unix Makefiles'
+            SRC_DIR = './Source'
         }
     }
     stages {
-        stage('Test') {
+        stage('build_cmake') {
+            environment {
+                CMAKE_TOOLCHAIN_FILE = '/root/cmake/tc_gnuarm.cmake'
+                CMAKE_DEFINES = '-DCONFIG_KERNEL_QK=TRUE -DMCU=TLE9844_2QX'
+                BLD_DIR = 'Build/Make_Gnu'
+            }
             steps {
-                sh 'buildprj -p Gnu'
-                sh 'buildprj -p MinGW'
-                sh 'buildprj -p Raspi'
+                echo 'build for ARM Cortex-M0 with arm-none-eabi-gcc'
+                sh 'cmake -G ${CMAKE_GENERATOR} -B ${BLD_DIR} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} ${CMAKE_DEFINES} ${SRC_DIR}'
+                sh 'cmake --build ${BLD_DIR} --target all'
+                echo 'done'
+            }
+        }
+        stage('build_buildprj') {
+            steps {
+                echo 'build all targets'
+                sh 'buildprj -p all'
+                echo 'done'
             }
         }
     }

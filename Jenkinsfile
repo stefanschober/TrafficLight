@@ -1,7 +1,6 @@
 pipeline {
     agent any
     environment {
-        CMAKE_GENERATOR = '"Unix Makefiles"'
         SRC_DIR = './Source'
     }
     stages {
@@ -13,7 +12,7 @@ pipeline {
             }
             steps {
                 echo 'build for ARM Cortex-M0 with arm-none-eabi-gcc'
-                sh 'cmake -G ${CMAKE_GENERATOR} -B ${BLD_DIR} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} ${CMAKE_DEFINES} ${SRC_DIR}'
+                sh 'cmake -B ${BLD_DIR} -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE} ${CMAKE_DEFINES} ${SRC_DIR}'
                 sh 'cmake --build ${BLD_DIR} --target all'
                 echo 'done'
             }

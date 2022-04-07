@@ -1,0 +1,90 @@
+#! armcc -E -P @CMAKE_C_FLAGS@
+
+// *************************************************************
+// *** USC V2 Generic Scatter-Loading Description File       ***
+// *************************************************************
+// CMake configuration section
+#cmakedefine NO_LIBINIT
+#cmakedefine STACKSIZE @STACKSIZE@
+#cmakedefine HEAPSIZE @HEAPSIZE@
+#cmakedefine MCU_FLASH_SIZE @MCU_FLASH_SIZE@
+#if defined MCU_FLASH_SIZE
+#   define FLASHSIZE MCU_FLASH_SIZE
+#else
+#   define FLASHSIZE (1024 * 32)
+#endif
+
+// plausibility checks
+#if (!defined(STACKSIZE) || (STACKSIZE <= 0))
+  #error "No or wrong STACKSIZE definition!"
+#endif
+
+//#define RAMSIZE   0x00004000
+#define ROMSTART    0x8000000
+#define ROMSIZE     (FLASHSIZE)
+#define RAMSTART    0x20000000
+#define RAMSIZE     (1024 * 32)
+#define EEPSIZE     (1024 * 4)
+#define VECSIZE     (4*(16+24))
+#define RAMEND      (RAMSTART+RAMSIZE)
+#define CODESIZE    (ROMSIZE-EEPSIZE)
+#define EEPSTART    (ROMSTART+CODESIZE)
+#define NACNADSIZE  4
+
+LR_IROM1 ROMSTART NOCOMPRESS ROMSIZE    ; load region size_region
+{
+	VEC ROMSTART ABSOLUTE FIXED
+	{
+		* (.vectors, +FIRST)
+	}
+
+	ROM +0 (CODESIZE - ImageLength(VEC))
+	{
+		* (.init)
+#if !defined(NO_LIBINIT)
+		* (InRoot$$Sections)
+#endif
+		* (.text*, i.*, .emb_text*)
+		* (.rodata*, .const*, RO)
+	}
+	
+	NIRAM RAMSTART UNINIT ALIGNALL 4
+	{
+		* (.noinit*)
+	}
+	
+	RAM +0 ALIGNALL 4 (RAMSIZE - STACKSIZE - ImageLength(NIRAM))
+	{
+		* (.data*, RW)
+		* (.bss*, ZI)
+	}
+
+#if defined HEAPSIZE && (HEAPSIZE > 0)
+	HEAP +0 UNINIT ALIGNALL 4
+	{
+        	* (.heap, +LAST)
+	}
+#endif
+
+
+	STACK RAMEND EMPTY -STACKSIZE
+	{
+		/* * (.stack, STACK) */
+	}
+
+	EEPROM EEPSTART ABSOLUTE FIXED ALIGNALL 512 EEPSIZE
+	{
+		* (.parameter*)
+		* (.profile*)
+		* (.eoldata*)
+	}
+}
+
+LR_IROM2 (ROMSTART-NACNADSIZE) NOCOMPRESS NACNADSIZE    ; load region size_region
+{
+	NACROM (ROMSTART-NACNADSIZE) ABSOLUTE FIXED NACNADSIZE
+	{
+		* (.nacnad)
+	}
+}
+

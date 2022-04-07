@@ -41,6 +41,9 @@ endif()
 
 # add GTK+-3.0 support
 if(CONFIG_GUI)
+    if(CONFIG_RASPI)
+        set(ENV{PKG_CONFIG_PATH} "/usr/lib/arm-linux-gnueabihf/pkgconfig/")
+    endif()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK3 gtk+-3.0) # QUIET IMPORTED_TARGET)
 

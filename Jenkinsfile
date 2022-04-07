@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('build_cmake') {
             environment {
-                CMAKE_TOOLCHAIN_FILE = '/root/cmake/tc_gnuarm.cmake'
+                CMAKE_TOOLCHAIN_FILE = '${JENKINS_HOME}/cmake/tc_gnuarm.cmake'
                 CMAKE_DEFINES = '-DCONFIG_KERNEL_QK=TRUE -DMCU=TLE9844_2QX'
                 BLD_DIR = 'Build/Make_Gnu'
             }

@@ -70,6 +70,9 @@ endfunction()
 set(PORT arm-cm)
 
 if(CONFIG_PICO)
+    message(STATUS "initializing Raspberry Pi Pico SDK")
+    pico_sdk_init()
+
     pico_enable_stdio_usb(${TGT} TRUE)
     pico_enable_stdio_uart(${TGT} TRUE)
     pico_add_extra_outputs(${TGT})

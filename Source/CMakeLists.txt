@@ -19,6 +19,15 @@ else()
     unset(_bindir)
 endif()
 
+# update the module search path
+if(MSYS OR WINDOWS OR WIN32)
+    string(REPLACE "\\" "/" HOME_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
+    set(CMAKE_MODULE_PATH "${HOME_PATH}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH}")
+else()
+    set(CMAKE_MODULE_PATH $ENV{HOME}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH})
+endif()
+# message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
+
 # set up configurable options
 option(CONFIG_QSPY       "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" OFF)
 option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
@@ -41,14 +50,32 @@ option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be c
 option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
 
-if(CONFIG_DEBUG)
+if(CONFIG_UNIT_TEST)
+	set(CONFIG_QSPY ON CACHE BOOL "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" FORCE)
+endif()
+
+# setup Raspberry Pi Pico SDK
+if(CONFIG_PICO)
+    find_path(PICO_SDK_PATH pico_sdk_init.cmake
+              PATHS ~ /opt /var /usr/lib /
+              PATH_SUFFIXES pico pico-sdk pico/pico-sdk)
+
+    if(PICO_SDK_PATH)
+        message(STATUS "setup Raspberry Pi Pico SDK from ${PICO_SDK_PATH}")
+        set(CMAKE_BUILD_TYPE "Debug")
+        set(PICO_BOARD pico)
+        set(PICO_BARE_METAL FALSE)
+        set(PICO_PLATFORM rp2040)
+
+        # include must happen before project(...)
+        include(pico_sdk_import)
+    else()
+        message(FATAL "PICO_SDK_PATH not found!")
+    endif()
+elseif(CONFIG_DEBUG)
     set(CMAKE_BUILD_TYPE "Debug")
 else()
     set(CMAKE_BUILD_TYPE "Release")
-endif()
-
-if(CONFIG_UNIT_TEST)
-	set(CONFIG_QSPY ON CACHE BOOL "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" FORCE)
 endif()
 
 # check/set Qx real time kernel
@@ -117,11 +144,6 @@ endif()
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
-if(CONFIG_PICO)
-    message(STATUS "initializing Raspberry Pi Pico SDK")
-    pico_sdk_init()
-endif()
-
 include(CTest)
 include(CheckIncludeFile)
 include(CheckLibraryExists)
@@ -164,26 +186,29 @@ target_link_options(${TGT}
         $<$<BOOL:${CONFIG_VERBOSE}>:-v>
 )
 
-if(CONFIG_PICO)
-    add_executable(systicktst systicktst.c)
-    pico_enable_stdio_usb(systicktst TRUE)
-    pico_enable_stdio_uart(systicktst FALSE)
+#if(CONFIG_PICO)
+#    add_executable(systicktst systicktst.c)
+#    pico_enable_stdio_usb(systicktst TRUE)
+#    pico_enable_stdio_uart(systicktst FALSE)
 
-    pico_add_extra_outputs(systicktst)
-    target_link_libraries(systicktst pico_stdlib pico_time hardware_exception cmsis_core)
-    target_compile_definitions(systicktst
-        PUBLIC
-            PICO_CMSIS_RENAME_EXCEPTIONS=1
-    #        PICO_NO_RAM_VECTOR_TABLE=1
-    )
-    target_compile_options(systicktst
-        PUBLIC
-            -O0
-            -g3
-    )
-    #pico_set_binary_type(systicktst no_flash)
-    pico_set_binary_type(systicktst default)
-endif()
+#    pico_add_extra_outputs(systicktst)
+#    target_link_libraries(systicktst pico_stdlib pico_time hardware_exception cmsis_core)
+
+#    target_compile_definitions(systicktst
+#        PUBLIC
+#            PICO_CMSIS_RENAME_EXCEPTIONS=1
+#            PICO_NO_RAM_VECTOR_TABLE=1
+#    )
+
+#    target_compile_options(systicktst
+#        PUBLIC
+#            -O0
+#            -g3
+#    )
+
+#    pico_set_binary_type(systicktst no_flash)
+#    pico_set_binary_type(systicktst default)
+#endif()
 
 # set the default file names for parameter and profile data
 # the files are in binary format and need to have

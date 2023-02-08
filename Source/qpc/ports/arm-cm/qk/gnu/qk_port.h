@@ -1,40 +1,33 @@
-/**
-* @file
-* @brief QK/C port to ARM Cortex-M, GNU-ARM toolset
-* @cond
-******************************************************************************
-* Last updated for version 6.9.2a
-* Last updated on  2021-01-31
+/*============================================================================
+* QK/C port to ARM Cortex-M, GNU-ARM
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 *
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
 *
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
 *
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
 *
 * Contact information:
-* <www.state-machine.com/licensing>
+* <www.state-machine.com>
 * <info@state-machine.com>
-******************************************************************************
-* @endcond
+============================================================================*/
+/*!
+* @date Last updated on: 2022-12-18
+* @version Last updated for: @ref qpc_7_2_0
+*
+* @file
+* @brief QK/C port to ARM Cortex-M, GNU-ARM toolset
 */
 #ifndef QK_PORT_H
 #define QK_PORT_H
@@ -49,7 +42,7 @@ static inline uint32_t QK_get_IPSR(void) {
     return regIPSR;
 }
 
-/* QK interrupt entry and exit */
+/* QK ISR entry and exit */
 #define QK_ISR_ENTRY() ((void)0)
 
 #define QK_ISR_EXIT()  do {                                   \
@@ -61,9 +54,9 @@ static inline uint32_t QK_get_IPSR(void) {
     QK_ARM_ERRATUM_838869();                                  \
 } while (false)
 
-#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
+#if (__ARM_ARCH == 6) /* ARMv6-M? */
     #define QK_ARM_ERRATUM_838869() ((void)0)
-#else /* Cortex-M3/M4/M7 (v7-M) */
+#else /* ARMv7-M or higher */
     /* The following macro implements the recommended workaround for the
     * ARM Erratum 838869. Specifically, for Cortex-M3/M4/M7 the DSB
     * (memory barrier) instruction needs to be added before exiting an ISR.
@@ -72,10 +65,29 @@ static inline uint32_t QK_get_IPSR(void) {
         __asm volatile ("dsb" ::: "memory")
 #endif
 
+/* Use a given ARM Cortex-M IRQ to return to thread mode (default NMI)
+*
+* NOTE:
+* If you need the NMI for other purposes, you can define the macros
+* QK_USE_IRQ_NUM and QK_USE_IRQ_HANDLER to use thus specified IRQ
+* instead of the NMI (the IRQ should not be used for anything else).
+* These two macros can be defined on the command line to the compiler
+* and are actually needed only to compile the qk_port.c file.
+*/
+//#define QK_USE_IRQ_NUM     25
+//#define QK_USE_IRQ_HANDLER CRYPTO_IRQHandler
+
 /* initialization of the QK kernel */
 #define QK_INIT() QK_init()
 void QK_init(void);
 void QK_thread_ret(void);
+
+#if (__ARM_FP != 0) /* if VFP available... */
+/* When the FPU is configured, clear the FPCA bit in the CONTROL register
+* to prevent wasting the stack space for the FPU context.
+*/
+#define QK_START() __asm volatile ("msr CONTROL,%0" :: "r" (0) : )
+#endif
 
 #include "qk.h" /* QK platform-independent public interface */
 

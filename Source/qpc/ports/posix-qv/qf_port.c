@@ -1,41 +1,33 @@
-/**
-* @file
-* @brief QF/C port to POSIX API (single-threaded, like QV kernel)
-* @ingroup ports
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-06-17
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 *
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
 *
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
 *
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
 *
 * Contact information:
-* <www.state-machine.com/licensing>
+* <www.state-machine.com>
 * <info@state-machine.com>
-******************************************************************************
-* @endcond
+============================================================================*/
+/*!
+* @date Last updated on: 2023-01-07
+* @version Last updated for: @ref qpc_7_2_0
+*
+* @file
+* @brief QF/C port to POSIX API (single-threaded, like QV kernel)
 */
 
 /* expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008) */
@@ -66,7 +58,6 @@
 Q_DEFINE_THIS_MODULE("qf_port")
 
 /* Global objects ==========================================================*/
-QPSet  QV_readySet_;        /* QV-ready set of active objects */
 pthread_cond_t QV_condVar_; /* Cond.var. to signal events */
 
 /* Local objects ===========================================================*/
@@ -168,15 +159,10 @@ int_t QF_run(void) {
     QS_END_NOCRIT_PRE_()
 
     while (l_isRunning) {
-        QEvt const *e;
-        QActive *a;
-        uint_fast8_t p;
-
         /* find the maximum priority AO ready to run */
-        if (QPSet_notEmpty(&QV_readySet_)) {
-
-            QPSet_findMax(&QV_readySet_, p);
-            a = QF_active_[p];
+        if (QPSet_notEmpty(&QF_readySet_)) {
+            uint_fast8_t p = QPSet_findMax(&QF_readySet_);
+            QActive *a = QActive_registry_[p];
             QF_CRIT_X_();
 
             /* the active object 'a' must still be registered in QF
@@ -190,14 +176,14 @@ int_t QF_run(void) {
             * 2. dispatch the event to the AO's state machine.
             * 3. determine if event is garbage and collect it if so
             */
-            e = QActive_get_(a);
+            QEvt const *e = QActive_get_(a);
             QHSM_DISPATCH(&a->super, e, a->prio);
             QF_gc(e);
 
             QF_CRIT_E_();
 
             if (a->eQueue.frontEvt == (QEvt *)0) { /* empty queue? */
-                QPSet_remove(&QV_readySet_, p);
+                QPSet_remove(&QF_readySet_, p);
             }
         }
         else {
@@ -206,7 +192,7 @@ int_t QF_run(void) {
             * for events. Instead, the POSIX-QV port efficiently waits until
             * QP events become available.
             */
-            while (QPSet_isEmpty(&QV_readySet_)) {
+            while (QPSet_isEmpty(&QF_readySet_)) {
                 pthread_cond_wait(&QV_condVar_, &l_pThreadMutex);
             }
         }
@@ -237,7 +223,7 @@ void QF_stop(void) {
 
     /* unblock the event-loop so it can terminate */
     p = 1U;
-    QPSet_insert(&QV_readySet_, p);
+    QPSet_insert(&QF_readySet_, p);
     pthread_cond_signal(&QV_condVar_);
 }
 
@@ -271,20 +257,20 @@ int QF_consoleWaitForKey(void) {
 }
 
 /****************************************************************************/
-void QActive_start_(QActive * const me, uint_fast8_t prio,
+void QActive_start_(QActive * const me, QPrioSpec const prioSpec,
                   QEvt const * * const qSto, uint_fast16_t const qLen,
                   void * const stkSto, uint_fast16_t const stkSize,
                   void const * const par)
 {
     (void)stkSize; /* unused parameter in the POSIX port */
 
-    Q_REQUIRE_ID(600, (0U < prio)  /* priority...*/
-        && (prio <= QF_MAX_ACTIVE) /*... in range */
-        && (stkSto == (void *)0)); /* statck storage must NOT...
-                                       * ... be provided */
+    /* no external stack storage needed for this port */
+    Q_REQUIRE_ID(600, (stkSto == (void *)0));
     QEQueue_init(&me->eQueue, qSto, qLen);
-    me->prio = (uint8_t)prio;
-    QF_add_(me); /* make QF aware of this active object */
+
+    me->prio  = (uint8_t)(prioSpec & 0xFFU); /* QF-priority of the AO */
+    me->pthre = (uint8_t)(prioSpec >> 8U);   /* preemption-threshold */
+    QActive_register_(me); /* register this AO */
 
     /* the top-most initial tran. (virtual) */
     QHSM_INIT(&me->super, par, me->prio);
@@ -299,10 +285,10 @@ void QActive_stop(QActive * const me) {
 
     /* make sure the AO is no longer in "ready set" */
     QF_CRIT_E_();
-    QPSet_remove(&QV_readySet_, me->prio);
+    QPSet_remove(&QF_readySet_, me->prio);
     QF_CRIT_X_();
 
-    QF_remove_(me); /* remove this AO from QF */
+    QActive_unregister_(me); /* un-register this active object */
 }
 #endif
 /*..........................................................................*/
@@ -318,7 +304,7 @@ static void *ticker_thread(void *arg) { /* for pthread_create() */
     (void)arg; /* unused parameter */
     while (l_isRunning) { /* the clock tick loop... */
         nanosleep(&l_tick, NULL); /* sleep for the number of ticks, NOTE05 */
-        QF_onClockTick(); /* clock tick callback (must call QF_TICK_X()) */
+        QF_onClockTick(); /* clock tick callback (must call QTIMEEVT_TICK_X()) */
     }
     return (void *)0; /* return success */
 }
@@ -329,8 +315,8 @@ static void sigIntHandler(int dummy) {
     exit(-1);
 }
 
-/*****************************************************************************
-* NOTE01:
+/*==========================================================================*/
+/* NOTE01:
 * In Linux, the scheduler policy closest to real-time is the SCHED_FIFO
 * policy, available only with superuser privileges. QF_run() attempts to set
 * this policy as well as to maximize its priority, so that the ticking

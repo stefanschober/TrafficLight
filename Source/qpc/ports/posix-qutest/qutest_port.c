@@ -1,41 +1,33 @@
-/**
-* @file
-* @brief QS/C QUTest port to POSIX
-* @ingroup ports
-* @cond
-******************************************************************************
-* Last updated for version 6.9.4
-* Last updated on  2021-06-17
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 *
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
 *
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
 *
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
 *
 * Contact information:
-* <www.state-machine.com/licensing>
+* <www.state-machine.com>
 * <info@state-machine.com>
-******************************************************************************
-* @endcond
+============================================================================*/
+/*!
+* @date Last updated on: 2023-01-07
+* @version Last updated for: @ref qpc_7_2_0
+*
+* @file
+* @brief QS/C QUTest port to POSIX
 */
 /* expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008) */
 #define _POSIX_C_SOURCE 200809L
@@ -63,19 +55,25 @@
 #include <fcntl.h>
 #include <signal.h>
 
-/*Q_DEFINE_THIS_MODULE("qutest_port")*/
-
 #define QS_TX_SIZE     (8*1024)
 #define QS_RX_SIZE     (2*1024)
 #define QS_TX_CHUNK    QS_TX_SIZE
-#define QS_TIMEOUT_MS  10
+#define QS_TIMEOUT_MS  10L
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR   -1
 
+/*Q_DEFINE_THIS_MODULE("qutest_port")*/
+
 /* local variables .........................................................*/
 static int l_sock = INVALID_SOCKET;
-static void sigIntHandler(int dummy);
+static void sigIntHandler(int dummy); /* prototype */
+static void sigIntHandler(int dummy) {
+    (void)dummy; /* unused parameter */
+    QS_onCleanup();
+    /*PRINTF_S("\n<TARGET> disconnecting from QSPY\n");*/
+    exit(-1);
+}
 
 /*..........................................................................*/
 uint8_t QS_onStartup(void const *arg) {
@@ -115,6 +113,8 @@ uint8_t QS_onStartup(void const *arg) {
     if (*src == ':') {
         serviceName = src + 1;
     }
+    //PRINTF_S("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
+    //         hostName, serviceName);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -124,7 +124,7 @@ uint8_t QS_onStartup(void const *arg) {
     if (status != 0) {
         FPRINTF_S(stderr,
             "<TARGET> ERROR   cannot resolve host Name=%s:%s,Err=%d\n",
-                    hostName, serviceName, status);
+            hostName, serviceName, status);
         goto error;
     }
 
@@ -174,6 +174,9 @@ uint8_t QS_onStartup(void const *arg) {
     sockopt_bool = 0; /* negative option */
     setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
                &sockopt_bool, sizeof(sockopt_bool));
+
+    //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
+    //         hostName, port_remote);
     QS_onFlush();
 
     /* install the SIGINT (Ctrl-C) signal handler */
@@ -188,6 +191,8 @@ error:
 }
 /*..........................................................................*/
 void QS_onCleanup(void) {
+    static struct timespec const c_timeout = {0, 10L*QS_TIMEOUT_MS*1000000L };
+    nanosleep(&c_timeout, NULL); /* allow the last QS output to come out */
     if (l_sock != INVALID_SOCKET) {
         close(l_sock);
         l_sock = INVALID_SOCKET;
@@ -201,16 +206,14 @@ void QS_onReset(void) {
 }
 /*..........................................................................*/
 void QS_onFlush(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-    static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS*1000000L };
-
     if (l_sock == INVALID_SOCKET) { /* socket NOT initialized? */
         FPRINTF_S(stderr, "%s\n", "<TARGET> ERROR   invalid TCP socket");
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
+    uint8_t const *data;
+    static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS*1000000L };
+    uint16_t nBytes = QS_TX_CHUNK;
     while ((data = QS_getBlock(&nBytes)) != (uint8_t *)0) {
         for (;;) { /* for-ever until break or return */
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
@@ -246,28 +249,27 @@ void QS_onTestLoop() {
     fd_set readSet;
     FD_ZERO(&readSet);
 
+    struct timeval timeout = {
+        (long)0, (long)(QS_TIMEOUT_MS * 1000)
+    };
+
     QS_rxPriv_.inTestLoop = true;
     while (QS_rxPriv_.inTestLoop) {
-        struct timeval timeout = {
-            (long)0, (long)(QS_TIMEOUT_MS * 1000)
-        };
-        int nrec;
-
         FD_SET(l_sock, &readSet);
 
         /* selective, timed blocking on the TCP/IP socket... */
         timeout.tv_usec = (long)(QS_TIMEOUT_MS * 1000);
-        nrec = select(l_sock + 1, &readSet,
+        int status = select(l_sock + 1, &readSet,
                       (fd_set *)0, (fd_set *)0, &timeout);
-        if (nrec < 0) {
+        if (status < 0) {
             FPRINTF_S(stderr, "<TARGET> ERROR socket select,errno=%d\n",
-                    errno);
+                errno);
             QS_onCleanup();
             exit(-2);
         }
-        else if (FD_ISSET(l_sock, &readSet)) { /* socket ready to read? */
-            int status = recv(l_sock,
-                              (char *)QS_rxPriv_.buf, (int)QS_rxPriv_.end, 0);
+        else if ((status > 0) && FD_ISSET(l_sock, &readSet)) { /* socket ready */
+            status = recv(l_sock,
+                          (char *)QS_rxPriv_.buf, (int)QS_rxPriv_.end, 0);
             if (status > 0) { /* any data received? */
                 QS_rxPriv_.tail = 0U;
                 QS_rxPriv_.head = status; /* # bytes received */
@@ -275,19 +277,11 @@ void QS_onTestLoop() {
             }
         }
 
-        /* flush the QS TX buffer */
         QS_onFlush();
     }
     /* set inTestLoop to true in case calls to QS_onTestLoop() nest,
     * which can happen through the calls to QS_TEST_PAUSE().
     */
     QS_rxPriv_.inTestLoop = true;
-}
-/*..........................................................................*/
-static void sigIntHandler(int dummy) {
-    (void)dummy; /* unused parameter */
-    QS_onCleanup();
-    /*PRINTF_S("\n<TARGET> disconnecting from QSPY\n");*/
-    exit(-1);
 }
 

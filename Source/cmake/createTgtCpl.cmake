@@ -3,9 +3,10 @@
 # PARAM_IN - the complete path to the parameter eeprom data file (binary)
 # PROFILE_IN - the complete path to the profile eeprom data file (binary)
 # HEXFILE - the flashable application in Intel HEX format as created by
+# MAPFILE - the map file created by the linker
 # objcopy/fromelf
-if(NOT (PARAM_IN AND PROFILE_IN AND HEXFILE))
-    message(FATAL_ERROR "usage ${CMAKE_CURRENT_LIST_FILE} -DHEXFILE=<app hex file> -DPARAM_IN=<param data> -DPROFILE_IN=<profile data> -[DARMCC=ON]")
+if(NOT (PARAM_IN AND PROFILE_IN AND HEXFILE AND MAPFILE))
+    message(FATAL_ERROR "usage ${CMAKE_CURRENT_LIST_FILE} -DMAPFILE=<app map file> -DHEXFILE=<app hex file> -DPARAM_IN=<param data> -DPROFILE_IN=<profile data> -[DARMCC=ON]")
 endif()
 
 # find the required helper programs
@@ -30,20 +31,23 @@ endif()
 
 # extract the eeprom memory address from the map file
 execute_process(
-    COMMAND ${AWK} "${AWKCMDpar}" ${CMAKE_BINARY_DIR}/${HEXFILE}.map
+    COMMAND ${AWK} "${AWKCMDpar}" ${MAPFILE}
     RESULT_VARIABLE NOK
     OUTPUT_VARIABLE EEPAR_ADDR
 )
 if(NOK OR (NOT EEPAR_ADDR))
+    message(STATUS "excuted: ${AWK} ${AWKCMDpar} ${MAPFILE}")
     message(FATAL_ERROR "could not determine the eepromParameter structure's memory address")
 endif()
 
 execute_process(
-    COMMAND ${AWK} "${AWKCMDprf}" ${CMAKE_BINARY_DIR}/${HEXFILE}.map
+    COMMAND ${CMAKE_COMMAND} -E echo "excuting: ${AWK} ${AWKCMDprf} ${MAPFILE}"
+    COMMAND ${AWK} "${AWKCMDprf}" ${MAPFILE}
     RESULT_VARIABLE NOK
     OUTPUT_VARIABLE EEPRF_ADDR
 )
 if(NOK OR (NOT EEPRF_ADDR))
+    message(STATUS "excuted: ${AWK} ${AWKCMDpar} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${MAPFILE}")
     message(FATAL_ERROR "could not determine the eepromVariant structure's memory address")
 endif()
 

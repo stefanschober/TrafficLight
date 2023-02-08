@@ -1,11 +1,11 @@
 #! /bin/bash
 
-declare -A platform=([Gnu]=Gnu [Pico]=Pico [Raspi]=Raspi [MinGW]=MinGW [Linux]=Linux [Console]=Console) # [mgwClang]="BuildMinGW/Clang")
-declare -A tctpl=([Gnu]=gnuarm [Pico]=none [Raspi]=gnuarmhf [MinGW]=mingwgcc [Linux]="none" [Console]="none") # [mgwClang]=mingwclang)
-declare -A container=([Gnu]=none [Pico]=none [Raspi]=armhf-cross [MinGW]=crosscompile [Linux]="none" [Console]="none")
+declare -A platform=([Gnu]=Gnu [Pico]=Pico [Raspi]=Raspi [MinGW]=MinGW [Linux]=Linux [MSys]=MSys) # [mgwClang]="BuildMinGW/Clang")
+declare -A tctpl=([Gnu]=gnuarm [Pico]=none [Raspi]=gnuarmhf [MinGW]=mingwgcc [Linux]="none" [MSys]=msys) # [mgwClang]=mingwclang)
+declare -A container=([Gnu]=none [Pico]=none [Raspi]=armhf-cross [MinGW]=crosscompile [Linux]="none" [MSys]=crosscompile)
 declare -A generator=([Make]="Make") # [Ninja]="Ninja")
 declare -A cmakegen=([Make]="${CMAKE_GENERATOR:=none}") # [Ninja]="Ninja")
-declare -A extracfg=([Gnu]="-DMCU=STM32F091xC" [Pico]="-DCONFIG_PICO=ON" [Raspi]="-DCONFIG_RASPI=ON -DCONFIG_RASPI_IO=ON -DCONFIG_PIGPIO=OFF -DCONFIG_GUI=ON" [MinGW]="-DCONFIG_GUI=ON" [Linux]="-DCONFIG_GUI=ON" [Console]="-CONFIG_GUI=OFF -DCONFIG_CONSOLE=ON")
+declare -A extracfg=([Gnu]="-DMCU=STM32F091xC" [Pico]="-DCONFIG_PICO=ON" [Raspi]="-DCONFIG_RASPI=ON -DCONFIG_RASPI_IO=ON -DCONFIG_PIGPIO=OFF -DCONFIG_GUI=ON" [MinGW]="-DCONFIG_GUI=ON" [Linux]="-DCONFIG_GUI=ON" [MSys]="-DCONFIG_GUI=ON")
 
 DEFAULT_PRJ="TrafficLight"
 

@@ -50,6 +50,7 @@
 *.he
 *.sct
 *.ld
+*.ctu-info
 
 # Kernel Module Compile Results
 *.mod*

@@ -3,9 +3,14 @@ if(NOT CONFIG_UNIT_TEST)
     set(CONFIG_GUI ON)
 endif()
 
+if(NOT WIN32)
+    set(WIN32 ON)
+endif()
+
+enable_language(RC)
+
 #default port is WIN32
 set(PORT win32)
-set(MCU Host-CPU)
 
 # additional compile definitions
 target_compile_definitions(${TGT}
@@ -14,11 +19,19 @@ target_compile_definitions(${TGT}
 )
 
 # compiler options
+target_compile_options(${QPLIB}
+	PUBLIC
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
+	    -fmessage-length=0
+	    -fdata-sections
+	    -ffunction-sections
+        -pthread
+)
+
 target_compile_options(${TGT}
     PUBLIC
         $<IF:$<C_COMPILER_ID:GNU>,$<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>, >
-        -Os
-        -g3
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
         -Wall
         -fmessage-length=0
         -ffunction-sections
@@ -29,7 +42,8 @@ target_compile_options(${TGT}
 target_link_options(${TGT}
     PUBLIC
         $<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>
-        -Wl,--cref,--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0>
+        -Wl,$<$<C_COMPILER_ID:GNU>:--cref,>--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
 )
 
 # add windows socket library for Q_SPY/Q_UTEST configurations
@@ -37,4 +51,26 @@ if(CONFIG_QSPY)
     target_link_libraries(${TGT} PRIVATE ws2_32)
 endif()
 
-# include(custom_commands)
+# add GTK+-3.0 support
+if(CONFIG_GUI AND USE_GTK)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GTK3 gtk+-3.0) # QUIET IMPORTED_TARGET)
+
+    if (NOT GTK3_FOUND)
+        message(FATAL_ERROR "The package GTK3, required for this build, could not be found on the system!")
+    endif()
+
+    # Add other flags to the compiler
+    target_compile_options(${TGT} PRIVATE ${GTK3_CFLAGS_OTHER})
+
+    # Setup CMake to use GTK+, tell the compiler where to look for headers
+    # and to the linker where to look for libraries
+    target_include_directories(${TGT} PRIVATE ${GTK3_INCLUDE_DIRS})
+    target_link_directories(${TGT} PRIVATE ${GTK3_LIBRARY_DIRS})
+    target_link_options(${TGT} PRIVATE ${GTK3_LDFLAGS_OTHER})
+
+    # Link the target to the GTK+ libraries
+    target_link_libraries(${TGT} PRIVATE ${GTK3_LIBRARIES}) # PkgConfig::GTK3)
+endif()
+
+include(custom_commands)

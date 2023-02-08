@@ -23,7 +23,7 @@
 * <info@state-machine.com>
 ============================================================================*/
 /*!
-* @date Last updated on: 2022-06-12
+* @date Last updated on: 2022-07-30
 * @version Last updated for: @ref qpc_7_0_1
 *
 * @file
@@ -50,13 +50,14 @@
     * compiler in the C++ mode, which can happen when qep_port.h is included
     * in a C++ module, or the compilation is forced to C++ by the option /TP.
     *
-    * The following pragma suppresses the level-4 C++ warnings C4510, C4512, and
-    * C4610, which warn that default constructors and assignment operators could
-    * not be generated for structures QMState and QMTranActTable.
+    * The following pragma suppresses the level-4 C++ warnings C4510, C4512,
+    * and C4610, which warn that default constructors and assignment operators
+    * could not be generated for structures QMState and QMTranActTable.
     *
-    * The QP/C source code cannot be changed to avoid these C++ warnings, because
-    * the structures QMState and QMTranActTable must remain PODs (Plain Old
-    * Datatypes) to be initializable statically with constant initializers.
+    * The QP/C source code cannot be changed to avoid these C++ warnings
+    * because the structures QMState and QMTranActTable must remain PODs
+    * (Plain Old Datatypes) to be initializable statically with constant
+    * initializers.
     */
     #pragma warning (disable: 4510 4512 4610)
 

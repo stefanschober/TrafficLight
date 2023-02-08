@@ -1,45 +1,34 @@
-/**
-* @file
-* @brief QS/C port to POSIX
-* @ingroup ports
-* @cond
-******************************************************************************
-* Last updated for version 6.9.2
-* Last updated on  2021-01-14
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 *
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
 *
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
 *
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
 *
 * Contact information:
-* <www.state-machine.com/licensing>
+* <www.state-machine.com>
 * <info@state-machine.com>
-******************************************************************************
-* @endcond
+============================================================================*/
+/*!
+* @date Last updated on: 2023-01-07
+* @version Last updated for: @ref qpc_7_2_0
+*
+* @file
+* @brief QS/C port for Win32 API
 */
-/* expose features from the 2008 POSIX standard (IEEE Standard 1003.1-2008) */
-#define _POSIX_C_SOURCE 200809L
-
 #ifndef Q_SPY
     #error "Q_SPY must be defined to compile qs_port.c"
 #endif /* Q_SPY */
@@ -52,14 +41,21 @@
 
 #include "safe_std.h" /* portable "safe" <stdio.h>/<string.h> facilities */
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <errno.h>
 #include <time.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <conio.h>
+
+/* Minimum required Windows version is Windows-XP or newer (0x0501) */
+#ifdef WINVER
+#undef WINVER
+#endif
+#ifdef _WIN32_WINNT
+#undef _WIN32_WINNT
+#endif
+
+#define WINVER _WIN32_WINNT_WINXP
+#define _WIN32_WINNT _WIN32_WINNT_WINXP
+
+#include <ws2tcpip.h>
 
 /*Q_DEFINE_THIS_MODULE("qs_port")*/
 
@@ -68,19 +64,15 @@
 #define QS_TX_CHUNK    QS_TX_SIZE
 #define QS_TIMEOUT_MS  10
 
-#define INVALID_SOCKET -1
-#define SOCKET_ERROR   -1
-
 /* local variables .........................................................*/
-static int l_sock = INVALID_SOCKET;
-static struct timespec const c_timeout = { 0, QS_TIMEOUT_MS*1000000L };
+static SOCKET l_sock = INVALID_SOCKET;
 
 /*..........................................................................*/
 uint8_t QS_onStartup(void const *arg) {
     static uint8_t qsBuf[QS_TX_SIZE];   /* buffer for QS-TX channel */
     static uint8_t qsRxBuf[QS_RX_SIZE]; /* buffer for QS-RX channel */
     char hostName[128];
-    char const *serviceName = "6601";  /* default QSPY server port */
+    char const *serviceName = "6601";   /* default QSPY server port */
     char const *src;
     char *dst;
     int status;
@@ -88,11 +80,20 @@ uint8_t QS_onStartup(void const *arg) {
     struct addrinfo *result = NULL;
     struct addrinfo *rp = NULL;
     struct addrinfo hints;
-    int sockopt_bool;
+    BOOL   sockopt_bool;
+    ULONG  ioctl_opt;
+    WSADATA wsaData;
 
     /* initialize the QS transmit and receive buffers */
     QS_initBuf(qsBuf, sizeof(qsBuf));
     QS_rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+
+    /* initialize Windows sockets version 2.2 */
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != NO_ERROR) {
+        FPRINTF_S(stderr, "<TARGET> ERROR %s\n",
+                  "Windows Sockets cannot be initialized");
+        goto error;
+    }
 
     /* extract hostName from 'arg' (hostName:port_remote)... */
     src = (arg != (void *)0)
@@ -127,10 +128,10 @@ uint8_t QS_onStartup(void const *arg) {
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         l_sock = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (l_sock != INVALID_SOCKET) {
-            if (connect(l_sock, rp->ai_addr, rp->ai_addrlen)
+            if (connect(l_sock, rp->ai_addr, (int)rp->ai_addrlen)
                 == SOCKET_ERROR)
             {
-                close(l_sock);
+                closesocket(l_sock);
                 l_sock = INVALID_SOCKET;
             }
             break;
@@ -148,28 +149,20 @@ uint8_t QS_onStartup(void const *arg) {
     }
 
     /* set the socket to non-blocking mode */
-    status = fcntl(l_sock, F_GETFL, 0);
-    if (status == -1) {
-        FPRINTF_S(stderr,
-            "<TARGET> ERROR   Socket configuration failed errno=%d\n",
-            errno);
-        QS_EXIT();
-        goto error;
-    }
-    if (fcntl(l_sock, F_SETFL, status | O_NONBLOCK) != 0) {
-        FPRINTF_S(stderr, "<TARGET> ERROR   Failed to set non-blocking socket "
-            "errno=%d\n", errno);
-        QS_EXIT();
+    ioctl_opt = 1;
+    if (ioctlsocket(l_sock, FIONBIO, &ioctl_opt) != NO_ERROR) {
+        FPRINTF_S(stderr, "<TARGET> ERROR   %s WASErr=%d\n,",
+            "Failed to set non-blocking socket", WSAGetLastError());
         goto error;
     }
 
     /* configure the socket to reuse the address and not to linger */
-    sockopt_bool = 1;
+    sockopt_bool = TRUE;
     setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR,
-               &sockopt_bool, sizeof(sockopt_bool));
-    sockopt_bool = 0; /* negative option */
-    setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
-               &sockopt_bool, sizeof(sockopt_bool));
+               (const char *)&sockopt_bool, sizeof(sockopt_bool));
+    sockopt_bool = TRUE;
+    setsockopt(l_sock, SOL_SOCKET, SO_DONTLINGER,
+               (const char *)&sockopt_bool, sizeof(sockopt_bool));
     QS_onFlush();
 
     return 1U; /* success */
@@ -180,9 +173,10 @@ error:
 /*..........................................................................*/
 void QS_onCleanup(void) {
     if (l_sock != INVALID_SOCKET) {
-        close(l_sock);
+        closesocket(l_sock);
         l_sock = INVALID_SOCKET;
     }
+    WSACleanup();
     /*PRINTF_S("<TARGET> Disconnected from QSPY\n");*/
 }
 /*..........................................................................*/
@@ -197,7 +191,8 @@ void QS_onFlush(void) {
     QS_CRIT_STAT_
 
     if (l_sock == INVALID_SOCKET) { /* socket NOT initialized? */
-        FPRINTF_S(stderr, "<TARGET> ERROR   %s\n", "invalid TCP socket");
+        FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
+                  "invalid TCP socket");
         return;
     }
 
@@ -208,26 +203,27 @@ void QS_onFlush(void) {
         for (;;) { /* for-ever until break or return */
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { /* sending failed? */
-                if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
+                int err = WSAGetLastError();
+                if (err == WSAEWOULDBLOCK) {
                     /* sleep for the timeout and then loop back
                     * to send() the SAME data again
                     */
-                    nanosleep(&c_timeout, NULL);
+                    Sleep(QS_TIMEOUT_MS);
                 }
                 else { /* some other socket error... */
-                    FPRINTF_S(stderr, "<TARGET> ERROR   sending data over TCP,"
-                           "errno=%d\n", errno);
+                    FPRINTF_S(stderr, "<TARGET> ERROR   %s WASErr=%d\n",
+                              "sending data over TCP", err);
                     return;
                 }
             }
             else if (nSent < (int)nBytes) { /* sent fewer than requested? */
-                nanosleep(&c_timeout, NULL); /* sleep for the timeout */
+                Sleep(QS_TIMEOUT_MS); /* sleep for the timeout */
                 /* adjust the data and loop back to send() the rest */
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
             }
             else {
-                break;
+                break; /* break out of the for-ever loop */
             }
         }
         /* set nBytes for the next call to QS_getBlock() */
@@ -238,13 +234,9 @@ void QS_onFlush(void) {
 }
 /*..........................................................................*/
 QSTimeCtr QS_onGetTime(void) {
-    struct timespec tspec;
-    QSTimeCtr time;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &tspec);
-
-    /* convert to units of 0.1 microsecond */
-    time = (QSTimeCtr)(tspec.tv_sec * 10000000 + tspec.tv_nsec / 100);
-    return time;
+    LARGE_INTEGER time;
+    QueryPerformanceCounter(&time);
+    return (QSTimeCtr)time.QuadPart;
 }
 
 /*..........................................................................*/
@@ -254,7 +246,8 @@ void QS_output(void) {
     QS_CRIT_STAT_
 
     if (l_sock == INVALID_SOCKET) { /* socket NOT initialized? */
-        FPRINTF_S(stderr, "<TARGET> ERROR   %s\n", "invalid TCP socket");
+        FPRINTF_S(stderr, "<TARGET> ERROR   %s\n",
+                  "invalid TCP socket");
         return;
     }
 
@@ -265,20 +258,21 @@ void QS_output(void) {
         for (;;) { /* for-ever until break or return */
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
             if (nSent == SOCKET_ERROR) { /* sending failed? */
-                if ((errno == EWOULDBLOCK) || (errno == EAGAIN)) {
+                int err = WSAGetLastError();
+                if (err == WSAEWOULDBLOCK) {
                     /* sleep for the timeout and then loop back
                     * to send() the SAME data again
                     */
-                    nanosleep(&c_timeout, NULL);
+                    Sleep(QS_TIMEOUT_MS);
                 }
                 else { /* some other socket error... */
                     FPRINTF_S(stderr, "<TARGET> ERROR   sending data over TCP,"
-                           "errno=%d\n", errno);
+                           "WASErr=%d\n", err);
                     return;
                 }
             }
             else if (nSent < (int)nBytes) { /* sent fewer than requested? */
-                nanosleep(&c_timeout, NULL); /* sleep for the timeout */
+                Sleep(QS_TIMEOUT_MS); /* sleep for the timeout */
                 /* adjust the data and loop back to send() the rest */
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;

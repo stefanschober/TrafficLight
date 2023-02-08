@@ -68,7 +68,6 @@ endfunction()
 
 #default port is arm-cm
 set(PORT arm-cm)
-message(STATUS "ARM port set to ${PORT}")
 
 if(CONFIG_PICO)
     pico_enable_stdio_usb(${TGT} TRUE)
@@ -132,6 +131,10 @@ else()
     if(NOT DEFINED SCATTER_TPL)
         set(SCATTER_TPL "stm32f091")
     endif()
+    set(MKHEX ${FROMELF})
+    set(MKHEX_ARGS --i32combined --output=$<TARGET_NAME:${TGT}>.hex $<TARGET_FILE_NAME:${TGT}>)
+    set(MKSIZE ${FROMELF})
+    set(MKSIZE_ARGS --text -z $<TARGET_FILE_NAME:${TGT}>)
 
     if(CMAKE_C_COMPILER_ID STREQUAL "ARMCC")
         find_program(FROMELF
@@ -198,6 +201,7 @@ target_compile_definitions(${TGT}
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
 )
+
 add_custom_target(${TGT}Hex ALL
     COMMAND ${MKHEX} ${MKHEX_ARGS}
     COMMAND ${MKSIZE} ${MKSIZE_ARGS}

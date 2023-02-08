@@ -26,6 +26,12 @@
 #   undef WIN_FUDGE
 #   define WIN_FUDGE 10
 
+#   if defined(__WIN32__)
+#       undef main
+#       define main main_gui
+        int main_gui(void);
+#   endif
+#elif defined(NO_LIBINIT)
 #   undef main
 #   define main main_gui
     int main_gui(int argc, char *argv[]);
@@ -57,9 +63,21 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
+// ===== main() ==============================================================
+#if defined QWIN_GUI && defined __WIN32__
+int main(void)
+{
+    const char *argv[] = {
+        "USC2 GUI",
+        NULL
+    };
+    const int argc = 1;
+#else
 int main(int argc, char *argv[])
 {
-    BSP_HW_init();
+#endif
+    // BSP_HWinit();
+
     QF_init();    /* initialize the framework and the underlying RT kernel */
     BSP_init(argc, argv); /* initialize the Board Support Package */
 

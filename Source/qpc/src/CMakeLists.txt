@@ -1,6 +1,6 @@
 # qpc/src
 add_subdirectory(qf)
-if(NOT (WINDOWS OR WIN32 OR UNIX))
+if(NOT (WIN32 OR UNIX))
     if(CONFIG_KERNEL_QK)
         add_subdirectory(qk)
     endif()

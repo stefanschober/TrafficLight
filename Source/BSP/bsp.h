@@ -19,7 +19,11 @@
 #ifndef bsp_h
 #define bsp_h
 
+#if __WIN32__
+#define BSP_TICKS_PER_SEC     100U
+#else
 #define BSP_TICKS_PER_SEC    1000U
+#endif
 
 #ifdef Q_SPY
     enum {

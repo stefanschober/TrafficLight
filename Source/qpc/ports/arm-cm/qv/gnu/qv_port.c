@@ -1,54 +1,107 @@
-/**
-* @file
-* @brief QV/C port to ARM Cortex-M, GNU-ARM toolset
-* @cond
-******************************************************************************
-* Last updated for version 6.9.1
-* Last updated on  2020-09-23
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 *
-* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
 *
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
 *
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses/>.
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
 *
 * Contact information:
-* <www.state-machine.com/licensing>
+* <www.state-machine.com>
 * <info@state-machine.com>
-******************************************************************************
-* @endcond
+============================================================================*/
+/*!
+* @date Last updated on: 2023-02-03
+* @version Last updated for: @ref qpc_7_2_2
+*
+* @file
+* @brief QV/C port to ARM Cortex-M, GNU-ARM toolset
 */
-/* This QV port is part of the interanl QP implementation */
+/* This QV port is part of the internal QP implementation */
 #define QP_IMPL 1U
 #include "qf_port.h"
 
-#if (__ARM_ARCH == 6) /* Cortex-M0/M0+/M1 (v6-M, v6S-M)? */
+#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004U)
+#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED18U)
+#define NVIC_IP      ((uint32_t volatile *)0xE000E400U)
+#define SCB_CPACR   *((uint32_t volatile *)0xE000ED88U)
+#define FPU_FPCCR   *((uint32_t volatile *)0xE000EF34U)
 
+/*..........................................................................*/
 /*
-* Hand-optimized quick LOG2 in assembly (M0/M0+ have no CLZ instruction)
+* Initialize the exception priorities and IRQ priorities to safe values.
 *
+* Description:
+* On ARMv7-M or higher, this QK port disables interrupts by means of the
+* BASEPRI register. However, this method cannot disable interrupt
+* priority zero, which is the default for all interrupts out of reset.
+* The following code changes the SysTick priority and all IRQ priorities
+* to the safe value QF_BASEPRI, which the QF critical section can disable.
+* This avoids breaching of the QF critical sections in case the
+* application programmer forgets to explicitly set priorities of all
+* "kernel aware" interrupts.
+*
+* The interrupt priorities established in QV_init() can be later
+* changed by the application-level code.
+*/
+void QV_init(void) {
+
+#if (__ARM_ARCH != 6)   /*--------- if ARMv7-M and higher... */
+
+    /* set exception priorities to QF_BASEPRI...
+    * SCB_SYSPRI[0]: Usage-fault, Bus-fault, Memory-fault
+    */
+    SCB_SYSPRI[0] = (SCB_SYSPRI[0]
+        | (QF_BASEPRI << 16U) | (QF_BASEPRI << 8U) | QF_BASEPRI);
+
+    /* SCB_SYSPRI[1]: SVCall */
+    SCB_SYSPRI[1] = (SCB_SYSPRI[1] | (QF_BASEPRI << 24U));
+
+    /* SCB_SYSPRI[2]:  SysTick, PendSV, Debug */
+    SCB_SYSPRI[2] = (SCB_SYSPRI[2]
+        | (QF_BASEPRI << 24U) | (QF_BASEPRI << 16U) | QF_BASEPRI);
+
+    /* set all implemented IRQ priories to QF_BASEPRI... */
+    uint8_t nprio = (8U + ((*SCnSCB_ICTR & 0x7U) << 3U)) * 4U;
+    for (uint8_t n = 0U; n < nprio; ++n) {
+        NVIC_IP[n] = QF_BASEPRI;
+    }
+
+#endif                  /*--------- ARMv7-M or higher */
+
+    /* SCB_SYSPRI[2]: PendSV set to priority 0xFF (lowest) */
+    SCB_SYSPRI[2] = (SCB_SYSPRI[2] | (0xFFU << 16U));
+
+#if (__ARM_FP != 0)     /*--------- if VFP available... */
+    /* make sure that the FPU is enabled by seting CP10 & CP11 Full Access */
+    SCB_CPACR = (SCB_CPACR | ((3UL << 20U) | (3UL << 22U)));
+
+    /* FPU automatic state preservation (ASPEN) lazy stacking (LSPEN) */
+    FPU_FPCCR = (FPU_FPCCR | (1U << 30U) | (1U << 31U));
+#endif                  /*--------- VFP available */
+}
+
+/*==========================================================================*/
+#if (__ARM_ARCH == 6) /* if ARMv6-M... */
+
+/* hand-optimized quick LOG2 in assembly (no CLZ instruction in ARMv6-M) */
+/*
 * NOTE:
 * The inline GNU assembler does not accept mnemonics MOVS, LSRS and ADDS,
-* but for Cortex-M0/M0+/M1 the mnemonics MOV, LSR and ADD always set the
-* condition flags in the PSR.
+* but for ARMv6-M the mnemonics MOV, LSR and ADD always set the condition
+* flags in the PSR.
 */
 __attribute__ ((naked, optimize("-fno-stack-protector")))
 uint_fast8_t QF_qlog2(uint32_t x) {
@@ -83,50 +136,5 @@ __asm volatile (
     );
 }
 
-#else /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M)? */
-
-#define SCnSCB_ICTR  ((uint32_t volatile *)0xE000E004)
-#define SCB_SYSPRI   ((uint32_t volatile *)0xE000ED14)
-#define NVIC_IP      ((uint32_t volatile *)0xE000E400)
-
-/*
-* Initialize the exception priorities and IRQ priorities to safe values.
-*
-* Description:
-* On Cortex-M3/M4/M7, this QV port disables interrupts by means of the
-* BASEPRI register. However, this method cannot disable interrupt
-* priority zero, which is the default for all interrupts out of reset.
-* The following code changes the SysTick priority and all IRQ priorities
-* to the safe value QF_BASEPRI, wich the QF critical section can disable.
-* This avoids breaching of the QF critical sections in case the
-* application programmer forgets to explicitly set priorities of all
-* "kernel aware" interrupts.
-*
-* The interrupt priorities established in QV_init() can be later
-* changed by the application-level code.
-*/
-void QV_init(void) {
-    uint32_t n;
-
-    /* set exception priorities to QF_BASEPRI...
-    * SCB_SYSPRI1: Usage-fault, Bus-fault, Memory-fault
-    */
-    SCB_SYSPRI[1] |= (QF_BASEPRI << 16) | (QF_BASEPRI << 8) | QF_BASEPRI;
-
-    /* SCB_SYSPRI2: SVCall */
-    SCB_SYSPRI[2] |= (QF_BASEPRI << 24);
-
-    /* SCB_SYSPRI3:  SysTick, PendSV, Debug */
-    SCB_SYSPRI[3] |= (QF_BASEPRI << 24) | (QF_BASEPRI << 16) | QF_BASEPRI;
-
-    /* set all implemented IRQ priories to QF_BASEPRI... */
-    n = 8U + ((*SCnSCB_ICTR & 0x7U) << 3); /* (# NVIC_PRIO registers)/4 */
-    do {
-        --n;
-        NVIC_IP[n] = (QF_BASEPRI << 24) | (QF_BASEPRI << 16)
-                     | (QF_BASEPRI << 8) | QF_BASEPRI;
-    } while (n != 0);
-}
-
-#endif /* NOT Cortex-M0/M0+/M1(v6-M, v6S-M)? */
+#endif /* ARMv6-M */
 

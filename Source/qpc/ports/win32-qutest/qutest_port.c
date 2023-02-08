@@ -1,41 +1,33 @@
-/**
-* @file
-* @brief QS/C QUTest port for Win32
-* @ingroup ports
-* @cond
-******************************************************************************
-* Last updated for version 6.9.3
-* Last updated on  2021-03-16
+/*============================================================================
+* QP/C Real-Time Embedded Framework (RTEF)
+* Copyright (C) 2005 Quantum Leaps, LLC. All rights reserved.
 *
-*                    Q u a n t u m  L e a P s
-*                    ------------------------
-*                    Modern Embedded Software
+* SPDX-License-Identifier: GPL-3.0-or-later OR LicenseRef-QL-commercial
 *
-* Copyright (C) 2005-2021 Quantum Leaps, LLC. All rights reserved.
+* This software is dual-licensed under the terms of the open source GNU
+* General Public License version 3 (or any later version), or alternatively,
+* under the terms of one of the closed source Quantum Leaps commercial
+* licenses.
 *
-* This program is open source software: you can redistribute it and/or
-* modify it under the terms of the GNU General Public License as published
-* by the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
+* The terms of the open source GNU General Public License version 3
+* can be found at: <www.gnu.org/licenses/gpl-3.0>
 *
-* Alternatively, this program may be distributed and modified under the
-* terms of Quantum Leaps commercial licenses, which expressly supersede
-* the GNU General Public License and are specifically designed for
-* licensees interested in retaining the proprietary status of their code.
+* The terms of the closed source Quantum Leaps commercial licenses
+* can be found at: <www.state-machine.com/licensing>
 *
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program. If not, see <www.gnu.org/licenses>.
+* Redistributions in source code must retain this top-level comment block.
+* Plagiarizing this software to sidestep the license obligations is illegal.
 *
 * Contact information:
-* <www.state-machine.com/licensing>
+* <www.state-machine.com>
 * <info@state-machine.com>
-******************************************************************************
-* @endcond
+============================================================================*/
+/*!
+* @date Last updated on: 2023-01-07
+* @version Last updated for: @ref qpc_7_2_0
+*
+* @file
+* @brief QS/C QUTest port for Win32
 */
 #ifndef Q_SPY
     #error "Q_SPY must be defined to compile qutest_port.c"
@@ -70,7 +62,7 @@
 #define QS_TX_SIZE     (8*1024)
 #define QS_RX_SIZE     (2*1024)
 #define QS_TX_CHUNK    QS_TX_SIZE
-#define QS_TIMEOUT_MS  10
+#define QS_TIMEOUT_MS  10U
 
 /* local variables .........................................................*/
 static SOCKET l_sock = INVALID_SOCKET;
@@ -120,6 +112,8 @@ uint8_t QS_onStartup(void const *arg) {
     if (*src == ':') {
         serviceName = src + 1;
     }
+    //printf("<TARGET> Connecting to QSPY on Host=%s:%s...\n",
+    //       hostName, serviceName);
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
@@ -171,6 +165,9 @@ uint8_t QS_onStartup(void const *arg) {
     sockopt_bool = TRUE;
     setsockopt(l_sock, SOL_SOCKET, SO_DONTLINGER,
                (const char *)&sockopt_bool, sizeof(sockopt_bool));
+
+    //PRINTF_S("<TARGET> Connected to QSPY at Host=%s:%d\n",
+    //       hostName, port_remote);
     QS_onFlush();
 
     return 1U; /* success */
@@ -180,29 +177,29 @@ error:
 }
 /*..........................................................................*/
 void QS_onCleanup(void) {
+    Sleep(QS_TIMEOUT_MS * 10U); /* allow the last QS output to come out */
     if (l_sock != INVALID_SOCKET) {
         closesocket(l_sock);
         l_sock = INVALID_SOCKET;
     }
     WSACleanup();
-    /*PRINTF_S("<TARGET> Disconnected from QSPY\n");*/
+    //PRINTF_S("\n%s\n", "QS_onCleanup");
 }
 /*..........................................................................*/
 void QS_onReset(void) {
     QS_onCleanup();
+    //PRINTF_S("\n%s\n", "QS_onReset");
     exit(0);
 }
 /*..........................................................................*/
 void QS_onFlush(void) {
-    uint16_t nBytes;
-    uint8_t const *data;
-
     if (l_sock == INVALID_SOCKET) { /* socket NOT initialized? */
         FPRINTF_S(stderr, "<TARGET> ERROR   %s\n", "invalid TCP socket");
         return;
     }
 
-    nBytes = QS_TX_CHUNK;
+    uint16_t nBytes = QS_TX_CHUNK;
+    uint8_t const *data;
     while ((data = QS_getBlock(&nBytes)) != (uint8_t *)0) {
         for (;;) { /* for-ever until break or return */
             int nSent = send(l_sock, (char const *)data, (int)nBytes, 0);
@@ -222,6 +219,7 @@ void QS_onFlush(void) {
             }
             else if (nSent < (int)nBytes) { /* sent fewer than requested? */
                 Sleep(QS_TIMEOUT_MS); /* sleep for the timeout */
+
                 /* adjust the data and loop back to send() the rest */
                 data   += nSent;
                 nBytes -= (uint16_t)nSent;
@@ -244,13 +242,11 @@ void QS_onTestLoop() {
         struct timeval timeout = {
             (long)0, (long)(QS_TIMEOUT_MS * 1000)
         };
-        int status;
-        wint_t ch;
 
         FD_SET(l_sock, &readSet);
 
         /* selective, timed blocking on the TCP/IP socket... */
-        status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
+        int status = select(0, &readSet, (fd_set *)0, (fd_set *)0, &timeout);
         if (status == SOCKET_ERROR) {
             FPRINTF_S(stderr,
                 "<TARGET> ERROR socket select,WSAErr=%d",
@@ -268,10 +264,9 @@ void QS_onTestLoop() {
             }
         }
 
-        /* flush the QS TX buffer */
         QS_onFlush();
 
-        ch = 0;
+        wint_t ch = 0;
         while (_kbhit()) { /* any key pressed? */
             ch = _getwch();
         }

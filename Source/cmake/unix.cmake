@@ -1,6 +1,5 @@
 #default port is posix
 set(PORT posix)
-set(MCU Host-CPU)
 
 # additional compile definitions
 target_compile_definitions(${TGT}
@@ -11,10 +10,18 @@ target_compile_definitions(${TGT}
 )
 
 # compiler options
+target_compile_options(${QPLIB}
+	PUBLIC
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
+	    -fmessage-length=0
+	    -fdata-sections
+	    -ffunction-sections
+        -pthread
+)
+
 target_compile_options(${TGT}
     PUBLIC
-        -Os
-        -g3
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
         -Wall
         -fmessage-length=0
         -ffunction-sections
@@ -27,7 +34,8 @@ target_compile_options(${TGT}
 target_link_options(${TGT}
     PUBLIC
         -pthread
-        -Wl,--cref,--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0>
+        -Wl,$<$<C_COMPILER_ID:GNU>:--cref,>--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
 #        $<$<BOOL:${CONFIG_RASPI}>:-v>
 )
 
@@ -64,4 +72,4 @@ if(CONFIG_GUI)
     target_link_libraries(${TGT} PRIVATE ${GTK3_LIBRARIES}) # PkgConfig::GTK3)
 endif()
 
-# include(custom_commands)
+include(custom_commands)

@@ -20,12 +20,18 @@ else()
 endif()
 
 # set up configurable options
-option(CONFIG_QSPY      "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" OFF)
-option(CONFIG_UNIT_TEST "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
-option(CONFIG_CPPCHECK  "set to ON, if CPP_CHECK shall be enabled (default: OFF)" OFF)
-option(CONFIG_GUI       "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
-option(CONFIG_KERNEL_QV "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
-option(CONFIG_KERNEL_QK "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
+option(CONFIG_QSPY       "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" OFF)
+option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
+option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF)" OFF)
+option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
+option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
+option(USE_GTK           "set to on to use GTK 3.0 in a MS Windows environment instead of a native WIN32 GUI. (default: OFF)" OFF)
+option(CONFIG_KERNEL_QV  "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
+option(CONFIG_KERNEL_QK  "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
+option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)
+option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
+option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
+option(CONFIG_PIGPIO     "set to ON, if the PIGPIO server on the Raspberry Pi shall be used. (default: OFF)" OFF)
 option(CONFIG_CONSOLE   "set to ON, if Linux console output shall be configured. (default: OFF)" OFF)
 option(CONFIG_PICO      "set to ON, if Raspberry Pi Pico system shall be configured. (default: OFF)" OFF)
 option(CONFIG_PICO_CMSIS "set to ON, if Raspberry Pi Pico system shall use CMSIS APIs. (default: ON)" ON)
@@ -33,11 +39,18 @@ option(CONFIG_CORTEX_M0 "set to ON, if an ARM Cortex-M0 target system shall be c
 option(CONFIG_CORTEX_M0plus "set to ON, if an ARM Cortex-M0+ target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_CORTEX_M3 "set to ON, if an ARM Cortex-M3 target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be configured. (default: OFF)" OFF)
-option(CONFIG_RASPI     "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
-option(CONFIG_RASPI_IO  "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
-option(CONFIG_PIGPIO    "set to ON, if the PIGPIO server on the Raspberry Pi shall be used. (default: OFF)" OFF)
 option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
+
+if(CONFIG_CPPCHECK)
+    find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
+    if(CPPCHECK)
+        set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+    else()
+        message(WARNING "CONFIG_CPPCHECK is set to ${CONFIG_CPPCHECK} but the CPPCHECK program cannot be found!")
+        set(CONFIG_CPPCHECK OFF)
+    endif()
+endif()
 
 if(CONFIG_DEBUG)
     set(CMAKE_BUILD_TYPE "Debug")
@@ -50,25 +63,15 @@ if(CONFIG_UNIT_TEST)
 endif()
 
 # check/set Qx real time kernel
-set(S_QV FALSE)
-if(NOT (CONFIG_KERNEL_QV OR CONFIG_KERNEL_QK))
-    set(S_QV TRUE)
-    set(C_QV ON)
-elseif(CONFIG_KERNEL_QV AND CONFIG_KERNEL_QK)
-    set(S_QV TRUE)
-    set(C_QV OFF)
-endif()
-if(S_QV)
-    if(C_QV)
-        set(_msg "No KERNEL (QV or QK) is configured! Falling back to QV kernel.")
+if((NOT (CONFIG_KERNEL_QV OR CONFIG_KERNEL_QK)) OR (CONFIG_KERNEL_QV AND CONFIG_KERNEL_QK))
+    if(CONFIG_KERNEL_QK)
+        message(WARNING "Only one KERNEL (out of QV or QK) shall be configured! Accepting QK kernel.")
     else()
-        set(_msg "Only one KERNEL (out of QV or QK) shall be configured! Accepting QK kernel.")
+        message(WARNING "No KERNEL (QV or QK) is configured! Falling back to QK kernel.")
     endif()
-    message(WARNING ${_msg})
-    set(CONFIG_KERNEL_QV ${C_QV} CACHE BOOL "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" FORCE)
-    unset(_msg)
-    unset(S_QV)
-    unset(C_QV)
+
+    set(CONFIG_KERNEL_QV OFF CACHE BOOL "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" FORCE)
+    set(CONFIG_KERNEL_QK ON  CACHE BOOL "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" FORCE)
 endif()
 
 if(CONFIG_KERNEL_QK)
@@ -79,18 +82,16 @@ endif()
 
 if(NOT PROJECT_NAME AND NOT TARGET)
     set(PROJECT_NAME "trafficlight")
+    set(TARGET ${PROJECT_NAME})
 elseif(NOT PROJECT_NAME)
     set(PROJECT_NAME ${TARGET})
-endif()
-
-if(NOT TARGET)
-    set(TGT ${PROJECT_NAME})
-else()
-    set(TGT ${TARGET})
+elseif(NOT TARGET)
+    set(TARGET ${PROJECT_NAME})
 endif()
 if(NOT IMAGE)
-    set(IMAGE ${TGT})
+    set(IMAGE ${TARGET})
 endif()
+set(TGT ${TARGET})
 
 if(NOT SW_VERSION)
     set(SW_VERSION "1.0.0" CACHE STRING "Software Version")
@@ -102,10 +103,10 @@ endif()
 project(${PROJECT_NAME}
     VERSION ${SW_VERSION}
     DESCRIPTION "Trafficlight project"
-    LANGUAGES C CXX ASM)
+    LANGUAGES C ASM)
 
 # update the module search path
-if(MSYS OR WINDOWS OR WIN32)
+if(CMAKE_HOST_WIN32)
     string(REPLACE "\\" "/" HOME_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
     set(CMAKE_MODULE_PATH "${HOME_PATH}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH}")
 else()
@@ -140,11 +141,37 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     include(CheckPIESupported)
 endif()
 
+# set up global C/CXX/ASM flags
+if(CONFIG_PICOLIB)
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} --specs=picolibc.specs")
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+    set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
+endif()
+
 # the project target
 add_executable(${TGT} "")
 if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
+
+add_library(${QPLIB} STATIC "")
+target_link_libraries(${TGT} PRIVATE ${QPLIB})
+
+# set general defines
+target_compile_definitions(${TGT}
+	PRIVATE
+	    $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
+)
+
+target_compile_options(${TGT}
+    PRIVATE
+        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
+)
+
+target_link_options(${TGT}
+    PRIVATE
+        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
+)
 
 if(CONFIG_PICO)
     add_executable(systicktst systicktst.c)
@@ -167,8 +194,6 @@ if(CONFIG_PICO)
     pico_set_binary_type(systicktst default)
 endif()
 
-add_library(${QPLIB} STATIC "")
-
 # set the default file names for parameter and profile data
 # the files are in binary format and need to have
 # file name extension of ".bin"
@@ -176,12 +201,12 @@ set(PARAMNAME   "USC2_Parameter")
 set(PROFILENAME "USC2_Profile")
 
 # include target specific definitions (set compiler options etc.)
-if(WINDOWS OR MSYS OR MINGW OR WIN32)
+if((CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]") OR CONFIG_PICO)
+	include(arm)
+elseif(WIN32 OR MINGW OR MSYS)
 	include(win32)
 elseif(UNIX)
 	include(unix)
-elseif((CMAKE_SYSTEM_PROCESSOR STREQUAL arm) OR CONFIG_PICO)
-	include(arm)
 else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()
@@ -210,26 +235,6 @@ function(listIncludes PATH)
 #  endforeach()
 endfunction()
 
-# set general defines
-target_compile_definitions(${TGT}
-	PRIVATE
-	    $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
- 	    $<$<BOOL:${CONFIG_LINBUS}>:LINBUS>
-	    $<$<BOOL:${LIN_SUBSYS}>:${LIN_SUBSYS}_SW>
-)
-
-target_compile_options(${TGT}
-    PRIVATE
-        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
-)
-
-target_link_options(${TGT}
-    PRIVATE
-        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
-)
-
-target_link_libraries(${TGT} PRIVATE ${QPLIB})
-
 # add subdirectories with source/header files
 add_subdirectory(qpc)
 add_subdirectory(BSP)
@@ -255,6 +260,7 @@ message(STATUS
     CONFIG_QSPY                 = ${CONFIG_QSPY}
     CONFIG_UNIT_TEST            = ${CONFIG_UNIT_TEST}
     CONFIG_CPPCHECK             = ${CONFIG_CPPCHECK}
+    CONFIG_CHECKMISRA           = ${CONFIG_CHECKMISRA}
     
     CONFIG_KERNEL_QV            = ${CONFIG_KERNEL_QV}
     CONFIG_KERNEL_QK            = ${CONFIG_KERNEL_QK}
@@ -277,8 +283,17 @@ message(STATUS
     CMAKE_VERSION               = ${CMAKE_VERSION}
     CMAKE_CROSSCOMPILING        = ${CMAKE_CROSSCOMPILING}
     CMAKE_HOST_SYSTEM           = ${CMAKE_HOST_SYSTEM}
+    CMAKE_HOST_SYSTEM_NAME      = ${CMAKE_HOST_SYSTEM_NAME}
+    CMAKE_HOST_LINUX            = ${CMAKE_HOST_LINUX}
+    CMAKE_HOST_UNIX             = ${CMAKE_HOST_UNIX}
+    CMAKE_HOST_WIN32            = ${CMAKE_HOST_WIN32}
     CMAKE_SYSTEM                = ${CMAKE_SYSTEM}
     CMAKE_SYSTEM_NAME           = ${CMAKE_SYSTEM_NAME}
+    WIN32                       = ${WIN32}
+    MSYS                        = ${MSYS}
+    MINGW                       = ${MINGW}
+    UNIX                        = ${UNIX}
+    LINUX                       = ${LINUX}
 
     CMAKE_C_COMPILER            = ${CMAKE_C_COMPILER}
     CMAKE_C_COMPILER_ID         = ${CMAKE_C_COMPILER_ID}

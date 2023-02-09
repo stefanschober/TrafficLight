@@ -42,6 +42,7 @@ target_compile_definitions(${QPLIB}
    	 	$<$<BOOL:${USE_GTK}>:USE_GTK>
 	    $<$<BOOL:${CONFIG_QSPY}>:Q_SPY>
 	    $<$<BOOL:${CONFIG_UNIT_TEST}>:Q_UTEST>
+        $<$<BOOL:${USE_GTK}>:USE_GTK>
 )
 
 target_compile_options(${QPLIB}

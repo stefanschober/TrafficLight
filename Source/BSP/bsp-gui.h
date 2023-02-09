@@ -19,11 +19,17 @@
 #ifndef bsp_gui_h
 #define bsp_gui_h
 
-void guiSetLight(eTLidentity_t id, uint8_t light);
-void guiSetPedLed(guint16 status);
-guint16 guiGetButton(void);
-
+#if defined(QWIN_GUI) && defined(__WIN32__)
+int     main_gui(void);
+#else
+int     main_gui(int argc, char *argv[]);
+#endif
 int startGui(int argc, char *argv[]);
-int main_gui(int argc, char *argv[]);
+
+void guiSetLight(eTLidentity_t id, uint8_t light);
+void guiSetPedLed(uint16_t status);
+void guiAssert(char const * const module, int_t loc);
+void guiTerminate(int16_t result);
+uint16_t guiGetButton(void);
 
 #endif /* bsp_gui_h */

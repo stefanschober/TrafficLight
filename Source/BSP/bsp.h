@@ -20,7 +20,7 @@
 #define bsp_h
 
 #if __WIN32__
-#define BSP_TICKS_PER_SEC     100U
+#define BSP_TICKS_PER_SEC      10U
 #else
 #define BSP_TICKS_PER_SEC    1000U
 #endif

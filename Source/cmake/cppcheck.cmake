@@ -9,7 +9,7 @@ if(CONFIG_CPPCHECK)
                 POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E echo "running cppcheck..."
                 COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/patch_compile_commands_json.py
-                COMMAND ${CPPCHECK} --template=gcc
+                COMMAND ${CPPCHECK} --verbose --template=gcc
                     --cppcheck-build-dir=${CMAKE_BINARY_DIR}
                     --check-library
                     --enable=style,performance,portability,information

@@ -1,0 +1,6 @@
+{
+    "script": "C:/Users/SchoberS/MSYS2/mingw64/share/cppcheck/addons/misra.py",
+    "args": [
+        "--rule-texts=C:/Users/SchoberS/misra-rules.txt"
+    ]
+}

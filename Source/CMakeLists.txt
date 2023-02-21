@@ -25,7 +25,6 @@ option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)"
 option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF)" OFF)
 option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
 option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
-option(USE_GTK           "set to on to use GTK 3.0 in a MS Windows environment instead of a native WIN32 GUI. (default: OFF)" OFF)
 option(CONFIG_KERNEL_QV  "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
 option(CONFIG_KERNEL_QK  "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
 option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)

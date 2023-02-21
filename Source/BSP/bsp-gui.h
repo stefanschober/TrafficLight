@@ -19,7 +19,7 @@
 #ifndef bsp_gui_h
 #define bsp_gui_h
 
-#if defined(QWIN_GUI) && defined(__WIN32__) && !defined(USE_GTK)
+#if defined(QWIN_GUI) && defined(__WIN32__)
 int     main_gui(void);
 #else
 int     main_gui(int argc, char *argv[]);

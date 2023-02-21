@@ -47,6 +47,7 @@ def patch(cc: dict) -> bool:
                 except:
                     return False
                 c['command'] = re.sub(regex, s, c['command']).replace('\n', ' ')
+                c['command'] = c['command'].replace('\\', '/')
 
     return True
 

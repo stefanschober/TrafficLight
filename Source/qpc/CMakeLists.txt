@@ -39,10 +39,8 @@ target_compile_definitions(${QPLIB}
 	PUBLIC
 		$<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
    	 	$<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
-   	 	$<$<BOOL:${USE_GTK}>:USE_GTK>
-	    $<$<BOOL:${CONFIG_QSPY}>:Q_SPY>
+        $<$<BOOL:${CONFIG_QSPY}>:Q_SPY>
 	    $<$<BOOL:${CONFIG_UNIT_TEST}>:Q_UTEST>
-        $<$<BOOL:${USE_GTK}>:USE_GTK>
 )
 
 target_compile_options(${QPLIB}

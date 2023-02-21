@@ -42,16 +42,6 @@ option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be c
 option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
 
-if(CONFIG_CPPCHECK)
-    find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
-    if(CPPCHECK)
-        set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-    else()
-        message(WARNING "CONFIG_CPPCHECK is set to ${CONFIG_CPPCHECK} but the CPPCHECK program cannot be found!")
-        set(CONFIG_CPPCHECK OFF)
-    endif()
-endif()
-
 if(CONFIG_DEBUG)
     set(CMAKE_BUILD_TYPE "Debug")
 else()
@@ -136,6 +126,7 @@ endif()
 include(CTest)
 include(CheckIncludeFile)
 include(CheckLibraryExists)
+include(cppcheck)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     include(CheckPIESupported)
@@ -153,6 +144,7 @@ add_executable(${TGT} "")
 if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
+setup_cppcheck(${TGT})
 
 add_library(${QPLIB} STATIC "")
 target_link_libraries(${TGT} PRIVATE ${QPLIB})
@@ -201,12 +193,12 @@ set(PARAMNAME   "USC2_Parameter")
 set(PROFILENAME "USC2_Profile")
 
 # include target specific definitions (set compiler options etc.)
-if((CMAKE_SYSTEM_PROCESSOR MATCHES "[Aa][Rr][Mm]") OR CONFIG_PICO)
+if(CMAKE_SYSTEM_NAME STREQUAL Linux OR UNIX)
+    include(unix)
+elseif(CMAKE_SYSTEM_NAME STREQUAL Windows OR WIN32)
+    include(win32)
+elseif(CMAKE_SYSTEM_NAME STREQUAL Generic AND CMAKE_SYSTEM_PROCESSOR MATCHES [Aa][Rr][Mm])
 	include(arm)
-elseif(WIN32 OR MINGW OR MSYS)
-	include(win32)
-elseif(UNIX)
-	include(unix)
 else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()
@@ -261,6 +253,7 @@ message(STATUS
     CONFIG_UNIT_TEST            = ${CONFIG_UNIT_TEST}
     CONFIG_CPPCHECK             = ${CONFIG_CPPCHECK}
     CONFIG_CHECKMISRA           = ${CONFIG_CHECKMISRA}
+    CMAKE_C_CPPCHECK            = ${CMAKE_C_CPPCHECK}
     
     CONFIG_KERNEL_QV            = ${CONFIG_KERNEL_QV}
     CONFIG_KERNEL_QK            = ${CONFIG_KERNEL_QK}
@@ -289,6 +282,7 @@ message(STATUS
     CMAKE_HOST_WIN32            = ${CMAKE_HOST_WIN32}
     CMAKE_SYSTEM                = ${CMAKE_SYSTEM}
     CMAKE_SYSTEM_NAME           = ${CMAKE_SYSTEM_NAME}
+    CMAKE_SYSTEM_PROCESSOR      = ${CMAKE_SYSTEM_PROCESSOR}
     WIN32                       = ${WIN32}
     MSYS                        = ${MSYS}
     MINGW                       = ${MINGW}

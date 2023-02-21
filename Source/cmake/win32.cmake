@@ -7,8 +7,6 @@ if(NOT WIN32)
     set(WIN32 ON)
 endif()
 
-enable_language(RC)
-
 #default port is WIN32
 set(PORT win32)
 
@@ -21,29 +19,18 @@ target_compile_definitions(${TGT}
 # compiler options
 target_compile_options(${QPLIB}
 	PUBLIC
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
-	    -fmessage-length=0
-	    -fdata-sections
-	    -ffunction-sections
         -pthread
 )
 
 target_compile_options(${TGT}
     PUBLIC
         $<IF:$<C_COMPILER_ID:GNU>,$<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>, >
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
-        -Wall
-        -fmessage-length=0
-        -ffunction-sections
-        -fdata-sections
 )
 
 # linker options
 target_link_options(${TGT}
     PUBLIC
         $<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0>
-        -Wl,$<$<C_COMPILER_ID:GNU>:--cref,>--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
 )
 
 # add windows socket library for Q_SPY/Q_UTEST configurations

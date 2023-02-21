@@ -15,9 +15,8 @@ target_compile_options(${QPLIB}
 	    --brief_diagnostics
 	    --diag_style=gnu
 	    --gnu
-	    -Ospace
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,--debug,-Ospace>
 	    --data_reorder
-	    --debug
 	    --library_type=microlib
 #	    --asm
         -g
@@ -32,9 +31,8 @@ target_compile_options(${TGT}
 	    --brief_diagnostics
 	    --diag_style=gnu
 	    --gnu
-	    -Ospace
+        $<IF:$<BOOL:${CONFIG_DEBUG}>,--debug,-Ospace>
 	    --data_reorder
-	    --debug
 	    --library_type=microlib
 #	    --asm
         -g
@@ -47,7 +45,7 @@ target_link_options(${TGT}
 	PUBLIC
         --strict
 	    --callgraph					                                # list a static callgraph of functions (HTML)
-	    --debug						                                # keep debug information in the final image
+        $<$<BOOL:${CONFIG_DEBUG}>:--debug>
 	    --entry=Reset_Handler			                            # define global entry point to the application
 	    --library_type=microlib		                                # link vs barebone system C library
 	    --remove						                            # remove unused input sections from the final image

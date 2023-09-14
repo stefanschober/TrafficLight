@@ -1,6 +1,7 @@
 # custom commands for UNIX/WINDOWS host systems
 # 1) use cppcheck for static analysis of the code
 # 2) copy parameter/profile data files into the build directory
+
 # copy the parameter/profile data files into the build directory
 if(FALSE)
 file(GLOB PAR_PROF LIST_DIRECTORIES FALSE "USC2_P*.bin")

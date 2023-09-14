@@ -79,6 +79,23 @@ else()
 endif()
 
 # check/set Qx real time kernel
+set(S_QV FALSE)
+if(NOT (CONFIG_KERNEL_QV OR CONFIG_KERNEL_QK))
+    set(S_QV TRUE)
+    set(C_QV ON)
+elseif(CONFIG_KERNEL_QV AND CONFIG_KERNEL_QK)
+    set(S_QV TRUE)
+    set(C_QV OFF)
+endif()
+if(S_QV)
+    if(C_QV)
+        set(_msg "No KERNEL (QV or QK) is configured! Falling back to QV kernel.")
+    else()
+        set(_msg "Only one KERNEL (out of QV or QK) shall be configured! Accepting QK kernel.")
+    endif()
+endif()
+
+# check/set Qx real time kernel
 if((NOT (CONFIG_KERNEL_QV OR CONFIG_KERNEL_QK)) OR (CONFIG_KERNEL_QV AND CONFIG_KERNEL_QK))
     if(CONFIG_KERNEL_QK)
         message(WARNING "Only one KERNEL (out of QV or QK) shall be configured! Accepting QK kernel.")
@@ -94,6 +111,43 @@ if(CONFIG_KERNEL_QK)
     set(QPLIB "qpclib-qk" CACHE STRING "The QPC library for the QV real time kernel" FORCE)
 else()
     set(QPLIB "qpclib-qv" CACHE STRING "The QPC library for the QV real time kernel" FORCE)
+endif()
+
+if(CONFIG_CPPCHECK)
+    # set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+    # find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
+    set(CPPCHECK ${CMAKE_SOURCE_DIR}/../cppcheck)
+    # find_package(Python COMPONENTS Interpreter REQUIRED)
+
+    if(CPPCHECK)
+        list(APPEND CPPCHECK
+            --template=gcc
+            --cppcheck-build-dir=${CMAKE_BINARY_DIR}
+            --check-library
+            --enable=style,performance,portability,information
+            --language=c
+            --max-ctu-depth=4
+            --std=c11
+            $<$<BOOL:${CONFIG_CHECKMISRA}>:--addon=${CMAKE_SOURCE_DIR}/misra.json>
+            $<$<BOOL:${WIN32}>:-D__WIN32__=1>
+            $<$<BOOL:$<STREQUAL:${CMAKE_SYSTEM_NAME},Generic>>:-D__GNUC__=1>
+            $<$<BOOL:$<NOT:$<STREQUAL:${CMAKE_GENERATOR},Ninja>>>:-D$<JOIN:$<TARGET_PROPERTY:COMPILE_DEFINITIONS>, -D>>
+            $<$<BOOL:$<NOT:$<STREQUAL:${CMAKE_GENERATOR},Ninja>>>:-I$<JOIN:$<TARGET_PROPERTY:INCLUDE_DIRECTORIES>, -I>>
+        )
+        message(STATUS "CPPCHEK = ${CPPCHECK}")
+        set(CMAKE_C_CPPCHECK ${CPPCHECK})
+        set(CMAKE_CXX_CPPCHECK ${CPPCHECK})
+
+        # set(CMAKE_C_CPPLINT ${CPPCHECK})
+        # set(CMAKE_CXX_CPPLINT ${CPPCHECK})
+
+        # set(CMAKE_C_CLANG_TIDY ${CPPCHECK})
+        # set(CMAKE_CXX_CLANG_TIDY ${CPPCHECK})
+
+        # set(CMAKE_C_NCLUDE_WHAT_YOU_USE ${CPPCHECK})
+        # set(CMAKE_CXX_NCLUDE_WHAT_YOU_USE ${CPPCHECK})
+
+    endif()
 endif()
 
 if(NOT PROJECT_NAME AND NOT TARGET)
@@ -147,7 +201,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 include(CheckIncludeFile)
 include(CheckLibraryExists)
-include(cppcheck)
+# include(cppcheck)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     include(CheckPIESupported)
@@ -161,13 +215,13 @@ if(CONFIG_PICOLIB)
 endif()
 
 # the project target
+add_library(${QPLIB} STATIC "")
+
+# setup_cppcheck()
 add_executable(${TGT} "")
 if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
-setup_cppcheck(${TGT})
-
-add_library(${QPLIB} STATIC "")
 target_link_libraries(${TGT} PRIVATE ${QPLIB})
 
 # set general defines

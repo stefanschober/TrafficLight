@@ -2,7 +2,7 @@
     "cmake.sourceDirectory": "${workspaceFolder}/Source",
     "cmake.buildDirectory": "${workspaceFolder}/Build/Pico_Make",
     "cmake.configureArgs": [
-        "-DCONFIG_PICO=TRUE",
+        "-DCONFIG_PICO=FALSE",
         "-DCONFIG_PICO_CMSIS=TRUE",
         "-DCONFIG_KERNEL_QK=TRUE",
         "-DCONFIG_KERNEL_QV=FALSE",

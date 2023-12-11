@@ -2,6 +2,7 @@
 if(NOT CONFIG_UNIT_TEST)
     set(CONFIG_GUI ON)
 endif()
+set(QPC_CFG_GUI ${CONFIG_GUI})
 
 if(NOT WIN32)
     set(WIN32 ON)
@@ -17,9 +18,8 @@ target_compile_definitions(${TGT}
 )
 
 # compiler options
-target_compile_options(${QPLIB}
-	PUBLIC
-        -pthread
+add_compile_options(
+    -pthread
 )
 
 target_compile_options(${TGT}

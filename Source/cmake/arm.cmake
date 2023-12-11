@@ -82,7 +82,7 @@ if(CONFIG_PICO)
 else()
     # MCU based settings (size of flash memory)
     if(NOT MCU)
-        message(WARNING "No MCU specified. Setting MCU to TLE9844_2QX!")
+        message(WARNING "No MCU specified. Setting MCU to STM32F091xC!")
         set(MCU STM32F091xC)
     endif()
 
@@ -182,6 +182,7 @@ else()
         # create the real scatter file from the template (*.sct.in)
         message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
         configure_file(${SCATTER_IN} ${SCATTER_OUT})
+        configure_file(${SCATTER_TPL}.sct.in ${SCATTER_TPL}.sct)
     endif()
 
     target_compile_definitions(${TGT}

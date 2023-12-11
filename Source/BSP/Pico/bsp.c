@@ -111,8 +111,7 @@ void SysTick_Handler(void) {   /* system clock tick ISR */
     }
 #endif
 
-    //QF_TICK_X(0U, &l_SysTick_Handler); /* process time events for rate 0 */
-    QACTIVE_POST(the_Ticker0, 0, &l_SysTick_Handler); /* post to Ticker0 */
+    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
 
     readUserButtons();
 
@@ -158,14 +157,14 @@ static void readUserButtons(void)
     chgButtons ^= debouncedButtons;
     if ( (debouncedButtons & chgButtons & 0x01) || (0 == time2Min) )
     {
-    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
 
         QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
     	time2Min = 120ul * BSP_TICKS_PER_SEC;
     }
     else if (debouncedButtons & chgButtons & 0x02)
     {
-    	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, 0U };
+    	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, QEVT_MARKER };
 
         buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
         QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */

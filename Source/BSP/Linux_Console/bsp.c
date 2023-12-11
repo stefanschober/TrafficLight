@@ -67,13 +67,11 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+    static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
     struct timeval timeout = { 0, 0 };  /* timeout for select() */
     fd_set con; /* FD set representing the console */
 
-    //QF_TICK_X(0U, &l_SysTick_Handler); /* perform the QF clock tick processing */
-    QACTIVE_POST(the_Ticker0, 0, &l_SysTick_Handler); /* post to Ticker0 */
-    //QF_PUBLISH(&tickEvt, &l_SysTick_Handler); /* publish to all subscribers */
+    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
 
     FD_ZERO(&con);
     FD_SET(0, &con);

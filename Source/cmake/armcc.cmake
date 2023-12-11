@@ -8,36 +8,19 @@ set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${PROJ_ASM_FLAGS}")
 target_compile_definitions(${TGT} PUBLIC MICROLIB)
 
 # set default compiler options, valid for all USC2 projects
-target_compile_options(${QPLIB}
-	PUBLIC
-	    --depend_format=unix
-	    --depend_single_line
-	    --brief_diagnostics
-	    --diag_style=gnu
-	    --gnu
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,--debug,-Ospace>
-	    --data_reorder
-	    --library_type=microlib
+add_compile_options(
+	--depend_format=unix
+	--depend_single_line
+	--brief_diagnostics
+	--diag_style=gnu
+	--gnu
+	$<IF:$<BOOL:${CONFIG_DEBUG}>,--debug,-Ospace>
+	--data_reorder
+	--library_type=microlib
 #	    --asm
-        -g
-        --apcs=interwork
-        --split_sections
-)
-		
-target_compile_options(${TGT}
-	PUBLIC
-	    --depend_format=unix
-	    --depend_single_line
-	    --brief_diagnostics
-	    --diag_style=gnu
-	    --gnu
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,--debug,-Ospace>
-	    --data_reorder
-	    --library_type=microlib
-#	    --asm
-        -g
-        --apcs=interwork
-        --split_sections
+	-g
+	--apcs=interwork
+	--split_sections
 )
 
 # set default linker options, valid for all USC2 projects

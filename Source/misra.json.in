@@ -1,0 +1,6 @@
+{
+    "script": "${MISRA_PY}",
+    "args": [
+        "--rule-texts=${MISRA_TXT}"
+    ]
+}

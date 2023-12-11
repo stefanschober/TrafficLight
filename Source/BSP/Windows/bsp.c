@@ -66,10 +66,7 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    //static QEvt const tickEvt = { TIME_TICK_SIG, 0U, 0U };
-
-    QACTIVE_POST(the_Ticker0, 0, &l_SysTick_Handler); /* post to Ticker0 */
-    //QF_PUBLISH(&tickEvt, &l_SysTick_Handler); /* publish to all subscribers */
+    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
 }
 
 /*..........................................................................*/
@@ -129,14 +126,14 @@ void BSP_setPedLed(uint16_t status)
 // called when button PEDESTRIAN is clicked
 void BSP_publishBtnEvt(void)
 {
-	static QEvt const buttonEvt = { BUTTON_SIG, 0U, 0U };
+	static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
 
     QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
 }
 // called when button EMERGENCY is clicked
 void BSP_publishEmergencyEvt(void)
 {
-	static QEvt emergencyEvt = { EM_RELEASE_SIG, 0U, 0U };
+	static QEvt emergencyEvt = { EM_RELEASE_SIG, 0U, QEVT_MARKER };
 
     emergencyEvt.sig = ((emergencyEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
     QF_PUBLISH(&emergencyEvt, &l_Button_Handler); /* publish to all subscribers */

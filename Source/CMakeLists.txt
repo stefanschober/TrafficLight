@@ -1,8 +1,8 @@
 # USC2 QM project root CMakeLists.txt
 
 # use a recent CMake version
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
-cmake_policy(VERSION 3.13)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
+cmake_policy(VERSION 3.27)
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     cmake_policy(SET CMP0083 NEW)
 endif()
@@ -32,10 +32,9 @@ endif()
 option(CONFIG_QSPY       "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" OFF)
 option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
 option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF)" OFF)
+option(CONFIG_CPPCHECK_TGT "set to ON, to generate a separate CPPCHECK target (default: OFF)" OFF)
 option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
 option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
-option(CONFIG_KERNEL_QV  "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
-option(CONFIG_KERNEL_QK  "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" OFF)
 option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)
 option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
@@ -49,6 +48,7 @@ option(CONFIG_CORTEX_M3 "set to ON, if an ARM Cortex-M3 target system shall be c
 option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
+set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
 
 if(CONFIG_UNIT_TEST)
 	set(CONFIG_QSPY ON CACHE BOOL "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" FORCE)
@@ -79,38 +79,12 @@ else()
 endif()
 
 # check/set Qx real time kernel
-set(S_QV FALSE)
-if(NOT (CONFIG_KERNEL_QV OR CONFIG_KERNEL_QK))
-    set(S_QV TRUE)
-    set(C_QV ON)
-elseif(CONFIG_KERNEL_QV AND CONFIG_KERNEL_QK)
-    set(S_QV TRUE)
-    set(C_QV OFF)
-endif()
-if(S_QV)
-    if(C_QV)
-        set(_msg "No KERNEL (QV or QK) is configured! Falling back to QV kernel.")
-    else()
-        set(_msg "Only one KERNEL (out of QV or QK) shall be configured! Accepting QK kernel.")
-    endif()
-endif()
-
-# check/set Qx real time kernel
-if((NOT (CONFIG_KERNEL_QV OR CONFIG_KERNEL_QK)) OR (CONFIG_KERNEL_QV AND CONFIG_KERNEL_QK))
-    if(CONFIG_KERNEL_QK)
-        message(WARNING "Only one KERNEL (out of QV or QK) shall be configured! Accepting QK kernel.")
-    else()
-        message(WARNING "No KERNEL (QV or QK) is configured! Falling back to QK kernel.")
-    endif()
-
-    set(CONFIG_KERNEL_QV OFF CACHE BOOL "set to ON, if the QV micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" FORCE)
-    set(CONFIG_KERNEL_QK ON  CACHE BOOL "set to ON, if the QK micro kernel shall be configured. Leave OFF for host based configurations. (default: OFF)" FORCE)
-endif()
-
-if(CONFIG_KERNEL_QK)
-    set(QPLIB "qpclib-qk" CACHE STRING "The QPC library for the QV real time kernel" FORCE)
-else()
-    set(QPLIB "qpclib-qv" CACHE STRING "The QPC library for the QV real time kernel" FORCE)
+set(KERNELS qv qk qxk)
+string(TOLOWER ${CONFIG_KERNEL} KERNEL)
+if(NOT (KERNEL IN_LIST KERNELS))
+    message(WARNING "Unknown QPC Kernel '${KERNEL}'. Falling back to default kernel (QV)")
+    set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
+    set(KERNEL qv)
 endif()
 
 if(CONFIG_CPPCHECK)
@@ -175,6 +149,13 @@ project(${PROJECT_NAME}
     DESCRIPTION "Trafficlight project"
     LANGUAGES C ASM)
 
+# enable ccache
+find_program(CCACHE_PROGRAM ccache ccache.exe)
+if(CCACHE_PROGRAM)
+    set(CMAKE_C_COMPILER_LAUNCHER   "${CCACHE_PROGRAM}")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+endif()
+
 # update the module search path
 if(CMAKE_HOST_WIN32)
     string(REPLACE "\\" "/" HOME_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
@@ -201,7 +182,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 include(CheckIncludeFile)
 include(CheckLibraryExists)
-# include(cppcheck)
+include(cppcheck)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     include(CheckPIESupported)
@@ -214,32 +195,26 @@ if(CONFIG_PICOLIB)
     set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
 endif()
 
-# the project target
-add_library(${QPLIB} STATIC "")
-
-# setup_cppcheck()
+# the project target(s)
 add_executable(${TGT} "")
 if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
-target_link_libraries(${TGT} PRIVATE ${QPLIB})
+setup_cppcheck(${TGT})
 
-# set general defines
-target_compile_definitions(${TGT}
-	PRIVATE
-	    $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
-)
+# set the default file names for parameter and profile data
+# the files are in binary format and need to have
+# file name extension of ".bin"
+set(PARAMNAME   "USC2_Parameter")
+set(PROFILENAME "USC2_Profile")
 
-target_compile_options(${TGT}
-    PRIVATE
-        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
-)
-
-target_link_options(${TGT}
-    PRIVATE
-        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
-)
-
+# include target specific definitions (set compiler options etc.)
+if(CMAKE_SYSTEM_NAME STREQUAL Linux OR UNIX)
+    include(unix)
+elseif(CMAKE_SYSTEM_NAME STREQUAL Windows OR WIN32)
+    include(win32)
+elseif(CMAKE_SYSTEM_NAME STREQUAL Generic AND CMAKE_SYSTEM_PROCESSOR MATCHES [Aa][Rr][Mm])
+	include(arm)
 #if(CONFIG_PICO)
 #    add_executable(systicktst systicktst.c)
 #    pico_enable_stdio_usb(systicktst TRUE)
@@ -264,29 +239,33 @@ target_link_options(${TGT}
 #    pico_set_binary_type(systicktst default)
 #endif()
 
-# set the default file names for parameter and profile data
-# the files are in binary format and need to have
-# file name extension of ".bin"
-set(PARAMNAME   "USC2_Parameter")
-set(PROFILENAME "USC2_Profile")
-
-# include target specific definitions (set compiler options etc.)
-if(CMAKE_SYSTEM_NAME STREQUAL Linux OR UNIX)
-    include(unix)
-elseif(CMAKE_SYSTEM_NAME STREQUAL Windows OR WIN32)
-    include(win32)
-elseif(CMAKE_SYSTEM_NAME STREQUAL Generic AND CMAKE_SYSTEM_PROCESSOR MATCHES [Aa][Rr][Mm])
-	include(arm)
 else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()
+
+# set general defines
+target_compile_definitions(${TGT}
+	PRIVATE
+	    $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
+        $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
+        TARGET=${TGT}
+)
+
+target_compile_options(${TGT}
+    PRIVATE
+        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
+)
+
+target_link_options(${TGT}
+    PRIVATE
+        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
+)
 
 # set position independent code compile/link parameters
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     check_pie_supported()
 endif()
 set_property(TARGET ${TGT} PROPERTY POSITION_INDEPENDENT_CODE FALSE)
-set_property(TARGET ${QPLIB} PROPERTY POSITION_INDEPENDENT_CODE FALSE)
 
 # define function to output list of modules
 set (MODLIST ${CMAKE_BINARY_DIR}/modlist.txt)
@@ -306,9 +285,26 @@ function(listIncludes PATH)
 endfunction()
 
 # add subdirectories with source/header files
-add_subdirectory(qpc)
 add_subdirectory(BSP)
 add_subdirectory(QM)
+
+if(NOT (DEFINED QPC_DIR OR DEFINED ENV{QPC_DIR}))
+    find_path(QPC_DIR
+        PATHS ../.. $ENV{HOME}/Projects $ENV{HOME} /usr/lib /opt
+        NAMES include/qpc.h qpc.qm
+        PATH_SUFFIXES qpc Qpc QPC
+        REQUIRED
+    )
+elseif((NOT DEFINED QPC_DIR) AND DEFINED ENV{QPC_DIR})
+    set(QPC_DIR $ENV{QPC_DIR})
+endif()
+
+if(QPC_DIR)
+    add_subdirectory(${QPC_DIR} ${CMAKE_BINARY_DIR}/qpc)
+    target_link_libraries(${TGT} PRIVATE qpc)
+else()
+    message(FATAL_ERROR "QPC_DIR not found!")
+endif()
 
 # show configuration results
 get_target_property(TGT_COMPILE_OPTS ${TGT} COMPILE_OPTIONS)
@@ -335,7 +331,7 @@ message(STATUS
     
     CONFIG_KERNEL_QV            = ${CONFIG_KERNEL_QV}
     CONFIG_KERNEL_QK            = ${CONFIG_KERNEL_QK}
-    QPLIB                       = ${QPLIB}
+    QPC_DIR                     = ${QPC_DIR}
 
     CONFIG_CORTEX_M0            = ${CONFIG_CORTEX_M0}
     CONFIG_CORTEX_M0plus        = ${CONFIG_CORTEX_M0plus}

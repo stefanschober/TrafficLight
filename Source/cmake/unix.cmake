@@ -10,24 +10,15 @@ target_compile_definitions(${TGT}
 )
 
 # compiler options
-target_compile_options(${QPLIB}
-	PUBLIC
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
-	    -fmessage-length=0
-	    -fdata-sections
-	    -ffunction-sections
-        -pthread
-)
-
-target_compile_options(${TGT}
-    PUBLIC
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0 -Os>
-        -Wall
-        -fmessage-length=0
-        -ffunction-sections
-        -fdata-sections
-        -pthread
-#        $<$<BOOL:${CONFIG_RASPI}>:-v>
+add_compile_options(
+    $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0>
+    $<IF:$<BOOL:${CONFIG_DEBUG}>,-O0,-Os>
+    -Wall
+    -fmessage-length=0
+    -ffunction-sections
+    -fdata-sections
+    -pthread
+#   $<$<BOOL:${CONFIG_RASPI}>:-v>
 )
 
 # linker options

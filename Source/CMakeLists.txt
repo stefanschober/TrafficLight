@@ -1,11 +1,12 @@
 # USC2 QM project root CMakeLists.txt
 
 # use a recent CMake version
-cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
-cmake_policy(VERSION 3.27)
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
-    cmake_policy(SET CMP0083 NEW)
-endif()
+cmake_minimum_required(VERSION 3.23 FATAL_ERROR)
+cmake_policy(VERSION 3.23...3.28)
+cmake_policy(SET CMP0083 NEW)
+cmake_policy(SET CMP0105 NEW)
+cmake_policy(SET CMP0116 NEW)
+cmake_policy(SET CMP0128 NEW)
 
 # first of all protect against in-source builds
 get_filename_component(_srcdir "${CMAKE_SOURCE_DIR}" REALPATH)
@@ -35,6 +36,7 @@ option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF
 option(CONFIG_CPPCHECK_TGT "set to ON, to generate a separate CPPCHECK target (default: OFF)" OFF)
 option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
 option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
+option(CONFIG_GTK        "set to ON, if a GTK GUI shall be compiled in (default: OFF)" OFF)
 option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)
 option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
@@ -80,7 +82,7 @@ endif()
 
 # check/set Qx real time kernel
 set(KERNELS qv qk qxk)
-string(TOLOWER ${CONFIG_KERNEL} KERNEL)
+string(TOLOWER "${CONFIG_KERNEL}" KERNEL)
 if(NOT (KERNEL IN_LIST KERNELS))
     message(WARNING "Unknown QPC Kernel '${KERNEL}'. Falling back to default kernel (QV)")
     set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
@@ -290,9 +292,9 @@ add_subdirectory(QM)
 
 if(NOT (DEFINED QPC_DIR OR DEFINED ENV{QPC_DIR}))
     find_path(QPC_DIR
-        PATHS ../.. $ENV{HOME}/Projects $ENV{HOME} /usr/lib /opt
-        NAMES include/qpc.h qpc.qm
-        PATH_SUFFIXES qpc Qpc QPC
+        PATHS "$ENV{HOME}/Projects" "$ENV{HOME}" ENV HOME "/usr/lib" "/opt"
+        NAMES "include/qpc.h" "qpc.qm"
+        PATH_SUFFIXES "qpc" "Qpc" "QPC"
         REQUIRED
     )
 elseif((NOT DEFINED QPC_DIR) AND DEFINED ENV{QPC_DIR})
@@ -300,6 +302,8 @@ elseif((NOT DEFINED QPC_DIR) AND DEFINED ENV{QPC_DIR})
 endif()
 
 if(QPC_DIR)
+    set(QPC_CFG_KERNEL ${CONFIG_KERNEL})
+    set(QPC_PROJECT qpc_${PROJECT_NAME})
     add_subdirectory(${QPC_DIR} ${CMAKE_BINARY_DIR}/qpc)
     target_link_libraries(${TGT} PRIVATE qpc)
 else()
@@ -321,6 +325,7 @@ message(STATUS
     IMAGE                       = ${IMAGE}
     SW_VERSION                  = ${SW_VERSION}
     
+    PORT                        = ${PORT}
     CONFIG_GUI                  = ${CONFIG_GUI}
     CONFIG_CONSOLE              = ${CONFIG_CONSOLE}
     CONFIG_QSPY                 = ${CONFIG_QSPY}
@@ -329,8 +334,7 @@ message(STATUS
     CONFIG_CHECKMISRA           = ${CONFIG_CHECKMISRA}
     CMAKE_C_CPPCHECK            = ${CMAKE_C_CPPCHECK}
     
-    CONFIG_KERNEL_QV            = ${CONFIG_KERNEL_QV}
-    CONFIG_KERNEL_QK            = ${CONFIG_KERNEL_QK}
+    CONFIG_KERNEL               = ${CONFIG_KERNEL}
     QPC_DIR                     = ${QPC_DIR}
 
     CONFIG_CORTEX_M0            = ${CONFIG_CORTEX_M0}

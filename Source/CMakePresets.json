@@ -1,0 +1,88 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 23,
+      "patch": 0
+    },
+    "configurePresets": [
+      {
+        "name": "default",
+        "displayName": "Default Config",
+        "description": "Default build using Makefile generator",
+        "generator": "Unix Makefiles",
+        "binaryDir": "${sourceDir}/build/default",
+        "cacheVariables": {
+          "CONFIG_KERNEL": {
+            "type": "STRING",
+            "value": "QV"
+          },
+          "CONFIG_GUI": "ON"
+        }
+      },
+      {
+        "name": "mingw",
+        "inherits": "default",
+        "displayName": "MinGW config",
+        "description": "Build for MinGW",
+        "binaryDir": "${sourceDir}/build/MinGW",
+        "toolchainFile": "${sourceDir}/../toolchain/tc_mingwgcc.cmake"
+      },
+      {
+        "name": "mingw-qk",
+        "inherits": "mingw",
+        "displayName": "MinGW config with QK kernel",
+        "description": "Build for MinGW with QK kernel",
+        "binaryDir": "${sourceDir}/build/MinGW_qk"
+      },
+      {
+        "name": "arm",
+        "inherits": "default",
+        "displayName": "Embedded config for Arm-CM",
+        "description": "Build for arm-cm",
+        "binaryDir": "${sourceDir}/build/Arm",
+        "toolchainFile": "${sourceDir}/../toolchain/tc_gnuarm.cmake",
+        "cacheVariables": {
+            "CONFIG_KERNEL": {
+              "type": "STRING",
+              "value": "QV"
+            },
+            "CONFIG_GUI": "OFF"
+        }
+      },
+      {
+        "name": "arm-qk",
+        "inherits": "arm",
+        "description": "Build for arm-cm, kernel QK",
+        "binaryDir": "${sourceDir}/build/Arm_qk",
+        "cacheVariables": {
+            "CONFIG_KERNEL": {
+              "type": "STRING",
+              "value": "QK"
+            }
+        }
+      }
+    ],
+    "buildPresets": [
+      {
+        "name": "default",
+        "configurePreset": "default"
+      },
+      {
+        "name": "mingw",
+        "configurePreset": "mingw"
+      },
+      {
+        "name": "mingw-qk",
+        "configurePreset": "mingw-qk"
+      },
+      {
+        "name": "arm",
+        "configurePreset": "arm"
+      },
+      {
+        "name": "arm-qk",
+        "configurePreset": "arm-qk"
+      }
+    ]
+}

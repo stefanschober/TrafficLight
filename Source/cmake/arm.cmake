@@ -200,8 +200,7 @@ include(${INCFILE})
 # set project/target related compiler #define macros
 target_compile_definitions(${TGT}
     PUBLIC
-        $<$<BOOL:${CONFIG_KERNEL_QK}>:KERNEL_QK=1>
-        $<$<BOOL:${CONFIG_KERNEL_QV}>:KERNEL_QV=1>
+        KERNEL_$<IF:$<STREQUAL:${CONFIG_KERNEL},QK>,QK,QV>=1
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
 )

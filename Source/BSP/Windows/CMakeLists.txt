@@ -1,11 +1,5 @@
 # BSP/Windows
-set(_src bsp.c trafficlight-gui.rc)
-
-if(CONFIG_GTK)
-    list(APPEND _src bsp-gtk.c resources.c)
-else()
-    list(APPEND _src bsp-gui.c)
-endif()
+set(_src bsp.c bsp-gui.c trafficlight-gui.rc)
 
 target_sources(${TGT} PRIVATE ${_src})
 listModules(${CMAKE_CURRENT_SOURCE_DIR} ${_src})

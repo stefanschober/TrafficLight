@@ -36,7 +36,6 @@ option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF
 option(CONFIG_CPPCHECK_TGT "set to ON, to generate a separate CPPCHECK target (default: OFF)" OFF)
 option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
 option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
-option(CONFIG_GTK        "set to ON, if a GTK GUI shall be compiled in (default: OFF)" OFF)
 option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)
 option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
@@ -91,9 +90,9 @@ endif()
 
 if(CONFIG_CPPCHECK)
     # set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-    # find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
-    set(CPPCHECK ${CMAKE_SOURCE_DIR}/../cppcheck)
-    # find_package(Python COMPONENTS Interpreter REQUIRED)
+    find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
+    # set(CPPCHECK ${CMAKE_SOURCE_DIR}/../cppcheck)
+    find_package(Python COMPONENTS Interpreter REQUIRED)
 
     if(CPPCHECK)
         list(APPEND CPPCHECK
@@ -302,8 +301,12 @@ elseif((NOT DEFINED QPC_DIR) AND DEFINED ENV{QPC_DIR})
 endif()
 
 if(QPC_DIR)
-    set(QPC_CFG_KERNEL ${CONFIG_KERNEL})
     set(QPC_PROJECT qpc_${PROJECT_NAME})
+    set(QPC_CFG_KERNEL ${CONFIG_KERNEL})
+    set(QPC_CFG_QSPY ${CONFIG_QSPY})
+    set(QPC_QFG_UNIT_TEST ${CONFIG_UNIT_TEST})
+    set(QPC_CFG_GUI ${CONFIG_GUI})
+
     add_subdirectory(${QPC_DIR} ${CMAKE_BINARY_DIR}/qpc)
     target_link_libraries(${TGT} PRIVATE qpc)
 else()
@@ -311,14 +314,9 @@ else()
 endif()
 
 # show configuration results
-get_target_property(TGT_COMPILE_OPTS ${TGT} COMPILE_OPTIONS)
-get_target_property(TGT_COMPILE_DEFS ${TGT} COMPILE_DEFINITIONS)
-get_target_property(TGT_INCLUDES ${TGT} INCLUDE_DIRECTORIES)
-get_target_property(TGT_LINK_OPTS ${TGT} LINK_OPTIONS)
-get_target_property(TGT_LINK_LIBS ${TGT} LINK_LIBRARIES)
-get_target_property(TGT_SOURCES ${TGT} SOURCES)
 message(STATUS
-"Configured project ${PROJECT_NAME} for ${PORT}
+"========================================================
+Configured project ${PROJECT_NAME} for ${PORT}
  Configuration options set:
     PROJECT_NAME                = ${PROJECT_NAME}
     TARGET                      = ${TARGET}
@@ -379,11 +377,16 @@ message(STATUS
     CMAKE_ASM_FLAGS             = ${CMAKE_ASM_FLAGS}"
 )
 
-# Target information for target ${TGT}
-#    TGT_COMPILE_OPTS            = ${TGT_COMPILE_OPTS}
-#    TGT_COMPILE_DEFS            = ${TGT_COMPILE_DEFS}
-#    TGT_INCLUDES                = ${TGT_INCLUDES}
-#    TGT_LINK_OPTS               = ${TGT_LINK_OPTS}
-#    TGT_LINK_LIBS               = ${TGT_LINK_LIBS}
-#    TGT_SOURCES                 = ${TGT_SOURCES}"
-#)
+# show target configuration, if CONFIG_VERBOSE is set to ON
+if(CONFIG_VERBOSE)
+    message(STATUS
+"========================================================
+Target information for target ${TGT}
+    TGT_COMPILE_OPTS            = ${TGT_COMPILE_OPTS}
+    TGT_COMPILE_DEFS            = ${TGT_COMPILE_DEFS}
+    TGT_INCLUDES                = ${TGT_INCLUDES}
+    TGT_LINK_OPTS               = ${TGT_LINK_OPTS}
+    TGT_LINK_LIBS               = ${TGT_LINK_LIBS}
+    TGT_SOURCES                 = ${TGT_SOURCES}"
+)
+endif()

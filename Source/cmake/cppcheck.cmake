@@ -1,6 +1,6 @@
 if(CONFIG_CPPCHECK)
-    # find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
-    set(CPPCHECK "${CMAKE_SOURCE_DIR}/../cppcheck.exe")
+    find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
+    # set(CPPCHECK "${CMAKE_SOURCE_DIR}/../cppcheck.exe")
 
     find_package(Python COMPONENTS Interpreter REQUIRED)
     if(CONFIG_CHECKMISRA)

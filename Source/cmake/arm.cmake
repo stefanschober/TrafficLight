@@ -182,7 +182,9 @@ else()
         # create the real scatter file from the template (*.sct.in)
         message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
         configure_file(${SCATTER_IN} ${SCATTER_OUT})
-        configure_file(${SCATTER_TPL}.sct.in ${SCATTER_TPL}.sct)
+        if(EXISTS ${CMAKE_SOURCE_DIR}/${SCATTER_TPL}_sect.ld.in)
+            configure_file(${SCATTER_TPL}_sect.ld.in ${SCATTER_TPL}_sect.cpp)
+        endif()
     endif()
 
     target_compile_definitions(${TGT}

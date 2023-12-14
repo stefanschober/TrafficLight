@@ -24,10 +24,10 @@ RAMSTART   = 0x20000000;
 EEPSIZE    = 4k;
  
 #if (defined(STACKSIZE) && (STACKSIZE > 0))
-  __stacksize = STACKSIZE;
+  PROVIDE(__stacksize = STACKSIZE);
 #endif
 #if (defined(HEAPSIZE) && (HEAPSIZE > 0))
-  __heapsize = HEAPSIZE;
+  PROVIDE(__heapsize = HEAPSIZE);
 #endif
 
 NADSIZE  = 4;

@@ -1,9 +1,6 @@
 /*****************************************************************************
 * Product: Linker script for stm32f091, GNU-ARM linker
 *****************************************************************************/
-#cmakedefine STACKSIZE @STACKSIZE@
-#cmakedefine HEAPSIZE @HEAPSIZE@
-
 SECTIONS {
     .isr_vector : {        /* the vector table goes FIRST into ROM */
     	__rom_start = .;

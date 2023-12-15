@@ -58,4 +58,4 @@ REGION_ALIAS("R_HEAP",   RAM);
 REGION_ALIAS("R_STACK",  RAM);
 REGION_ALIAS("R_EXIDX",  RAM);
 
-INCLUDE "stm32f091_sect.ld";
+#include "stm32f091_sect.ld.in"

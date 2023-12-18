@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.3" links="0">
+<model version="6.0.0" links="0">
  <framework name="qpc"/>
  <package name="AOs" stereotype="0x02">
   <class name="TLtraffic" superclass="qpc::QActive">
@@ -775,7 +775,6 @@ $define(AOs::TLpedestrian)</text>
 
 #   undef main
 #   define main main_gui
-    int main_gui(int argc, char *argv[]);
 #endif
 
 enum { WIN_FUDGE_FACTOR = WIN_FUDGE };
@@ -795,7 +794,17 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
+#if defined(QWIN_GUI) &amp;&amp; defined(__WIN32__)
+static const char *argv[] = {
+    &quot;trafficlight&quot;,
+    NULL
+};
+static const size_t argc = ((sizeof(argv) / sizeof(argv[0])) - 1)
+
+int     main_gui(void)
+#else
 int main(int argc, char *argv[])
+#endif
 {
     BSP_HW_init();
     QF_init();    /* initialize the framework and the underlying RT kernel */

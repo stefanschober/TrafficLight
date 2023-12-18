@@ -289,41 +289,36 @@ endfunction()
 add_subdirectory(BSP)
 add_subdirectory(QM)
 
-if(NOT (DEFINED QPC_DIR OR DEFINED ENV{QPC_DIR}))
-    find_path(QPC_DIR
-        PATHS "$ENV{HOME}/Projects" "$ENV{HOME}" ENV HOME "/usr/lib" "/opt"
-        NAMES "include/qpc.h" "qpc.qm"
-        PATH_SUFFIXES "qpc" "Qpc" "QPC"
-        REQUIRED
-    )
-elseif((NOT DEFINED QPC_DIR) AND DEFINED ENV{QPC_DIR})
-    set(QPC_DIR $ENV{QPC_DIR})
-endif()
+set(QPC_PROJECT qpc_${PROJECT_NAME})
+set(QPC_CFG_KERNEL ${CONFIG_KERNEL})
+set(QPC_CFG_QSPY ${CONFIG_QSPY})
+set(QPC_QFG_UNIT_TEST ${CONFIG_UNIT_TEST})
+set(QPC_CFG_GUI ${CONFIG_GUI})
+set(QPC_CFG_VERBOSE ${CONFIG_VERBOSE})
+set(QPC_CFG_PORT ${PORT})
 
-if(QPC_DIR)
-    set(QPC_PROJECT qpc_${PROJECT_NAME})
-    set(QPC_CFG_KERNEL ${CONFIG_KERNEL})
-    set(QPC_CFG_QSPY ${CONFIG_QSPY})
-    set(QPC_QFG_UNIT_TEST ${CONFIG_UNIT_TEST})
-    set(QPC_CFG_GUI ${CONFIG_GUI})
-
-    add_subdirectory(${QPC_DIR} ${CMAKE_BINARY_DIR}/qpc)
-    target_link_libraries(${TGT} PRIVATE qpc)
-else()
-    message(FATAL_ERROR "QPC_DIR not found!")
-endif()
+add_subdirectory(qpc)
+target_link_libraries(${TGT} PRIVATE qpc)
 
 # show configuration results
 message(STATUS
 "========================================================
 Configured project ${PROJECT_NAME} for ${PORT}
- Configuration options set:
+ Project Settings:
     PROJECT_NAME                = ${PROJECT_NAME}
     TARGET                      = ${TARGET}
     IMAGE                       = ${IMAGE}
     SW_VERSION                  = ${SW_VERSION}
-    
     PORT                        = ${PORT}
+-- ========================================================
+"
+)
+
+# show target configuration, if CONFIG_VERBOSE is set to ON
+if(CONFIG_VERBOSE)
+    message(STATUS
+"========================================================
+  Configuration options set:
     CONFIG_GUI                  = ${CONFIG_GUI}
     CONFIG_CONSOLE              = ${CONFIG_CONSOLE}
     CONFIG_QSPY                 = ${CONFIG_QSPY}
@@ -331,7 +326,7 @@ Configured project ${PROJECT_NAME} for ${PORT}
     CONFIG_CPPCHECK             = ${CONFIG_CPPCHECK}
     CONFIG_CHECKMISRA           = ${CONFIG_CHECKMISRA}
     CMAKE_C_CPPCHECK            = ${CMAKE_C_CPPCHECK}
-    
+
     CONFIG_KERNEL               = ${CONFIG_KERNEL}
     QPC_DIR                     = ${QPC_DIR}
 
@@ -347,8 +342,16 @@ Configured project ${PROJECT_NAME} for ${PORT}
     CONFIG_PIGPIO               = ${CONFIG_PIGPIO}
 
     CONFIG_DEBUG                = ${CONFIG_DEBUG}
-    
- System information:
+
+  Target information for target ${TGT}
+    TGT_COMPILE_OPTS            = ${TGT_COMPILE_OPTS}
+    TGT_COMPILE_DEFS            = ${TGT_COMPILE_DEFS}
+    TGT_INCLUDES                = ${TGT_INCLUDES}
+    TGT_LINK_OPTS               = ${TGT_LINK_OPTS}
+    TGT_LINK_LIBS               = ${TGT_LINK_LIBS}
+    TGT_SOURCES                 = ${TGT_SOURCES}
+
+  System information:
     CMAKE_VERSION               = ${CMAKE_VERSION}
     CMAKE_CROSSCOMPILING        = ${CMAKE_CROSSCOMPILING}
     CMAKE_HOST_SYSTEM           = ${CMAKE_HOST_SYSTEM}
@@ -374,19 +377,8 @@ Configured project ${PROJECT_NAME} for ${PORT}
     CMAKE_CXX_FLAGS             = ${CMAKE_CXX_FLAGS}
 
     CMAKE_ASM_COMPILER          = ${CMAKE_ASM_COMPILER}
-    CMAKE_ASM_FLAGS             = ${CMAKE_ASM_FLAGS}"
-)
-
-# show target configuration, if CONFIG_VERBOSE is set to ON
-if(CONFIG_VERBOSE)
-    message(STATUS
-"========================================================
-Target information for target ${TGT}
-    TGT_COMPILE_OPTS            = ${TGT_COMPILE_OPTS}
-    TGT_COMPILE_DEFS            = ${TGT_COMPILE_DEFS}
-    TGT_INCLUDES                = ${TGT_INCLUDES}
-    TGT_LINK_OPTS               = ${TGT_LINK_OPTS}
-    TGT_LINK_LIBS               = ${TGT_LINK_LIBS}
-    TGT_SOURCES                 = ${TGT_SOURCES}"
+    CMAKE_ASM_FLAGS             = ${CMAKE_ASM_FLAGS}
+-- ========================================================
+"
 )
 endif()

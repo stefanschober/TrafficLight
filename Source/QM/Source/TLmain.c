@@ -40,7 +40,6 @@
 
 #   undef main
 #   define main main_gui
-    // int main_gui(int argc, char *argv[]);
 #endif
 
 enum { WIN_FUDGE_FACTOR = WIN_FUDGE };
@@ -77,7 +76,8 @@ static const char *argv[] = {
     "trafficlight",
     NULL
 };
-static const int argc = 1;
+static const size_t argc = ((sizeof(argv) / sizeof(argv[0])) - 1)
+
 int     main_gui(void)
 #else
 int main(int argc, char *argv[])

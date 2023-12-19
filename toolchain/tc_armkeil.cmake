@@ -8,7 +8,7 @@ set(CMAKE_SYSTEM_PROCESSOR Arm)
 #---------------------------------------------------------------------------------------
 # Set toolchain paths
 #---------------------------------------------------------------------------------------
-set(TOOLCHAIN arm-none-eabi)
+set(TOOLCHAIN arm)
 
 if(NOT DEFINED TOOLCHAIN_PREFIX)
     if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
@@ -19,6 +19,8 @@ if(NOT DEFINED TOOLCHAIN_PREFIX)
         if($ENV{MINGW_PREFIX} MATCHES "^.*/(mingw|clang)64$")
             set(TOOLCHAIN_PREFIX $ENV{MINGW_PREFIX})
             # STRING(REGEX REPLACE "^.*/(mingw|clang)64$" "/\\164" TOOLCHAIN_PREFIX $ENV{MINGW_PREFIX})
+        elseif(EXISTS "C:/Keil")
+            set(TOOLCHAIN_PREFIX "C:/Keil")
         else()
             message(STATUS "Please specify the TOOLCHAIN_PREFIX !\n For example: -DTOOLCHAIN_PREFIX=\"C:/Program Files/GNU Tools ARM Embedded\" ")
         endif()
@@ -54,18 +56,18 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # -fdata-sections       Place each data item into its own section in the output file.
 # -fomit-frame-pointer  Omit the frame pointer in functions that don’t need one.
 # -mabi=aapcs           Defines enums to be a variable sized type.
-set(OBJECT_GEN_FLAGS "-mthumb -fno-builtin -Wall -ffunction-sections -fdata-sections -fomit-frame-pointer -fmessage-length=0")
+set(OBJECT_GEN_FLAGS "--thumb --gnu --split_sections")
 
-set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu17 " CACHE INTERNAL "C Compiler options")
-set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=gnu++17 " CACHE INTERNAL "C++ Compiler options")
-set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
+set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} --c99 " CACHE INTERNAL "C Compiler options")
+set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} --cpp11 " CACHE INTERNAL "C++ Compiler options")
+set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} " CACHE INTERNAL "ASM Compiler options")
 
 
 # -Wl,--gc-sections     Perform the dead code elimination.
 # --specs=nano.specs    Link with newlib-nano.
 # --specs=nosys.specs   No syscalls, provide empty implementations for the POSIX system calls.
 set(MAPFILE "${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker Map File")
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=nosys.specs -mthumb -nostartfiles -static -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
+set(CMAKE_EXE_LINKER_FLAGS "" CACHE INTERNAL "Linker options")
 
 #---------------------------------------------------------------------------------------
 # Set debug/release build configuration Options
@@ -74,27 +76,27 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=
 # Options for DEBUG build
 # -Og   Enables optimizations that do not interfere with debugging.
 # -g    Produce debugging information in the operating system’s native format.
-set(CMAKE_C_FLAGS_DEBUG "-Og -g3" CACHE INTERNAL "C Compiler options for debug build type")
-set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3" CACHE INTERNAL "C++ Compiler options for debug build type")
-set(CMAKE_ASM_FLAGS_DEBUG "-g3" CACHE INTERNAL "ASM Compiler options for debug build type")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-g3" CACHE INTERNAL "Linker options for debug build type")
+set(CMAKE_C_FLAGS_DEBUG "-O0 --debug" CACHE INTERNAL "C Compiler options for debug build type")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 --debug" CACHE INTERNAL "C++ Compiler options for debug build type")
+set(CMAKE_ASM_FLAGS_DEBUG "--debug" CACHE INTERNAL "ASM Compiler options for debug build type")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "--debug" CACHE INTERNAL "Linker options for debug build type")
 
 # Options for RELEASE build
 # -Os   Optimize for size. -Os enables all -O2 optimizations.
 # -flto Runs the standard link-time optimizer.
-set(CMAKE_C_FLAGS_RELEASE "-Os -g0" CACHE INTERNAL "C Compiler options for release build type")
-set(CMAKE_CXX_FLAGS_RELEASE "-Os -g0" CACHE INTERNAL "C++ Compiler options for release build type")
+set(CMAKE_C_FLAGS_RELEASE "-Ospace --no_debug" CACHE INTERNAL "C Compiler options for release build type")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ospace --no_debug" CACHE INTERNAL "C++ Compiler options for release build type")
 set(CMAKE_ASM_FLAGS_RELEASE "" CACHE INTERNAL "ASM Compiler options for release build type")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-g0" CACHE INTERNAL "Linker options for release build type")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "--no_debug" CACHE INTERNAL "Linker options for release build type")
 # set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-g3 -flto" CACHE INTERNAL "Linker options for release build type")
 
 
 #---------------------------------------------------------------------------------------
 # Set compilers
 #---------------------------------------------------------------------------------------
-set(CMAKE_C_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "C Compiler")
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-g++${TOOLCHAIN_EXT} CACHE INTERNAL "C++ Compiler")
-set(CMAKE_ASM_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "ASM Compiler")
+set(CMAKE_C_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}cc${TOOLCHAIN_EXT} CACHE INTERNAL "C Compiler")
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}c++${TOOLCHAIN_EXT} CACHE INTERNAL "C++ Compiler")
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}cc${TOOLCHAIN_EXT} CACHE INTERNAL "ASM Compiler")
 
 set(CMAKE_FIND_ROOT_PATH ${TOOLCHAIN_PREFIX}/${${TOOLCHAIN}} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
@@ -103,7 +105,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 
 add_compile_options(
-    $<IF:$<BOOL:${ARM_CPU}>,-mcpu=${ARM_CPU},-mcpu=cortex-m0>
-    $<$<BOOL:${ARM_FPU}>:-mfpu=${ARM_FPU}>
-    $<$<BOOL:${FLOAT_ABI}>:-mfloat-abi=${FLOAT_ABI}>
+    $<IF:$<BOOL:${ARM_CPU}>,--cpu=${ARM_CPU},--cpu=cortex-m0>
+#    $<$<BOOL:${ARM_FPU}>:--fpu=${ARM_FPU}>
+#    $<$<BOOL:${FLOAT_ABI}>:-mfloat-abi=${FLOAT_ABI}>
 )

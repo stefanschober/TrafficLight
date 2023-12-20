@@ -31,7 +31,11 @@
 #ifndef bsp_h
 #define bsp_h
 
-#define BSP_TICKS_PER_SEC    1000U
+#if defined QWIN_GUI
+#  define BSP_TICKS_PER_SEC    100U
+#else
+#  define BSP_TICKS_PER_SEC   1000U
+#endif
 
 #ifdef Q_SPY
     enum {

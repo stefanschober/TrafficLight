@@ -76,9 +76,9 @@ static const char *argv[] = {
     "trafficlight",
     NULL
 };
-static const size_t argc = ((sizeof(argv) / sizeof(argv[0])) - 1)
+static const size_t argc = ((sizeof(argv) / sizeof(argv[0])) - 1);
 
-int     main_gui(void)
+int main_gui(void)
 #else
 int main(int argc, char *argv[])
 #endif

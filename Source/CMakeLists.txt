@@ -30,7 +30,6 @@ endif()
 # message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
 # set up configurable options
-option(CONFIG_QSPY       "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" OFF)
 option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
 option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF)" OFF)
 option(CONFIG_CPPCHECK_TGT "set to ON, to generate a separate CPPCHECK target (default: OFF)" OFF)
@@ -50,10 +49,8 @@ option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be c
 option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
 set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
-
-if(CONFIG_UNIT_TEST)
-	set(CONFIG_QSPY ON CACHE BOOL "set to ON, if QSPY monitoring shall be compiled in (default: OFF)" FORCE)
-endif()
+set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
+set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;SPY" CACHE STRING "The list of available build configurations for multi config generators")
 
 # setup Raspberry Pi Pico SDK
 if(CONFIG_PICO)
@@ -291,7 +288,6 @@ add_subdirectory(QM)
 
 set(QPC_PROJECT qpc_${PROJECT_NAME})
 set(QPC_CFG_KERNEL ${CONFIG_KERNEL})
-set(QPC_CFG_QSPY ${CONFIG_QSPY})
 set(QPC_QFG_UNIT_TEST ${CONFIG_UNIT_TEST})
 set(QPC_CFG_GUI ${CONFIG_GUI})
 set(QPC_CFG_VERBOSE ${CONFIG_VERBOSE})
@@ -321,7 +317,6 @@ if(CONFIG_VERBOSE)
   Configuration options set:
     CONFIG_GUI                  = ${CONFIG_GUI}
     CONFIG_CONSOLE              = ${CONFIG_CONSOLE}
-    CONFIG_QSPY                 = ${CONFIG_QSPY}
     CONFIG_UNIT_TEST            = ${CONFIG_UNIT_TEST}
     CONFIG_CPPCHECK             = ${CONFIG_CPPCHECK}
     CONFIG_CHECKMISRA           = ${CONFIG_CHECKMISRA}

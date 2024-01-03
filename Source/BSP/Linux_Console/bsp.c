@@ -71,7 +71,7 @@ void QF_onClockTick(void) {
     struct timeval timeout = { 0, 0 };  /* timeout for select() */
     fd_set con; /* FD set representing the console */
 
-    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
+    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
     FD_ZERO(&con);
     FD_SET(0, &con);

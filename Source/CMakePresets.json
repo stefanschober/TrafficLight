@@ -1,88 +1,106 @@
 {
-    "version": 6,
-    "cmakeMinimumRequired": {
-      "major": 3,
-      "minor": 23,
-      "patch": 0
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build using Ninja Multi-Config generator",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceParentDir}/Build/default",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QV"
+        },
+        "CMAKE_CONFIGURATION_TYPES": {
+          "type": "STRING",
+          "value": "DEBUG;RELEASE;SPY"
+        },
+        "CONFIG_GUI": "ON"
+      }
     },
-    "configurePresets": [
-      {
-        "name": "default",
-        "displayName": "Default Config",
-        "description": "Default build using Makefile generator",
-        "generator": "Ninja",
-        "binaryDir": "${sourceParentDir}/Build/default",
-        "cacheVariables": {
+    {
+      "name": "mingw",
+      "inherits": "default",
+      "displayName": "MinGW config",
+      "description": "Build for MinGW",
+      "binaryDir": "${sourceParentDir}/Build/mingw/qv",
+      "toolchainFile": "${sourceParentDir}/toolchain/tc_mingwgcc.cmake"
+    },
+    {
+      "name": "mingw-qk",
+      "inherits": "mingw",
+      "displayName": "MinGW config with QK kernel",
+      "description": "Build for MinGW with QK kernel",
+      "binaryDir": "${sourceParentDir}/Build/mingw/qk",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    },
+    {
+      "name": "arm",
+      "inherits": "default",
+      "displayName": "Embedded config for Arm-CM",
+      "description": "Build for arm-cm",
+      "binaryDir": "${sourceParentDir}/Build/arm/qv",
+      "toolchainFile": "${sourceParentDir}/toolchain/tc_gnuarm.cmake",
+      "cacheVariables": {
           "CONFIG_KERNEL": {
             "type": "STRING",
             "value": "QV"
           },
-          "CONFIG_GUI": "ON"
-        }
-      },
-      {
-        "name": "mingw",
-        "inherits": "default",
-        "displayName": "MinGW config",
-        "description": "Build for MinGW",
-        "binaryDir": "${sourceParentDir}/Build/MinGW",
-        "toolchainFile": "${sourceDir}/../toolchain/tc_mingwgcc.cmake"
-      },
-      {
-        "name": "mingw-qk",
-        "inherits": "mingw",
-        "displayName": "MinGW config with QK kernel",
-        "description": "Build for MinGW with QK kernel",
-        "binaryDir": "${sourceParentDir}/Build/MinGW_qk"
-      },
-      {
-        "name": "arm",
-        "inherits": "default",
-        "displayName": "Embedded config for Arm-CM",
-        "description": "Build for arm-cm",
-        "binaryDir": "${sourceParentDir}/Build/Arm",
-        "toolchainFile": "${sourceDir}/../toolchain/tc_gnuarm.cmake",
-        "cacheVariables": {
-            "CONFIG_KERNEL": {
-              "type": "STRING",
-              "value": "QV"
-            },
-            "CONFIG_GUI": "OFF"
-        }
-      },
-      {
-        "name": "arm-qk",
-        "inherits": "arm",
-        "description": "Build for arm-cm, kernel QK",
-        "binaryDir": "${sourceParentDir}/Build/Arm_qk",
-        "cacheVariables": {
-            "CONFIG_KERNEL": {
-              "type": "STRING",
-              "value": "QK"
-            }
+          "CONFIG_GUI": "OFF"
+      }
+    },
+    {
+      "name": "arm-qk",
+      "inherits": "arm",
+      "description": "Build for arm-cm, kernel QK",
+      "binaryDir": "${sourceParentDir}/Build/arm/qk",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
         }
       }
-    ],
-    "buildPresets": [
-      {
-        "name": "default",
-        "configurePreset": "default"
-      },
-      {
-        "name": "mingw",
-        "configurePreset": "mingw"
-      },
-      {
-        "name": "mingw-qk",
-        "configurePreset": "mingw-qk"
-      },
-      {
-        "name": "arm",
-        "configurePreset": "arm"
-      },
-      {
-        "name": "arm-qk",
-        "configurePreset": "arm-qk"
-      }
-    ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "configuration": "Debug",
+      "jobs": 4
+    },
+    {
+      "name": "mingw",
+      "configurePreset": "mingw"
+    },
+    {
+      "name": "mingw-qk",
+      "configurePreset": "mingw-qk"
+    },
+    {
+      "name": "arm",
+      "configurePreset": "arm"
+    },
+    {
+      "name": "arm-qk",
+      "configurePreset": "arm-qk"
+    }
+  ],
+  "vendor": {
+    "example.com/TrafficLight/V1.0": {
+      "author": "Stefan Schober",
+      "releaseDate": "2024-01-03"
+    }
+  }
 }

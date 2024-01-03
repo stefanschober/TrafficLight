@@ -182,7 +182,7 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
+    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 }
 /*..........................................................................*/
 void Q_onAssert(gchar const * const module, gint loc) {

@@ -139,7 +139,7 @@ static QTicker l_ticker0;
 //$define${AOs::the_Ticker0} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${AOs::the_Ticker0} ........................................................
-QActive * const the_Ticker0  = (QActive * const)&l_ticker0;
+QActive * const the_Ticker0  = (QActive * const)&l_ticker0.super;
 //$enddef${AOs::the_Ticker0} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //$define${AOs::Ticker_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

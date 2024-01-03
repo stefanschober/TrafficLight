@@ -17,6 +17,8 @@ set(PORT win32)
 target_compile_definitions(${TGT}
     PUBLIC
         USC2_WIN32
+        $<$<CONFIG:Spy>:Q_SPY>
+        $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
 )
 
 # compiler options
@@ -36,8 +38,6 @@ target_link_options(${TGT}
 )
 
 # add windows socket library for Q_SPY/Q_UTEST configurations
-if(CONFIG_QSPY)
-    target_link_libraries(${TGT} PRIVATE ws2_32)
-endif()
+target_link_libraries(${TGT} PRIVATE $<$<CONFIG:Spy>:ws2_32>)
 
 include(custom_commands)

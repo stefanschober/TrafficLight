@@ -14,7 +14,7 @@ add_compile_options(
 	--brief_diagnostics
 	--diag_style=gnu
 	--gnu
-	$<IF:$<BOOL:${CONFIG_DEBUG}>,--debug,-Ospace>
+	$<IF:$<CONFIG:Debug,Spy>,--debug,-Ospace>
 	--data_reorder
 	--library_type=microlib
 #	    --asm
@@ -28,7 +28,7 @@ target_link_options(${TGT}
 	PUBLIC
         --strict
 	    --callgraph					                                # list a static callgraph of functions (HTML)
-        $<$<BOOL:${CONFIG_DEBUG}>:--debug>
+        $<$<CONFIG:Debug,Spy>:--debug>
 	    --entry=Reset_Handler			                            # define global entry point to the application
 	    --library_type=microlib		                                # link vs barebone system C library
 	    --remove						                            # remove unused input sections from the final image

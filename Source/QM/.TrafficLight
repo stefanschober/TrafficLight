@@ -10,10 +10,10 @@
  </group>
  <group name="windows">
   <item id="./Source::TLmain.c">0,0,934,643,*</item>
-  <item id="./Source::TLtraffic.c">0,367,284,300</item>
-  <item id="../BSP::bsp.h">59,0,875,459</item>
-  <item id="AOs::TLtraffic::SM">97,273,837,394</item>
-  <item id="./Source::trafficlight.h">0,0,596,300</item>
+  <item id="../BSP::bsp.h">0,24,934,643</item>
+  <item id="AOs::TLtraffic::SM">97,0,837,394</item>
+  <item id="./Source::trafficlight.h">284,367,596,300</item>
+  <item id="AOs::TLpedestrian::SM">0,0,640,480</item>
  </group>
  <group name="search">
   <item name="options">2032128</item>

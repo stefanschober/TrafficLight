@@ -11,8 +11,8 @@ target_compile_definitions(${TGT}
 
 # compiler options
 add_compile_options(
-    $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0>
-    $<IF:$<BOOL:${CONFIG_DEBUG}>,-O0,-Os>
+    $<IF:$<CONFIG:Debug,Spy>,-g3,-g0>
+    $<IF:$<CONFIG:Debug,Spy>,-O0,-Os>
     -Wall
     -fmessage-length=0
     -ffunction-sections
@@ -25,21 +25,18 @@ add_compile_options(
 target_link_options(${TGT}
     PUBLIC
         -pthread
-        $<IF:$<BOOL:${CONFIG_DEBUG}>,-g3,-g0>
+        $<IF:$<CONFIG:Debug,Spy>,-g3,-g0>
         -Wl,$<$<C_COMPILER_ID:GNU>:--cref,>--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
 #        $<$<BOOL:${CONFIG_RASPI}>:-v>
 )
 
-if(CONFIG_RASPI_IO)
-    if(CONFIG_PIGPIO)
-        target_link_libraries(${TGT} PRIVATE pigpiod_if2)
-    else()
-        target_link_libraries(${TGT} PRIVATE pigpio)
-    endif()
-endif()
+target_link_libraries(${TGT} PRIVATE $<$<BOOL:${CONFIG_RASPI_IO}>:$<IF:$<BOOL:${CONFIG_PIGPIO}>,pigpiod_if2,pigpio>>)
 
 # add GTK+-3.0 support
 if(CONFIG_GUI)
+    if(CONFIG_RASPI)
+        set(ENV{PKG_CONFIG_PATH} "/usr/lib/arm-linux-gnueabihf/pkgconfig/")
+    endif()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK3 gtk+-3.0) # QUIET IMPORTED_TARGET)
 

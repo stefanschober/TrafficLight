@@ -529,7 +529,7 @@ QActive_subscribe((QActive *)me, EMERGENCY_SIG);</action>
   <attribute name="AO_TLpedestrian" type="QActive * const" visibility="0x00" properties="0x00"/>
   <attribute name="AO_TLblinker" type="QActive * const" visibility="0x00" properties="0x00"/>
   <attribute name="the_Ticker0" type="QActive * const" visibility="0x00" properties="0x00">
-   <code> = (QActive * const)&amp;l_ticker0;</code>
+   <code> = (QActive * const)&amp;l_ticker0.super;</code>
   </attribute>
   <attribute name="l_ticker0" type="QTicker" visibility="0x02" properties="0x00"/>
   <operation name="TLtraffic_ctor" type="int16_t" visibility="0x00" properties="0x00">

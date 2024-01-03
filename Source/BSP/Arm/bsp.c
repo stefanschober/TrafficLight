@@ -110,8 +110,7 @@ void HAL_SYSTICK_Callback(void) {   /* system clock tick ISR */
     }
 #endif
 
-    //QF_TICK_X(0U, &l_SysTick_Handler); /* process time events for rate 0 */
-    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
+    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
     readUserButtons();
 #ifdef KERNEL_QK

@@ -111,7 +111,7 @@ void SysTick_Handler(void) {   /* system clock tick ISR */
     }
 #endif
 
-    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
+    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
     readUserButtons();
 

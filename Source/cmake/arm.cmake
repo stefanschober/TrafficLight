@@ -202,15 +202,27 @@ target_compile_definitions(${TGT}
         KERNEL_$<IF:$<STREQUAL:${CONFIG_KERNEL},QK>,QK,QV>=1
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
+        $<$<CONFIG:Spy>:Q_SPY>
 )
 
-add_custom_target(${TGT}Hex ALL
-    COMMAND ${MKHEX} ${MKHEX_ARGS}
-    COMMAND ${MKSIZE} ${MKSIZE_ARGS}
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    COMMENT "Create HEX file"
-    VERBATIM
-)
+get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if (isMultiConfig)
+    add_custom_target(${TGT}Hex ALL
+        COMMAND ${MKHEX} ${MKHEX_ARGS}
+        COMMAND ${MKSIZE} ${MKSIZE_ARGS}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>
+        COMMENT "Create HEX file"
+        VERBATIM
+    )
+else()
+    add_custom_target(${TGT}Hex ALL
+        COMMAND ${MKHEX} ${MKHEX_ARGS}
+        COMMAND ${MKSIZE} ${MKSIZE_ARGS}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Create HEX file"
+        VERBATIM
+    )
+endif()
 add_dependencies(${TGT}Hex ${TGT})
 
 findParFile(RESULT PARAM_IN

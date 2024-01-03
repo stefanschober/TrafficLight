@@ -66,7 +66,7 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    QTIMEEVT_TICK(&l_SysTick_Handler); /* post to Ticker0 */
+    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 }
 
 /*..........................................................................*/
@@ -84,8 +84,14 @@ void BSP_init(int argc, char *argv[]) {
     (void)argv;
 
 #ifdef Q_SPY
+    char *l_cmdLine = NULL;
+
+    if(argc > 1)
+    {
+        l_cmdLine = argv[1];
+    }
     if (QS_INIT(l_cmdLine) == (uint8_t)0) { /* QS initialization failed? */
-        MessageBox(l_hWnd,
+        MessageBox(NULL,
                    "Cannot connect to QSPY via TCP/IP\n"
                    "Please make sure that 'qspy -t' is running",
                    "QS_INIT() Error",
@@ -100,8 +106,6 @@ void BSP_init(int argc, char *argv[]) {
 /*..........................................................................*/
 void BSP_terminate(int16_t result)
 {
-    UINT n;
-
 #ifdef Q_SPY
     if (l_sock != INVALID_SOCKET) {
         closesocket(l_sock);
@@ -160,6 +164,7 @@ void BSP_publishEmergencyEvt(void)
 */
 
 /*..........................................................................*/
+#if 0
 static DWORD WINAPI idleThread(LPVOID par) {/* signature for CreateThread() */
     (void)par;
     while (l_sock != INVALID_SOCKET) {
@@ -187,9 +192,9 @@ static DWORD WINAPI idleThread(LPVOID par) {/* signature for CreateThread() */
         QS_rxParse();  /* parse all the received bytes */
 
         nBytes = 1024U;
-        QF_CRIT_ENTRY(dummy);
+        QF_CRIT_ENTRY();
         block = QS_getBlock(&nBytes);
-        QF_CRIT_EXIT(dummy);
+        QF_CRIT_EXIT();
 
         if (block != (uint8_t *)0) {
             send(l_sock, (char const *)block, nBytes, 0);
@@ -319,6 +324,8 @@ QSTimeCtr QS_onGetTime(void) {
 void QS_onReset(void) {
     //TBD
 }
+#endif
+
 /*..........................................................................*/
 /*! callback function to execute a uesr command (to be implemented in BSP) */
 void QS_onCommand(uint8_t cmdId,

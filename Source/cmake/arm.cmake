@@ -112,6 +112,7 @@ else()
             message(FATAL_ERROR "Unknown MCU ${MCU} specified!")
     endif()
 
+
     # Defaults for stack and heap memory
     if(NOT STACKSIZE)
         set(STACKSIZE 0x0200)
@@ -205,24 +206,18 @@ target_compile_definitions(${TGT}
         $<$<CONFIG:Spy>:Q_SPY>
 )
 
-get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-if (isMultiConfig)
-    add_custom_target(${TGT}Hex ALL
-        COMMAND ${MKHEX} ${MKHEX_ARGS}
-        COMMAND ${MKSIZE} ${MKSIZE_ARGS}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>
-        COMMENT "Create HEX file"
-        VERBATIM
-    )
-else()
-    add_custom_target(${TGT}Hex ALL
-        COMMAND ${MKHEX} ${MKHEX_ARGS}
-        COMMAND ${MKSIZE} ${MKSIZE_ARGS}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        COMMENT "Create HEX file"
-        VERBATIM
-    )
-endif()
+target_link_options(${TGT}
+    PRIVATE
+        -v
+)
+
+add_custom_target(${TGT}Hex ALL
+    COMMAND ${MKHEX} ${MKHEX_ARGS}
+    COMMAND ${MKSIZE} ${MKSIZE_ARGS}
+    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COMMENT "Create HEX file"
+    VERBATIM
+)
 add_dependencies(${TGT}Hex ${TGT})
 
 findParFile(RESULT PARAM_IN

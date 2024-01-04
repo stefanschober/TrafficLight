@@ -8,6 +8,7 @@
   "configurePresets": [
     {
       "name": "default",
+      "hidden": true,
       "displayName": "Default Config",
       "description": "Default build using Ninja Multi-Config generator",
       "generator": "Ninja Multi-Config",
@@ -25,7 +26,31 @@
       }
     },
     {
-      "name": "mingw",
+      "name": "dftNinja",
+      "hidden": true,
+      "inherits": "default",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "DEBUG"
+        }
+      }
+    },
+    {
+      "name": "dftMake",
+      "hidden": true,
+      "inherits": "default",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "DEBUG"
+        }
+      }
+    },
+    {
+      "name": "mingw-qv",
       "inherits": "default",
       "displayName": "MinGW config",
       "description": "Build for MinGW",
@@ -33,8 +58,24 @@
       "toolchainFile": "${sourceParentDir}/toolchain/tc_mingwgcc.cmake"
     },
     {
+      "name": "mingwMake",
+      "inherits": [
+        "dftMake",
+        "mingw-qv"
+      ],
+      "binaryDir": "${sourceParentDir}/Build/mingwMake/qv"
+    },
+    {
+      "name": "mingwNinja",
+      "inherits": [
+        "dftNinja",
+        "mingw-qv"
+      ],
+      "binaryDir": "${sourceParentDir}/Build/mingwNinja/qv"
+    },
+    {
       "name": "mingw-qk",
-      "inherits": "mingw",
+      "inherits": "mingw-qv",
       "displayName": "MinGW config with QK kernel",
       "description": "Build for MinGW with QK kernel",
       "binaryDir": "${sourceParentDir}/Build/mingw/qk",
@@ -47,10 +88,8 @@
     },
     {
       "name": "arm",
+      "hidden": true,
       "inherits": "default",
-      "displayName": "Embedded config for Arm-CM",
-      "description": "Build for arm-cm",
-      "binaryDir": "${sourceParentDir}/Build/arm/qv",
       "toolchainFile": "${sourceParentDir}/toolchain/tc_gnuarm.cmake",
       "cacheVariables": {
           "CONFIG_KERNEL": {
@@ -59,6 +98,53 @@
           },
           "CONFIG_GUI": "OFF"
       }
+    },
+    {
+      "name": "armNj",
+      "hidden": true,
+      "inherits": "arm",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "DEBUG"
+        }
+      }
+    },
+    {
+      "name": "armMk",
+      "hidden": true,
+      "inherits": "arm",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "DEBUG"
+        }
+      }
+    },
+    {
+      "name": "armMake",
+      "inherits": [
+        "armMk",
+        "arm"
+      ],
+      "binaryDir": "${sourceParentDir}/Build/armMake/qv"
+    },
+    {
+      "name": "armNinja",
+      "inherits": [
+        "armNj",
+        "arm"
+      ],
+      "binaryDir": "${sourceParentDir}/Build/armNinja/qv"
+    },
+    {
+      "name": "arm-qv",
+      "inherits": "arm",
+      "displayName": "Embedded config for Arm-CM",
+      "description": "Build for arm-cm",
+      "binaryDir": "${sourceParentDir}/Build/arm/qv"
     },
     {
       "name": "arm-qk",
@@ -76,25 +162,50 @@
   "buildPresets": [
     {
       "name": "default",
+      "hidden": true,
       "configurePreset": "default",
       "configuration": "Debug",
       "jobs": 4
     },
     {
-      "name": "mingw",
-      "configurePreset": "mingw"
+      "name": "mingw-qv",
+      "inherits": "default",
+      "configurePreset": "mingw-qv"
     },
     {
       "name": "mingw-qk",
+      "inherits": "default",
       "configurePreset": "mingw-qk"
     },
     {
-      "name": "arm",
-      "configurePreset": "arm"
+      "name": "mingwMake",
+      "inherits": "default",
+      "configurePreset": "mingwMake"
+    },
+    {
+      "name": "mingwNinja",
+      "inherits": "default",
+      "configurePreset": "mingwNinja"
+    },
+    {
+      "name": "arm-qv",
+      "inherits": "default",
+      "configurePreset": "arm-qv"
     },
     {
       "name": "arm-qk",
+      "inherits": "default",
       "configurePreset": "arm-qk"
+    },
+    {
+      "name": "armMake",
+      "inherits": "default",
+      "configurePreset": "armMake"
+    },
+    {
+      "name": "armNinja",
+      "inherits": "default",
+      "configurePreset": "armNinja"
     }
   ],
   "vendor": {

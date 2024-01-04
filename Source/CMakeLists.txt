@@ -60,20 +60,24 @@ if(CONFIG_PICO)
 
     if(PICO_SDK_PATH)
         message(STATUS "setup Raspberry Pi Pico SDK from ${PICO_SDK_PATH}")
-        set(CMAKE_BUILD_TYPE "Debug")
         set(PICO_BOARD pico)
         set(PICO_BARE_METAL FALSE)
         set(PICO_PLATFORM rp2040)
+
+        # set up global C/CXX/ASM flags for Raspberry Pi Pico
+        set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} --specs=picolibc.specs")
+        set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+        set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
 
         # include must happen before project(...)
         include(pico_sdk_import)
     else()
         message(FATAL "PICO_SDK_PATH not found!")
     endif()
-elseif(CONFIG_DEBUG)
-    set(CMAKE_BUILD_TYPE "Debug")
-else()
-    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+if(NOT CONFIG_DEBUG)
+    set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
 
 # check/set Qx real time kernel
@@ -163,18 +167,8 @@ else()
 endif()
 # message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
 
-# setup Raspberry Pi Pico SDK
-if(CONFIG_PICO)
-    message(STATUS "setup Raspberry Pi Pico SDK")
-    set(CMAKE_BUILD_TYPE Debug)
-    set(PICO_BOARD pico)
-    set(PICO_BARE_METAL FALSE)
-    set(PICO_PLATFORM rp2040)
-    include(pico_sdk_import)
-endif()
-
 # set C-C++ standards
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
 
 include(CTest)
@@ -184,17 +178,24 @@ include(cppcheck)
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     include(CheckPIESupported)
+    check_pie_supported()
 endif()
 
-# set up global C/CXX/ASM flags
-if(CONFIG_PICOLIB)
-    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} --specs=picolibc.specs")
-    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
-    set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
+# set binary output directories for targets/build configurations
+get_property(isMultiConfigGen GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(isMultiConfigGen)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/$<CONFIG>)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
+else()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
 endif()
 
 # the project target(s)
 add_executable(${TGT} "")
+set_property(TARGET ${TGT} PROPERTY POSITION_INDEPENDENT_CODE FALSE)
 if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
@@ -213,30 +214,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Windows OR WIN32)
     include(win32)
 elseif(CMAKE_SYSTEM_NAME STREQUAL Generic AND CMAKE_SYSTEM_PROCESSOR MATCHES [Aa][Rr][Mm])
 	include(arm)
-#if(CONFIG_PICO)
-#    add_executable(systicktst systicktst.c)
-#    pico_enable_stdio_usb(systicktst TRUE)
-#    pico_enable_stdio_uart(systicktst FALSE)
-
-#    pico_add_extra_outputs(systicktst)
-#    target_link_libraries(systicktst pico_stdlib pico_time hardware_exception cmsis_core)
-
-#    target_compile_definitions(systicktst
-#        PUBLIC
-#            PICO_CMSIS_RENAME_EXCEPTIONS=1
-#            PICO_NO_RAM_VECTOR_TABLE=1
-#    )
-
-#    target_compile_options(systicktst
-#        PUBLIC
-#            -O0
-#            -g3
-#    )
-
-#    pico_set_binary_type(systicktst no_flash)
-#    pico_set_binary_type(systicktst default)
-#endif()
-
 else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()
@@ -258,12 +235,6 @@ target_link_options(${TGT}
     PRIVATE
         $<$<BOOL:${CONFIG_VERBOSE}>:-v>
 )
-
-# set position independent code compile/link parameters
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
-    check_pie_supported()
-endif()
-set_property(TARGET ${TGT} PROPERTY POSITION_INDEPENDENT_CODE FALSE)
 
 # define function to output list of modules
 set (MODLIST ${CMAKE_BINARY_DIR}/modlist.txt)

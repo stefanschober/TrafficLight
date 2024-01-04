@@ -1,3 +1,4 @@
+
 execute_process(
 	COMMAND ${CMAKE_C_COMPILER} -E -I  ${CMAKE_SOURCE_DIR} -P ${SCATTER_FILE}.cpp -o ${SCATTER_FILE}
 	WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -11,9 +12,11 @@ target_compile_definitions(${TGT}
 		__TARGET_CPU_CORTEX_M0
 )
 
-add_compile_options(
-	-mcpu=cortex-m0
-)
+if(MCU STREQUAL STM32F091xC)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m0plus")
+else()
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m0")
+endif()
 
 # set default linker options, valid for all USC2 projects
 target_link_options(${TGT}
@@ -21,4 +24,6 @@ target_link_options(${TGT}
         -T ${SCATTER_FILE}
 		-nostartfiles
 		-static
+		-mcpu=cortex-$<IF:$<STREQUAL:${MCU},STM32F091xC>,m0plus,m0>
+		LINKER:-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
 )

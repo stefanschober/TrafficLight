@@ -64,8 +64,8 @@ set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL 
 # -Wl,--gc-sections     Perform the dead code elimination.
 # --specs=nano.specs    Link with newlib-nano.
 # --specs=nosys.specs   No syscalls, provide empty implementations for the POSIX system calls.
-set(MAPFILE "${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker Map File")
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=nosys.specs -mthumb -nostartfiles -static -Wl,-Map=${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker options")
+# set(MAPFILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker Map File")
+set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=nosys.specs -mthumb -nostartfiles -static" CACHE INTERNAL "Linker options")
 
 #---------------------------------------------------------------------------------------
 # Set debug/release build configuration Options
@@ -107,9 +107,3 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-
-add_compile_options(
-    $<IF:$<BOOL:${ARM_CPU}>,-mcpu=${ARM_CPU},-mcpu=cortex-m0>
-    $<$<BOOL:${ARM_FPU}>:-mfpu=${ARM_FPU}>
-    $<$<BOOL:${FLOAT_ABI}>:-mfloat-abi=${FLOAT_ABI}>
-)

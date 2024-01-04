@@ -35,6 +35,7 @@ target_compile_options(${TGT}
 target_link_options(${TGT}
     PUBLIC
         $<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>
+        LINKER:-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
 )
 
 # add windows socket library for Q_SPY/Q_UTEST configurations

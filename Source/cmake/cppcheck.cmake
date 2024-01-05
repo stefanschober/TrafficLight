@@ -1,4 +1,5 @@
 if(CONFIG_CPPCHECK)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
     find_program(CPPCHECK NAMES cppcheck cppcheck.exe)
     # set(CPPCHECK "${CMAKE_SOURCE_DIR}/../cppcheck.exe")
 

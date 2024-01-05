@@ -21,9 +21,9 @@ endif()
 # set default linker options, valid for all USC2 projects
 target_link_options(${TGT}
 	PUBLIC
-        -T ${SCATTER_FILE}
-		-nostartfiles
-		-static
-		-mcpu=cortex-$<IF:$<STREQUAL:${MCU},STM32F091xC>,m0plus,m0>
-		LINKER:-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
+	LINKER:-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
+	-T ${SCATTER_FILE}
+	-nostartfiles
+	-static
+	-mcpu=cortex-$<IF:$<STREQUAL:${MCU},STM32F091xC>,m0plus,m0>
 )

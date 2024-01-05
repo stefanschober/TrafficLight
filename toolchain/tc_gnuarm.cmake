@@ -94,7 +94,6 @@ set(CMAKE_ASM_FLAGS_RELEASE "" CACHE INTERNAL "ASM Compiler options for release 
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-g0" CACHE INTERNAL "Linker options for release build type")
 # set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-g3 -flto" CACHE INTERNAL "Linker options for release build type")
 
-
 #---------------------------------------------------------------------------------------
 # Set compilers
 #---------------------------------------------------------------------------------------

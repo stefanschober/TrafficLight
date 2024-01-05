@@ -39,6 +39,7 @@ option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used.
 option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
 option(CONFIG_PIGPIO     "set to ON, if the PIGPIO server on the Raspberry Pi shall be used. (default: OFF)" OFF)
+option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_CONSOLE   "set to ON, if Linux console output shall be configured. (default: OFF)" OFF)
 option(CONFIG_PICO      "set to ON, if Raspberry Pi Pico system shall be configured. (default: OFF)" OFF)
 option(CONFIG_PICO_CMSIS "set to ON, if Raspberry Pi Pico system shall use CMSIS APIs. (default: ON)" ON)
@@ -46,11 +47,29 @@ option(CONFIG_CORTEX_M0 "set to ON, if an ARM Cortex-M0 target system shall be c
 option(CONFIG_CORTEX_M0plus "set to ON, if an ARM Cortex-M0+ target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_CORTEX_M3 "set to ON, if an ARM Cortex-M3 target system shall be configured. (default: OFF)" OFF)
 option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be configured. (default: OFF)" OFF)
-option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
+
 set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
 set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
 set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;SPY" CACHE STRING "The list of available build configurations for multi config generators")
+
+get_property(isMultiConfiGenerator GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(isMultiConfiGenerator)
+    unset(CMAKE_BUILD_TYPE)
+    set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;SPY" CACHE STRING "configuration types for multi config generator")
+else()
+    unset(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Default build type for single congig generators")
+endif()
+
+# check/set Qx real time kernel
+set(KERNELS qv qk qxk)
+string(TOLOWER "${CONFIG_KERNEL}" KERNEL)
+if(NOT (KERNEL IN_LIST KERNELS))
+    message(WARNING "Unknown QPC Kernel '${KERNEL}'. Falling back to default kernel (QV)")
+    set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
+    set(KERNEL qv)
+endif()
 
 # setup Raspberry Pi Pico SDK
 if(CONFIG_PICO)
@@ -74,19 +93,6 @@ if(CONFIG_PICO)
     else()
         message(FATAL "PICO_SDK_PATH not found!")
     endif()
-endif()
-
-if(NOT CONFIG_DEBUG)
-    set(CMAKE_BUILD_TYPE "RELEASE")
-endif()
-
-# check/set Qx real time kernel
-set(KERNELS qv qk qxk)
-string(TOLOWER "${CONFIG_KERNEL}" KERNEL)
-if(NOT (KERNEL IN_LIST KERNELS))
-    message(WARNING "Unknown QPC Kernel '${KERNEL}'. Falling back to default kernel (QV)")
-    set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
-    set(KERNEL qv)
 endif()
 
 if(CONFIG_CPPCHECK)
@@ -158,15 +164,6 @@ if(CCACHE_PROGRAM)
     set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
-# update the module search path
-if(CMAKE_HOST_WIN32)
-    string(REPLACE "\\" "/" HOME_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
-    set(CMAKE_MODULE_PATH "${HOME_PATH}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH}")
-else()
-    set(CMAKE_MODULE_PATH $ENV{HOME}/cmake;${PROJECT_SOURCE_DIR}/cmake;${PROJECT_SOURCE_DIR};${CMAKE_MODULE_PATH})
-endif()
-# message(STATUS "CMAKE_MODULE_PATH = ${CMAKE_MODULE_PATH}")
-
 # set C-C++ standards
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_CXX_STANDARD 17)
@@ -179,6 +176,13 @@ include(cppcheck)
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     include(CheckPIESupported)
     check_pie_supported()
+endif()
+
+# set up global C/CXX/ASM flags
+if(CONFIG_PICOLIB AND CMAKE_C_COMPILER_ID STREQUAL GNU)
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} --specs=picolibc.specs")
+    set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
+    set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
 endif()
 
 # set binary output directories for targets/build configurations
@@ -199,7 +203,27 @@ set_property(TARGET ${TGT} PROPERTY POSITION_INDEPENDENT_CODE FALSE)
 if(IMAGE)
     set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 endif()
-setup_cppcheck(${TGT})
+
+# set general defines
+target_compile_definitions(${TGT}
+    PRIVATE
+        $<UPPER_CASE:${IMAGE}>
+        TARGET=${TGT}
+        $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
+        KERNEL_$<IF:$<STREQUAL:${CONFIG_KERNEL},QK>,QK,QV>=1
+        $<$<CONFIG:Spy>:Q_SPY>
+        $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
+)
+
+target_compile_options(${TGT}
+    PRIVATE
+        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
+)
+
+target_link_options(${TGT}
+    PRIVATE
+        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
+)
 
 # set the default file names for parameter and profile data
 # the files are in binary format and need to have
@@ -217,24 +241,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Generic AND CMAKE_SYSTEM_PROCESSOR MATCHES [Aa
 else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()
-
-# set general defines
-target_compile_definitions(${TGT}
-	PRIVATE
-	    $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
-        $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
-        TARGET=${TGT}
-)
-
-target_compile_options(${TGT}
-    PRIVATE
-        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
-)
-
-target_link_options(${TGT}
-    PRIVATE
-        $<$<BOOL:${CONFIG_VERBOSE}>:-v>
-)
 
 # define function to output list of modules
 set (MODLIST ${CMAKE_BINARY_DIR}/modlist.txt)
@@ -267,7 +273,25 @@ set(QPC_CFG_PORT ${PORT})
 add_subdirectory(qpc)
 target_link_libraries(${TGT} PRIVATE qpc)
 
+setup_cppcheck(${TGT})
+
 # show configuration results
+get_target_property(TGT_COMPILE_OPTS ${TGT} COMPILE_OPTIONS)
+get_target_property(TGT_COMPILE_DEFS ${TGT} COMPILE_DEFINITIONS)
+get_target_property(TGT_LIB_DEFS ${TGT} INTERFACE_COMPILE_DEFINITIONS)
+get_target_property(TGT_INCLUDES ${TGT} INCLUDE_DIRECTORIES)
+get_target_property(TGT_LIB_INCS ${TGT} INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(TGT_SYS_INCS ${TGT} INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+get_target_property(TGT_LINK_OPTS ${TGT} LINK_OPTIONS)
+get_target_property(TGT_LINK_LIBS ${TGT} LINK_LIBRARIES)
+get_target_property(TGT_SOURCES ${TGT} SOURCES)
+
+get_target_property(LIB_COMPILE_DEFS qpc COMPILE_DEFINITIONS)
+get_target_property(LIB_LIB_DEFS qpc INTERFACE_COMPILE_DEFINITIONS)
+get_target_property(LIB_INCLUDES qpc INCLUDE_DIRECTORIES)
+get_target_property(LIB_LIB_INCS qpc INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(LIB_SYS_INCS qpc INTERFACE_SYSTEM_INCLUDE_DIRECTORIES)
+
 message(STATUS
 "========================================================
 Configured project ${PROJECT_NAME} for ${PORT}
@@ -334,6 +358,7 @@ if(CONFIG_VERBOSE)
     UNIX                        = ${UNIX}
     LINUX                       = ${LINUX}
 
+    CMAKE_BUILD_TYPE            = ${CMAKE_BUILD_TYPE}
     CMAKE_C_COMPILER            = ${CMAKE_C_COMPILER}
     CMAKE_C_COMPILER_ID         = ${CMAKE_C_COMPILER_ID}
     CMAKE_C_COMPILER_VERSION    = ${CMAKE_C_COMPILER_VERSION}

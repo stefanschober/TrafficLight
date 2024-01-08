@@ -22,7 +22,7 @@ endif()
 target_link_options(${TGT}
 	PUBLIC
 	LINKER:-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
-	-T ${SCATTER_FILE}
+	$<$<NOT:$<BOOL:${CONFIG_PICO}>>:-T ${SCATTER_FILE}>
 	-nostartfiles
 	-static
 	-mcpu=cortex-$<IF:$<STREQUAL:${MCU},STM32F091xC>,m0plus,m0>

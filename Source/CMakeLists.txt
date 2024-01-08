@@ -50,8 +50,8 @@ option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be c
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
 
 set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
-set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
-set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;SPY" CACHE STRING "The list of available build configurations for multi config generators")
+set(CMAKE_BUILD_TYPE debug CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
+set(CMAKE_CONFIGURATION_TYPES "debug;release;spy" CACHE STRING "The list of available build configurations for multi config generators")
 
 get_property(isMultiConfiGenerator GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(isMultiConfiGenerator)
@@ -73,24 +73,18 @@ endif()
 
 # setup Raspberry Pi Pico SDK
 if(CONFIG_PICO)
-    find_path(PICO_SDK_PATH pico_sdk_init.cmake
-              PATHS ~ /opt /var /usr/lib /
-              PATH_SUFFIXES pico pico-sdk pico/pico-sdk)
+    # include must happen before project(...)
+    set(PICO_BOARD pico)
+    set(PICO_BARE_METAL FALSE)
+    set(PICO_PLATFORM rp2040)
 
-    if(PICO_SDK_PATH)
-        message(STATUS "setup Raspberry Pi Pico SDK from ${PICO_SDK_PATH}")
-        set(PICO_BOARD pico)
-        set(PICO_BARE_METAL FALSE)
-        set(PICO_PLATFORM rp2040)
+    include(pico_sdk_import)
 
-        # set up global C/CXX/ASM flags for Raspberry Pi Pico
-        set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} --specs=picolibc.specs")
-        set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
-        set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS}")
+    if(NOT PICO_SDK_PATH)
+	unset(PICO_BOARD)
+    	unset(PICO_BARE_METALE)
+    	unset(PICO_PLATFORM)
 
-        # include must happen before project(...)
-        include(pico_sdk_import)
-    else()
         message(FATAL "PICO_SDK_PATH not found!")
     endif()
 endif()
@@ -155,7 +149,7 @@ endif()
 project(${PROJECT_NAME}
     VERSION ${SW_VERSION}
     DESCRIPTION "Trafficlight project"
-    LANGUAGES C ASM)
+    LANGUAGES C CXX ASM)
 
 # enable ccache
 find_program(CCACHE_PROGRAM ccache ccache.exe)
@@ -192,9 +186,12 @@ if(isMultiConfigGen)
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
 else()
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
+#    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
+#    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
+#    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
 
 # the project target(s)
@@ -232,12 +229,18 @@ set(PARAMNAME   "USC2_Parameter")
 set(PROFILENAME "USC2_Profile")
 
 # include target specific definitions (set compiler options etc.)
-if(CMAKE_SYSTEM_NAME STREQUAL Linux OR UNIX)
+if(DEFINED PORT AND PORT MATCHES arm)
+    include(arm)
+elseif(DEFINED PORT AND PORT MATCHES posix)
     include(unix)
-elseif(CMAKE_SYSTEM_NAME STREQUAL Windows OR WIN32)
+elseif(DEFINED PORT AND PORT MATCHES win32)
     include(win32)
 elseif(CMAKE_SYSTEM_NAME STREQUAL Generic AND CMAKE_SYSTEM_PROCESSOR MATCHES [Aa][Rr][Mm])
 	include(arm)
+elseif(CMAKE_SYSTEM_NAME STREQUAL Linux OR UNIX)
+    include(unix)
+elseif(CMAKE_SYSTEM_NAME STREQUAL Windows OR WIN32)
+    include(win32)
 else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()

@@ -20,9 +20,29 @@
         },
         "CMAKE_CONFIGURATION_TYPES": {
           "type": "STRING",
-          "value": "DEBUG;RELEASE;SPY"
+          "value": "debug;release;spy"
         },
         "CONFIG_GUI": "ON"
+      }
+    },
+    {
+      "name": "pico",
+      "inherits": "default",
+      "generator": "Ninja",
+      "displayName": "Pico config",
+      "description": "Build for Raspberry Pi Pico",
+      "binaryDir": "${sourceParentDir}/Build/pico/qv",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "debug"
+        },
+        "PORT": {
+          "type": "STRING",
+          "value": "arm-cm"
+        },
+        "CONFIG_GUI": "OFF",
+        "CONFIG_PICO": "ON"
       }
     },
     {
@@ -113,7 +133,12 @@
       "name": "arm-qk",
       "inherits": "armdft",
       "configurePreset": "arm-qk"
+    },
+    {
+      "name": "pico",
+      "configurePreset": "pico"
     }
+
   ],
   "vendor": {
     "example.com/TrafficLight/V1.0": {

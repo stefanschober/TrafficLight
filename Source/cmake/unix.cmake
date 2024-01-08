@@ -26,7 +26,7 @@ target_link_options(${TGT}
     PUBLIC
         -pthread
         $<IF:$<CONFIG:Debug,Spy>,-g3,-g0>
-        -Wl,$<$<C_COMPILER_ID:GNU>:--cref,>--gc-sections,-Map=$<TARGET_NAME:${TGT}>.map
+        LINKER:--cref,--gc-sections,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
 #        $<$<BOOL:${CONFIG_RASPI}>:-v>
 )
 

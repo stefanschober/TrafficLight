@@ -38,7 +38,4 @@ target_link_options(${TGT}
         LINKER:-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
 )
 
-# add windows socket library for Q_SPY/Q_UTEST configurations
-target_link_libraries(${TGT} PRIVATE $<$<CONFIG:Spy>:ws2_32>)
-
 include(custom_commands)

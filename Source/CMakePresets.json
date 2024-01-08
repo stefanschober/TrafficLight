@@ -20,23 +20,19 @@
         },
         "CMAKE_CONFIGURATION_TYPES": {
           "type": "STRING",
-          "value": "debug;release;spy"
+          "value": "Debug;Release;Spy"
         },
         "CONFIG_GUI": "ON"
       }
     },
     {
-      "name": "pico",
+      "name": "pico-qv",
       "inherits": "default",
-      "generator": "Ninja",
       "displayName": "Pico config",
       "description": "Build for Raspberry Pi Pico",
+      "generator": "Ninja",
       "binaryDir": "${sourceParentDir}/Build/pico/qv",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": {
-          "type": "STRING",
-          "value": "debug"
-        },
         "PORT": {
           "type": "STRING",
           "value": "arm-cm"
@@ -46,19 +42,32 @@
       }
     },
     {
-      "name": "mingw-qv",
+      "name": "pico-qk",
+      "inherits": "pico-qv",
+      "displayName": "Pico QK config",
+      "description": "Build for Raspberry Pi Pico with QK kernel",
+      "binaryDir": "${sourceParentDir}/Build/pico/qk",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    },
+    {
+      "name": "win32-qv",
       "inherits": "default",
       "displayName": "MinGW config",
-      "description": "Build for MinGW",
-      "binaryDir": "${sourceParentDir}/Build/mingw/qv",
+      "description": "Build for MinGW/Win32",
+      "binaryDir": "${sourceParentDir}/Build/win32/qv",
       "toolchainFile": "${sourceParentDir}/toolchain/tc_mingwgcc.cmake"
     },
     {
-      "name": "mingw-qk",
-      "inherits": "mingw-qv",
-      "displayName": "MinGW config with QK kernel",
-      "description": "Build for MinGW with QK kernel",
-      "binaryDir": "${sourceParentDir}/Build/mingw/qk",
+      "name": "win32-qk",
+      "inherits": "win32-qv",
+      "displayName": "MinGW/Win32 config with QK kernel",
+      "description": "Build for MinGW/Win32 with QK kernel",
+      "binaryDir": "${sourceParentDir}/Build/win32/qk",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -108,14 +117,14 @@
       "jobs": 4
     },
     {
-      "name": "mingw-qv",
+      "name": "win32-qv",
       "inherits": "default",
-      "configurePreset": "mingw-qv"
+      "configurePreset": "win32-qv"
     },
     {
-      "name": "mingw-qk",
+      "name": "win32-qk",
       "inherits": "default",
-      "configurePreset": "mingw-qk"
+      "configurePreset": "win32-qk"
     },
     {
       "name": "armdft",
@@ -135,10 +144,13 @@
       "configurePreset": "arm-qk"
     },
     {
-      "name": "pico",
-      "configurePreset": "pico"
+      "name": "pico-qv",
+      "configurePreset": "pico-qv"
+    },
+    {
+      "name": "pico-qk",
+      "configurePreset": "pico-qk"
     }
-
   ],
   "vendor": {
     "example.com/TrafficLight/V1.0": {

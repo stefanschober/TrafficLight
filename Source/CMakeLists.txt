@@ -50,16 +50,14 @@ option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be c
 option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
 
 set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
-set(CMAKE_BUILD_TYPE debug CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
-set(CMAKE_CONFIGURATION_TYPES "debug;release;spy" CACHE STRING "The list of available build configurations for multi config generators")
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release;Spy" CACHE STRING "The list of available build configurations for multi config generators")
 
 get_property(isMultiConfiGenerator GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(isMultiConfiGenerator)
     unset(CMAKE_BUILD_TYPE)
-    set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;SPY" CACHE STRING "configuration types for multi config generator")
 else()
     unset(CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_BUILD_TYPE DEBUG CACHE STRING "Default build type for single congig generators")
 endif()
 
 # check/set Qx real time kernel
@@ -182,16 +180,9 @@ endif()
 # set binary output directories for targets/build configurations
 get_property(isMultiConfigGen GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(isMultiConfigGen)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/$<CONFIG>)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
-else()
-#    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
-#    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
-#    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$<$<BOOL:${CMAKE_BUILD_TYPE}>:/${CMAKE_BUILD_TYPE}>)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
 endif()
 
 # the project target(s)

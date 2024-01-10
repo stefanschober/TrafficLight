@@ -35,7 +35,56 @@
 #include <gtk/gtk.h>
 
 #if defined RASPI
-#include "pigpio.h"
+#if defined PIGPIO_LIB
+#	include "pigpio.h"
+
+#	define GPIO_INIT()			gpioInitialise()
+#	define GPIO_TERMINATE()		gpioTerminate()
+
+#	define GPIO_SETMODE(_p, _m)	gpioSetMode((_p), (_m))
+#	define GPIO_WRITE(_p, _v)	gpioWrite((_p), (_v))
+#	define GPIO_READ(_p)		gpioRead(_p)
+#   define GPIO_SET_PUD(_p, _m) gpioSetPullUpDown((_p), (_m))
+
+#	define GPIO_CALLBACK(_p, _f) gpioSetISRFunc((_p), EITHER_EDGE, -1, (gpioISRFunc_t)(_f))
+#	define GPIO_CBDEL(_cb, _p)	 gpioSetISRFunc((_p), EITHER_EDGE, -1, NULL)
+
+#	define SPI_OPEN(_c, _s, _f) spiOpen((_c), (_s), (_f));
+#	define SPI_CLOSE(_h)		spiClose(_h);
+#	define SPI_XFER(_h, _t, _r, _c) spiXfer((_h), (char *)(_t), (char *)(_r), (_c))
+
+#	define I2C_OPEN(_b, _a, _f)	i2cOpen((_b), (_a), (_f))
+#	define I2C_CLOSE(_h)		i2cClose(_h);
+#	define I2C_RDREG8(_h, _r)	i2cReadByteData((_h), (_r))
+#	define I2C_RDREG16(_h, _r)	i2cReadWordData((_h), (_r))
+#	define I2C_WRREG8(_h, _r, _v)  i2cWriteByteData((_h), (_r), ((_v) & 0x0000FFu))
+#	define I2C_WRREG16(_h, _r, _v) i2cWriteWordData((_h), (_r), ((_v) & 0x00FFFFu))
+#  else
+#   include "pigpiod_if2.h"
+#   include "command.h"
+
+#	define GPIO_INIT()			pigpio_start(NULL, NULL)
+#	define GPIO_TERMINATE()		pigpio_stop(piHandle)
+
+#	define GPIO_SETMODE(_p, _m) set_mode(piHandle, (_p), (_m))
+#	define GPIO_WRITE(_p, _v)	gpio_write(piHandle, (_p), (_v))
+#	define GPIO_READ(_p)		gpio_read(piHandle, (_p))
+#   define GPIO_SET_PUD(_p, _m) set_pull_up_down(piHandle, (_p), (_m))
+
+#	define GPIO_CALLBACK(_p, _f) callback(piHandle, (_p), EITHER_EDGE, (CBFunc_t)(_f))
+#	define GPIO_CBDEL(_cb, _p)	 callback_cancel(_cb)
+
+#	define SPI_OPEN(_c, _s, _f) spi_open(piHandle, (_c), (_s), (_f));
+#	define SPI_CLOSE(_h)		spi_close(piHandle, (_h));
+#	define SPI_XFER(_h, _t, _r, _c) spi_xfer(piHandle, (_h), (char *)(_t), (char *)(_r), (_c))
+
+#	define I2C_OPEN(_b, _a, _f)	i2c_open(piHandle, (_b), (_a), (_f))
+#	define I2C_CLOSE(_h)		i2c_close(piHandle, (_h));
+#	define I2C_RDREG8(_h, _r)	i2c_read_byte_data(piHandle, (_h), (_r))
+#	define I2C_RDREG16(_h, _r)	i2c_read_word_data(piHandle, (_h), (_r))
+#	define I2C_WRREG8(_h, _r, _v)  i2c_write_byte_data(piHandle, (_h), (_r), ((_v) & 0x0000FFu))
+#	define I2C_WRREG16(_h, _r, _v) i2c_write_word_data(piHandle, (_h), (_r), ((_v) & 0x00FFFFu))
+#  endif /* defined PIGPIO_LIB */
 #endif
 
 #include "qpc.h"
@@ -65,6 +114,8 @@ enum outputPins {
 enum inputPins {
     pinUsrButton = 2
 };
+
+static int piHandle = -1;
 #endif
 
 // static struct termios l_tsav; /* structure with saved terminal attributes */
@@ -76,30 +127,32 @@ int main (gint argc, gchar *argv[])
 
 
 /*..........................................................................*/
-void BSP_HW_init() {
+void BSP_HW_init()
+{
+#if defined RASPI
+    // uint16_t io;
 
+    piHandle = GPIO_INIT();
+	Q_REQUIRE(piHandle >= 0);
+	Q_REQUIRE(GPIO_SETMODE(pinUsrButton,  PI_INPUT) == 0);
+
+    Q_REQUIRE(GPIO_SETMODE(pinTLAred,     PI_OUTPUT) == 0);
+    Q_REQUIRE(GPIO_SETMODE(pinTLAyellow,  PI_OUTPUT) == 0);
+    Q_REQUIRE(GPIO_SETMODE(pinTLAgreen,   PI_OUTPUT) == 0);
+
+    Q_REQUIRE(GPIO_SETMODE(pinTLBred,     PI_OUTPUT) == 0);
+    Q_REQUIRE(GPIO_SETMODE(pinTLByellow,  PI_OUTPUT) == 0);
+    Q_REQUIRE(GPIO_SETMODE(pinTLBgreen,   PI_OUTPUT) == 0);
+
+    Q_REQUIRE(GPIO_SETMODE(pinTLPedred,   PI_OUTPUT) == 0);
+    Q_REQUIRE(GPIO_SETMODE(pinTLPedgreen, PI_OUTPUT) == 0);
+#endif
 }
 /*..........................................................................*/
 void BSP_init(gint argc, gchar *argv[])
 {
-    Q_ALLEGE(QS_INIT(argc > 1 ? argv[1] : (gpointer)0));
-#if defined RASPI
-    // uint16_t io;
+    Q_REQUIRE(QS_INIT(argc > 1 ? argv[1] : (gpointer)0));
 
-	Q_ALLEGE(gpioInitialise() >= 0);
-	Q_ALLEGE(gpioSetMode(pinUsrButton,  PI_INPUT) == 0);
-
-    Q_ALLEGE(gpioSetMode(pinTLAred,     PI_OUTPUT) == 0);
-    Q_ALLEGE(gpioSetMode(pinTLAyellow,  PI_OUTPUT) == 0);
-    Q_ALLEGE(gpioSetMode(pinTLAgreen,   PI_OUTPUT) == 0);
-
-    Q_ALLEGE(gpioSetMode(pinTLBred,     PI_OUTPUT) == 0);
-    Q_ALLEGE(gpioSetMode(pinTLByellow,  PI_OUTPUT) == 0);
-    Q_ALLEGE(gpioSetMode(pinTLBgreen,   PI_OUTPUT) == 0);
-
-    Q_ALLEGE(gpioSetMode(pinTLPedred,   PI_OUTPUT) == 0);
-    Q_ALLEGE(gpioSetMode(pinTLPedgreen, PI_OUTPUT) == 0);
-#endif
     QS_OBJ_DICTIONARY(&l_SysTick_Handler); /* must be called *after* QF_init() */
     QS_OBJ_DICTIONARY(&l_Button_Handler); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
@@ -109,7 +162,7 @@ void BSP_terminate(gint16 result) {
     (void)result;
     QF_stop(); /* stop the main QF application and the ticker thread */
 #if defined RASPI
-    gpioTerminate();
+    GPIO_TERMINATE();
 #endif
 }
 /*..........................................................................*/
@@ -120,18 +173,18 @@ void BSP_setlight(eTLidentity_t id, uint8_t light)
     switch(id)
     {
         case TrafficLightA:
-            gpioWrite(pinTLAred,     light & RED    ? 1 : 0);
-            gpioWrite(pinTLAyellow,  light & YELLOW ? 1 : 0);
-            gpioWrite(pinTLAgreen,   light & GREEN  ? 1 : 0);
+            GPIO_WRITE(pinTLAred,     light & RED    ? 1 : 0);
+            GPIO_WRITE(pinTLAyellow,  light & YELLOW ? 1 : 0);
+            GPIO_WRITE(pinTLAgreen,   light & GREEN  ? 1 : 0);
             break;
         case TrafficLightB:
-            gpioWrite(pinTLBred,     light & RED    ? 1 : 0);
-            gpioWrite(pinTLByellow,  light & YELLOW ? 1 : 0);
-            gpioWrite(pinTLBgreen,   light & GREEN  ? 1 : 0);
+            GPIO_WRITE(pinTLBred,     light & RED    ? 1 : 0);
+            GPIO_WRITE(pinTLByellow,  light & YELLOW ? 1 : 0);
+            GPIO_WRITE(pinTLBgreen,   light & GREEN  ? 1 : 0);
             break;
         case PedestrianLight:
-            gpioWrite(pinTLPedred,   light & RED    ? 1 : 0);
-            gpioWrite(pinTLPedgreen, light & GREEN  ? 1 : 0);
+            GPIO_WRITE(pinTLPedred,   light & RED    ? 1 : 0);
+            GPIO_WRITE(pinTLPedgreen, light & GREEN  ? 1 : 0);
            break;
         default:
             break;
@@ -149,7 +202,7 @@ void BSP_setPedLed(guint16 status)
 {
     guiSetPedLed(status);
 #if defined RASPI
-    gpioWrite(pinTLblink, status ? 1 : 0);
+    GPIO_WRITE(pinTLblink, status ? 1 : 0);
 #endif
 }
 /*..........................................................................*/
@@ -182,7 +235,30 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
+    static uint8_t button = 0;
+
     QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
+
+#if defined RASPI
+    if(GPIO_READ(pinUsrButton))
+    {
+        if(button < 5)
+        {
+            button++;
+            if(button == 5)
+            {
+                BSP_publishBtnEvt();
+            }
+        }
+    }
+    else
+    {
+        if(button > 0)
+        {
+            button--;
+        }
+    }
+#endif
 }
 /*..........................................................................*/
 void Q_onAssert(gchar const * const module, gint loc) {

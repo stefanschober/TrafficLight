@@ -1,0 +1,86 @@
+# miscellaneous functions for various use cases
+# define function to output list of modules
+set (MODLIST ${CMAKE_BINARY_DIR}/modlist.txt)
+file(WRITE ${MODLIST} "Module list for Project ${PROJECT_NAME} (${PORT})\n")
+file(APPEND ${MODLIST} "Using C Compiler ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VERSION} (${CMAKE_C_COMPILER_ID})\n")
+function(listModules PATH)
+  file(APPEND ${MODLIST} ${PATH} ":\n")
+  foreach(_mod IN LISTS ARGN)
+    file(APPEND ${MODLIST} "    - ${_mod}\n")
+  endforeach()
+endfunction()
+function(listIncludes PATH)
+#  file(APPEND ${MODLIST} "Includes - ${PATH}:\n")
+#  foreach(_inc IN LISTS ARGN)
+#    file(APPEND ${MODLIST} "    - ${_inc}\n")
+#  endforeach()
+endfunction()
+
+# functions to work with .par files
+function(findParFile)
+    set(options)
+    set(oneValueArgs RESULT FILENAME)
+    set(multiValueArgs)
+    cmake_parse_arguments(FPF "${options}" "${oneValueArgs}"  "${multiValueArgs}" ${ARGN})
+    if (NOT (FPF_RESULT AND FPF_FILENAME))
+        message(FATAL_ERROR "usage: findParFile(RESULT <resultVar> FILENAME <parfile name>)")
+    endif()
+
+    set(_fnx ${FPF_FILENAME})
+    string(TOUPPER ${_fnx} _fnu)
+    string(TOLOWER ${_fnx} _fnl)
+
+    find_file(${FPF_RESULT}
+        NAMES
+            ${_fnx} ${_fnx}.bin
+            ${_fnu} ${_fnu}.BIN
+            ${_fnl} ${_fnl}.bin
+        PATHS
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_BINARY_DIR}
+            ${CMAKE_PROJECT_SOURCE_DIR}
+        NO_DEFAULT_PATH
+        NO_PACKAGE_ROOT_PATH
+        NO_CMAKE_PATH
+        NO_CMAKE_ENVIRONMENT_PATH
+        NO_SYSTEM_ENVIRONMENT_PATH
+        NO_CMAKE_SYSTEM_PATH
+        NO_CMAKE_FIND_ROOT_PATH
+    )
+endfunction()
+
+function(copyParFile)
+    set(options)
+    set(oneValueArgs RESULT IN TEMPLATE)
+    set(multiValueArgs)
+
+    cmake_parse_arguments(CPF "${options}" "${oneValueArgs}"  "${multiValueArgs}" ${ARGN})
+    if (NOT (CPF_RESULT AND CPF_IN AND CPF_TEMPLATE))
+        message(FATAL_ERROR "usage: copyParFile(RESULT <resultVar> IN <inFile> TEMPLATE <fileName template>)")
+    endif()
+
+    set(_out ${CMAKE_CURRENT_BINARY_DIR}/${CPF_TEMPLATE}.bin)
+    if(NOT EXISTS ${_out})
+        file(GENERATE OUTPUT ${_out} INPUT ${CPF_IN})
+    endif()
+    
+    set(${CPF_RESULT} ${_out} PARENT_SCOPE)
+endfunction()
+
+function(getTargetName _name _tgt)
+    get_target_property(_n ${_tgt} OUTPUT_NAME)
+    get_target_property(_p ${_tgt} PREFIX)
+    
+    if(NOT _p)
+        set(_p "")
+    endif()
+    if(NOT _n)
+        get_target_property(_n ${_tgt} NAME)
+        if(NOT _n)
+            set(_n ${CMAKE_PROJECT_NAME})
+        endif()
+    endif()
+    
+    set(${_name} "${_p}${_n}" PARENT_SCOPE)
+endfunction()
+

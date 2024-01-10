@@ -1,0 +1,173 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "displayName": "Default Config",
+      "description": "Default build using Ninja Multi-Config generator",
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/Build/default",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QV"
+        },
+        "CMAKE_CONFIGURATION_TYPES": {
+          "type": "STRING",
+          "value": "Debug;Release;Spy"
+        },
+        "CONFIG_GUI": "ON"
+      }
+    },
+    {
+      "name": "local",
+      "inherits": "default",
+      "displayName": "Default",
+      "description": "Build for local system",
+      "binaryDir": "${sourceDir}/Build/local"
+    },
+    {
+      "name": "pico-qv",
+      "inherits": "default",
+      "displayName": "Pico config",
+      "description": "Build for Raspberry Pi Pico",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Build/pico/qv",
+      "cacheVariables": {
+        "PORT": {
+          "type": "STRING",
+          "value": "arm-cm"
+        },
+        "CONFIG_GUI": "OFF",
+        "CONFIG_PICO": "ON"
+      }
+    },
+    {
+      "name": "pico-qk",
+      "inherits": "pico-qv",
+      "displayName": "Pico QK config",
+      "description": "Build for Raspberry Pi Pico with QK kernel",
+      "binaryDir": "${sourceDir}/Build/pico/qk",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    },
+    {
+      "name": "win32-qv",
+      "inherits": "default",
+      "displayName": "MinGW config",
+      "description": "Build for MinGW/Win32",
+      "binaryDir": "${sourceDir}/Build/win32/qv",
+      "toolchainFile": "${sourceDir}/toolchain/tc_mingwgcc.cmake"
+    },
+    {
+      "name": "win32-qk",
+      "inherits": "win32-qv",
+      "displayName": "MinGW/Win32 config with QK kernel",
+      "description": "Build for MinGW/Win32 with QK kernel",
+      "binaryDir": "${sourceDir}/Build/win32/qk",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    },
+    {
+      "name": "arm",
+      "hidden": true,
+      "inherits": "default",
+      "toolchainFile": "${sourceDir}/toolchain/tc_gnuarm.cmake",
+      "cacheVariables": {
+          "CONFIG_KERNEL": {
+            "type": "STRING",
+            "value": "QV"
+          },
+          "CONFIG_GUI": "OFF"
+      }
+    },
+    {
+      "name": "arm-qv",
+      "inherits": "arm",
+      "displayName": "Embedded config for Arm-CM",
+      "description": "Build for arm-cm",
+      "binaryDir": "${sourceDir}/Build/arm/qv"
+    },
+    {
+      "name": "arm-qk",
+      "inherits": "arm",
+      "description": "Build for arm-cm, kernel QK",
+      "binaryDir": "${sourceDir}/Build/arm/qk",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "configurePreset": "default",
+      "configuration": "Debug",
+      "jobs": 4
+    },
+    {
+      "name": "local",
+      "inherits": "default",
+      "configurePreset": "local"
+    },
+    {
+      "name": "win32-qv",
+      "inherits": "default",
+      "configurePreset": "win32-qv"
+    },
+    {
+      "name": "win32-qk",
+      "inherits": "default",
+      "configurePreset": "win32-qk"
+    },
+    {
+      "name": "armdft",
+      "hidden": true,
+      "configurePreset": "arm",
+      "configuration": "Debug",
+      "jobs": 4
+    },
+    {
+      "name": "arm-qv",
+      "inherits": "armdft",
+      "configurePreset": "arm-qv"
+    },
+    {
+      "name": "arm-qk",
+      "inherits": "armdft",
+      "configurePreset": "arm-qk"
+    },
+    {
+      "name": "pico-qv",
+      "configurePreset": "pico-qv"
+    },
+    {
+      "name": "pico-qk",
+      "configurePreset": "pico-qk"
+    }
+  ],
+  "vendor": {
+    "example.com/TrafficLight/V1.0": {
+      "author": "Stefan Schober",
+      "releaseDate": "2024-01-03"
+    }
+  }
+}

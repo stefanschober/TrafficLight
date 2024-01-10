@@ -23,6 +23,6 @@ target_link_options(${TGT}
 	    --xref						                                # list all cross references between input sections
 	    --symbols						                            # Output the local and global symbols
 	    --info=architecture,compression,sizes,stack,summarystack,totals,summarysizes,unused,veneers	# output size, stack and compression information
-	    --scatter=${SCATTER_FILE}		                            # the scatter file defines the memory assignment of the image
+	    --scatter=${CMAKE_BINARY_DIR}/${SCATTER_FILE}		                            # the scatter file defines the memory assignment of the image
 	    --strict_relocations
 )

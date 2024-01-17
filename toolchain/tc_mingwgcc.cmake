@@ -5,6 +5,9 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 # Target definition
 #---------------------------------------------------------------------------------------
 set(CMAKE_SYSTEM_NAME Windows)
+if(NOT CMAKE_SYSTEM_PROCESSOR)
+    set(CMAKE_SYSTEM_PROCESSOR AMD64)
+endif()
 
 #---------------------------------------------------------------------------------------
 # Set toolchain paths

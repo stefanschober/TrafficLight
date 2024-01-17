@@ -104,8 +104,3 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 
-add_compile_options(
-    $<IF:$<BOOL:${ARM_CPU}>,--cpu=${ARM_CPU},--cpu=cortex-m0>
-#    $<$<BOOL:${ARM_FPU}>:--fpu=${ARM_FPU}>
-#    $<$<BOOL:${FLOAT_ABI}>:-mfloat-abi=${FLOAT_ABI}>
-)

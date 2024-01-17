@@ -52,9 +52,6 @@ else()
 	message(FATAL_ERROR "Unknown target port (NOT [UNIX|WIN32|ARM])!")
 endif()
 
-# set global options/defines
-include(globalOptions)
-
 # add subdirectories with source/header files
 add_subdirectory(BSP)
 add_subdirectory(QM)
@@ -69,6 +66,9 @@ set(QPC_CFG_PORT ${PORT})
 qpc_sdk_init()
 
 target_link_libraries(${TGT} PRIVATE qpc)
+
+# set global options/defines
+include(globalOptions)
 
 setup_cppcheck(${TGT})
 

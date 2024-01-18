@@ -5,21 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Starten",
+            "name": "dpp Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Source/qpc/examples/posix-win32-gui_cmake/dpp/Build/dppGui/Debug/dpp.exe",
+            "program": "${workspaceFolder}/Source/qpc/examples/posix-win32-gui_cmake/dpp/Build/dppGui/Debug/dpp",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
-            "pipeTransport": {
-                "debuggerPath": "/mingw64/bin/gdb",
-                "pipeProgram": "C:/Users/SchoberS/MSYS2/usr/bin/bash.exe",
-                "pipeArgs": ["-c"],
-                "pipeCwd": ""
-            },
+            "MIMode": "gdb",
             "runToMain": true,
             // Work around for stopping at main on restart
             "postRestartCommands": [
@@ -28,12 +23,12 @@
             ],
             "setupCommands": [
                 {
-                    "description": "Automatische Strukturierung und Einrückung für \"gdb\" aktivieren",
+                    "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 },
                 {
-                    "description": "Disassemblierungsvariante auf Intel festlegen",
+                    "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
                     "ignoreFailures": true
                 }

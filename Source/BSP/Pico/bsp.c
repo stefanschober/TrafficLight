@@ -72,15 +72,6 @@ static void readUserButtons(void);
 #ifdef Q_SPY
     QSTimeCtr QS_tickTime_;
     QSTimeCtr QS_tickPeriod_;
-
-    /* event-source identifiers used for tracing */
-    static uint8_t const l_SysTick_Handler = 1U;
-    static uint8_t const l_Button_Handler  = 2U;
-
-    enum AppRecords { /* application-specific trace records */
-        PHILO_STAT = QS_USER
-    };
-
 #endif
 
 enum {
@@ -169,6 +160,14 @@ static void readUserButtons(void)
         buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
         QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
     }
+}
+
+/* main()        ===========================================================*/
+int main(void)
+{
+   BSP_HW_init();
+
+   return tlMain(0, NULL); 
 }
 
 /* BSP functions ===========================================================*/
@@ -301,16 +300,15 @@ void QV_onIdle(void) { /* called with interrupts enabled */
     QF_INT_ENABLE();
 
 #ifdef Q_SPY
-    if ((USART2->ISR & 0x0080U) != 0) {  /* is TXE empty? */
+    {
         uint16_t b;
 
         QF_INT_DISABLE();
         b = QS_getByte();
         QF_INT_ENABLE();
 
-        if (b != QS_EOD) {  /* not End-Of-Data? */
-            USART2->TDR  = (b & 0xFFU);  /* put into the DR register */
-        }
+        putchar_raw(b & 0x00FFu);
+        stdio_flush();
     }
 #elif defined NDEBUG
     /* Put the CPU and peripherals to the low-power mode.
@@ -354,41 +352,13 @@ void Q_onAssert(char const *module, int loc) {
 /* QS callbacks ============================================================*/
 #ifdef Q_SPY
 /*..........................................................................*/
-#define __DIV(__PCLK, __BAUD)       (((__PCLK / 4) *25)/(__BAUD))
-#define __DIVMANT(__PCLK, __BAUD)   (__DIV(__PCLK, __BAUD)/100)
-#define __DIVFRAQ(__PCLK, __BAUD)   \
-    (((__DIV(__PCLK, __BAUD) - (__DIVMANT(__PCLK, __BAUD) * 100)) \
-        * 16 + 50) / 100)
-#define __USART_BRR(__PCLK, __BAUD) \
-    ((__DIVMANT(__PCLK, __BAUD) << 4)|(__DIVFRAQ(__PCLK, __BAUD) & 0x0F))
-
 uint8_t QS_onStartup(void const *arg) {
     static uint8_t qsBuf[2*1024]; /* buffer for Quantum Spy */
 
     (void)arg; /* avoid the "unused parameter" compiler warning */
     QS_initBuf(qsBuf, sizeof(qsBuf));
 
-#if 0 // USART2 initialized in HAL_init()
-    /* enable peripheral clock for USART2 */
-    RCC->IOPENR  |= ( 1ul <<  0);   /* Enable GPIOA clock   */
-    RCC->APB1ENR |= ( 1ul << 17);   /* Enable USART#2 clock */
-
-    /* Configure PA3 to USART2_RX, PA2 to USART2_TX */
-    GPIOA->AFR[0] &= ~((15ul << 4* 3) | (15ul << 4* 2) );
-    GPIOA->AFR[0] |=  (( 4ul << 4* 3) | ( 4ul << 4* 2) );
-    GPIOA->MODER  &= ~(( 3ul << 2* 3) | ( 3ul << 2* 2) );
-    GPIOA->MODER  |=  (( 2ul << 2* 3) | ( 2ul << 2* 2) );
-
-    USART2->BRR  = __USART_BRR(SystemCoreClock, 115200ul);  /* baud rate */
-    USART2->CR3  = 0x0000;         /* no flow control */
-    USART2->CR2  = 0x0000;         /* 1 stop bit      */
-    USART2->CR1  = ((1ul <<  2) |  /* enable RX       */
-                    (1ul <<  3) |  /* enable TX       */
-                    (0ul << 12) |  /* 8 data bits     */
-                    (0ul << 28) |  /* 8 data bits     */
-                    (1ul <<  0) ); /* enable USART    */
-#endif
-
+    stdio_init_all(); // initialize the stdio system on Raspberry Pi pico
     QS_tickPeriod_ = SystemCoreClock / BSP_TICKS_PER_SEC;
     QS_tickTime_ = QS_tickPeriod_; /* to start the timestamp at zero */
 
@@ -426,15 +396,13 @@ void QS_onFlush(void) {
     QF_INT_DISABLE();
     while ((b = QS_getByte()) != QS_EOD) {    /* while not End-Of-Data... */
         QF_INT_ENABLE();
-        while ((USART2->ISR & 0x0080U) == 0U) { /* while TXE not empty */
-        }
-        USART2->TDR  = (b & 0xFFU);  /* put into the DR register */
+        putchar_raw(b & 0x00FFu);
         QF_INT_DISABLE();
     }
+    stdio_flush();
     QF_INT_ENABLE();
 }
 #endif /* Q_SPY */
-/*--------------------------------------------------------------------------*/
 
 /*****************************************************************************
 * NOTE00:

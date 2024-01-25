@@ -487,6 +487,14 @@ void QSPY_onPrintLn(void) {
 
 #endif // Q_SPY
 
+/* main()        ===========================================================*/
+int main(int argc, char *argv[])
+{
+   BSP_HW_init();
+
+   return tlMain(argc, argv); 
+}
+
 /* BSP functions ===========================================================*/
 void BSP_HW_init(void) {
 

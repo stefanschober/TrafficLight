@@ -37,9 +37,6 @@
 #if defined(QWIN_GUI)
 #   undef WIN_FUDGE
 #   define WIN_FUDGE 10
-
-#   undef main
-#   define main main_gui
 #endif
 
 enum { WIN_FUDGE_FACTOR = WIN_FUDGE };
@@ -71,19 +68,8 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
-#if defined(QWIN_GUI) && defined(__WIN32__)
-static const char *argv[] = {
-    "trafficlight",
-    NULL
-};
-static const size_t argc = ((sizeof(argv) / sizeof(argv[0])) - 1);
-
-int main_gui(void)
-#else
-int main(int argc, char *argv[])
-#endif
+int tlMain(int argc, char *argv[])
 {
-    BSP_HW_init();
     QF_init();    /* initialize the framework and the underlying RT kernel */
     BSP_init(argc, argv); /* initialize the Board Support Package */
 

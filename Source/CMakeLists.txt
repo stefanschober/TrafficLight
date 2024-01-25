@@ -22,14 +22,6 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
     check_pie_supported()
 endif()
 
-# set binary output directories for targets/build configurations
-get_property(isMultiConfigGen GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-if(isMultiConfigGen)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
-endif()
-
 # the project target(s)
 add_executable(${TGT} "")
 set_property(TARGET ${TGT} PROPERTY POSITION_INDEPENDENT_CODE FALSE)

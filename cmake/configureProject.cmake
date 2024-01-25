@@ -7,6 +7,7 @@ option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF
 option(CONFIG_CPPCHECK_TGT "set to ON, to generate a separate CPPCHECK target (default: OFF)" OFF)
 option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
 option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
+option(CONFIG_GTK        "set to ON, if GTK+3 GUI shall be compiled in (default: OFF)" OFF)
 option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)
 option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
@@ -33,9 +34,14 @@ if(NOT CONFIG_KERNEL)
     set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
 endif()
 
+# set binary output directories for targets/build configurations
 get_property(isMultiConfiGenerator GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(isMultiConfiGenerator)
     unset(CMAKE_BUILD_TYPE)
+
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/$<CONFIG>)
 else()
     unset(CMAKE_CONFIGURATION_TYPES)
 endif()
@@ -47,24 +53,6 @@ if(NOT (KERNEL IN_LIST KERNELS))
     message(WARNING "Unknown QPC Kernel '${KERNEL}'. Falling back to default kernel (QV)")
     set(CONFIG_KERNEL QV CACHE STRING "set to the desired QPC kernel to use - QV, QK or QXK kernel (default: QV)")
     set(KERNEL qv)
-endif()
-
-# setup Raspberry Pi Pico SDK
-if(CONFIG_PICO)
-    # include must happen before project(...)
-    set(PICO_BOARD pico)
-    set(PICO_BARE_METAL FALSE)
-    set(PICO_PLATFORM rp2040)
-
-    include(pico_sdk_import)
-
-    if(NOT PICO_SDK_PATH)
-	unset(PICO_BOARD)
-    	unset(PICO_BARE_METALE)
-    	unset(PICO_PLATFORM)
-        set(CONFIG_PICO OFF)
-        message(FATAL "PICO_SDK_PATH not found!")
-    endif()
 endif()
 
 if(CONFIG_CPPCHECK)

@@ -26,6 +26,31 @@ include(configureProject)
 set(QPC_SDK_PATH ${CMAKE_SOURCE_DIR}/Source/qpc)
 include(qpc_sdk_import)
 
+# setup Raspberry Pi Pico SDK
+if(CONFIG_PICO)
+    # include must happen before project(...)
+    if(NOT PICO_SDK_PATH) # check for already installed Pico SDK
+        if(EXISTS ENV{HOME}/Projects/pico-sdk)
+            set(PICO_SDK_PATH "$ENV{HOME}/Projects/pico-sdk")
+        elseif(DEFINED ENV{PICO_SDK_PATH})
+            set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
+        endif()
+    endif()
+    set(PICO_BOARD pico)
+    set(PICO_BARE_METAL FALSE)
+    set(PICO_PLATFORM rp2040)
+
+    include(pico_sdk_import)
+
+    if(NOT PICO_SDK_PATH)
+	    unset(PICO_BOARD)
+    	unset(PICO_BARE_METAL)
+    	unset(PICO_PLATFORM)
+        set(CONFIG_PICO OFF)
+        message(FATAL "PICO_SDK_PATH not found!")
+    endif()
+endif()
+
 # default image/project name is trafficlight
 # Give a special name via -DIMAGE=<image>
 # the main project

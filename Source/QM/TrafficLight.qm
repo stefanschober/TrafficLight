@@ -711,6 +711,8 @@ $declare(AOs::AO_TLpedestrian)
 $declare(AOs::TLblinker_ctor)
 $declare(AOs::AO_TLblinker)
 
+int tlMain(int argc, char *argv[]);
+
 #endif /* trafficlight_h */</text>
   </file>
   <file name="TLtraffic.c">
@@ -772,9 +774,6 @@ $define(AOs::TLpedestrian)</text>
 #if defined(QWIN_GUI)
 #   undef WIN_FUDGE
 #   define WIN_FUDGE 10
-
-#   undef main
-#   define main main_gui
 #endif
 
 enum { WIN_FUDGE_FACTOR = WIN_FUDGE };
@@ -794,19 +793,8 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
-#if defined(QWIN_GUI) &amp;&amp; defined(__WIN32__)
-static const char *argv[] = {
-    &quot;trafficlight&quot;,
-    NULL
-};
-static const size_t argc = ((sizeof(argv) / sizeof(argv[0])) - 1);
-
-int main_gui(void)
-#else
-int main(int argc, char *argv[])
-#endif
+int tlMain(int argc, char *argv[])
 {
-    BSP_HW_init();
     QF_init();    /* initialize the framework and the underlying RT kernel */
     BSP_init(argc, argv); /* initialize the Board Support Package */
 
@@ -920,14 +908,12 @@ $define(AOs::TLblinker)</text>
 #endif
 
 #ifdef Q_SPY
-    enum {
-        TL_STAT = QS_USER,
+    // application-specific trace records
+    enum AppRecords {
+        TL_APP = QS_USER,
+        TL_STAT,
         PHILO_STAT,
         COMMAND_STAT
-    };
-    enum AppRecords
-    { /* application-specific trace records */
-        TL_APP = QS_USER
     };
 
      typedef struct std_sender_id {

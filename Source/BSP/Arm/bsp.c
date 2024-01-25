@@ -169,6 +169,14 @@ static void readUserButtons(void)
     }
 }
 
+/* main()        ===========================================================*/
+int main(void)
+{
+   BSP_HW_init();
+
+   return tlMain(0, NULL); 
+}
+
 /* BSP functions ===========================================================*/
 void BSP_HW_init(void) {
     /* NOTE: SystemInit() has been already called from the startup code

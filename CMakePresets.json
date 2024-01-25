@@ -7,7 +7,7 @@
   },
   "configurePresets": [
     {
-      "name": "default",
+      "name": "dft_",
       "hidden": true,
       "displayName": "Default Config",
       "description": "Default build using Ninja Multi-Config generator",
@@ -27,18 +27,28 @@
     },
     {
       "name": "local",
-      "inherits": "default",
+      "inherits": "dft_",
       "displayName": "Default",
       "description": "Build for local system",
       "binaryDir": "${sourceDir}/Build/local"
     },
     {
-      "name": "pico-qv",
-      "inherits": "default",
+      "name": "gtk",
+      "inherits": "dft_",
+      "displayName": "Build with GTK+3 GUI",
+      "description": "Build for local GTK+3 system",
+      "binaryDir": "${sourceDir}/Build/gtk",
+      "cacheVariables": {
+        "CONFIG_GTK": "ON"
+      }
+    },
+    {
+      "name": "pico",
+      "inherits": "dft_",
       "displayName": "Pico config",
       "description": "Build for Raspberry Pi Pico",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Build/pico/qv",
+      "binaryDir": "${sourceDir}/Build/pico",
       "cacheVariables": {
         "PORT": {
           "type": "STRING",
@@ -49,11 +59,11 @@
       }
     },
     {
-      "name": "pico-qk",
-      "inherits": "pico-qv",
+      "name": "picoQK",
+      "inherits": "pico",
       "displayName": "Pico QK config",
       "description": "Build for Raspberry Pi Pico with QK kernel",
-      "binaryDir": "${sourceDir}/Build/pico/qk",
+      "binaryDir": "${sourceDir}/Build/picoQK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -62,19 +72,19 @@
       }
     },
     {
-      "name": "win32-qv",
-      "inherits": "default",
+      "name": "win32",
+      "inherits": "dft_",
       "displayName": "MinGW config",
       "description": "Build for MinGW/Win32",
-      "binaryDir": "${sourceDir}/Build/win32/qv",
+      "binaryDir": "${sourceDir}/Build/win32",
       "toolchainFile": "${sourceDir}/toolchain/tc_mingwgcc.cmake"
     },
     {
-      "name": "win32-qk",
-      "inherits": "win32-qv",
+      "name": "win32QK",
+      "inherits": "win32",
       "displayName": "MinGW/Win32 config with QK kernel",
       "description": "Build for MinGW/Win32 with QK kernel",
-      "binaryDir": "${sourceDir}/Build/win32/qk",
+      "binaryDir": "${sourceDir}/Build/win32QK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -83,30 +93,36 @@
       }
     },
     {
-      "name": "arm",
+      "name": "win32GTK",
+      "inherits": "win32",
+      "displayName": "MinGW/Win32 config with QK kernel",
+      "description": "Build for MinGW/Win32 with QK kernel",
+      "binaryDir": "${sourceDir}/Build/win32GTK",
+      "cacheVariables": {
+        "CONFIG_GTK": "ON"
+      }
+    },
+    {
+      "name": "arm_",
       "hidden": true,
-      "inherits": "default",
+      "inherits": "dft_",
       "toolchainFile": "${sourceDir}/toolchain/tc_gnuarm.cmake",
       "cacheVariables": {
-          "CONFIG_KERNEL": {
-            "type": "STRING",
-            "value": "QV"
-          },
           "CONFIG_GUI": "OFF"
       }
     },
     {
-      "name": "arm-qv",
-      "inherits": "arm",
+      "name": "arm",
+      "inherits": "arm_",
       "displayName": "Embedded config for Arm-CM",
       "description": "Build for arm-cm",
-      "binaryDir": "${sourceDir}/Build/arm/qv"
+      "binaryDir": "${sourceDir}/Build/arm"
     },
     {
-      "name": "arm-qk",
+      "name": "armQK",
       "inherits": "arm",
       "description": "Build for arm-cm, kernel QK",
-      "binaryDir": "${sourceDir}/Build/arm/qk",
+      "binaryDir": "${sourceDir}/Build/armQK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -117,51 +133,59 @@
   ],
   "buildPresets": [
     {
-      "name": "default",
+      "name": "dft_",
       "hidden": true,
-      "configurePreset": "default",
       "configuration": "Debug",
       "jobs": 4
     },
     {
       "name": "local",
-      "inherits": "default",
+      "inherits": "dft_",
       "configurePreset": "local"
     },
     {
-      "name": "win32-qv",
-      "inherits": "default",
-      "configurePreset": "win32-qv"
+      "name": "gtk",
+      "inherits": "dft_",
+      "configurePreset": "gtk"
     },
     {
-      "name": "win32-qk",
-      "inherits": "default",
-      "configurePreset": "win32-qk"
+      "name": "win32",
+      "inherits": "dft_",
+      "configurePreset": "win32"
     },
     {
-      "name": "armdft",
+      "name": "win32QK",
+      "inherits": "dft_",
+      "configurePreset": "win32QK"
+    },
+    {
+      "name": "win32GTK",
+      "inherits": "dft_",
+      "configurePreset": "win32GTK"
+    },
+    {
+      "name": "armdft_",
       "hidden": true,
-      "configurePreset": "arm",
       "configuration": "Debug",
       "jobs": 4
     },
     {
-      "name": "arm-qv",
-      "inherits": "armdft",
-      "configurePreset": "arm-qv"
+      "name": "arm",
+      "inherits": "armdft_",
+      "configurePreset": "arm"
     },
     {
-      "name": "arm-qk",
-      "inherits": "armdft",
-      "configurePreset": "arm-qk"
+      "name": "armQK",
+      "inherits": "armdft_",
+      "configurePreset": "armQK"
     },
     {
-      "name": "pico-qv",
-      "configurePreset": "pico-qv"
+      "name": "pico",
+      "configurePreset": "pico"
     },
     {
-      "name": "pico-qk",
-      "configurePreset": "pico-qk"
+      "name": "picoQK",
+      "configurePreset": "picoQK"
     }
   ],
   "vendor": {

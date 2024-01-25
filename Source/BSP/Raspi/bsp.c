@@ -94,6 +94,11 @@
 
 Q_DEFINE_THIS_FILE
 
+// fix to enable Win32/GTK builds
+#if defined main
+#  undef main
+#endif
+
 // LOCAL functions ----------------------------------------------------------
 #if defined RASPI
 enum outputPins {
@@ -122,6 +127,8 @@ static int piHandle = -1;
 
 int main (gint argc, gchar *argv[])
 {
+    BSP_HW_init();
+    
     return startGui(argc, argv);
 }
 

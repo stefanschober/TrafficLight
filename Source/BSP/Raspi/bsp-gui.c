@@ -99,6 +99,7 @@ static void theApp (GtkApplication* app, gpointer user_data)
 	GtkWidget       *winTrafficLight;
     GtkWidget       *lblCounter;
     GTask           *tlThread;
+    GString         *winTitle = g_string_new("TrafficLight V1.0");
     //uint16_t        i, j;
     //gchar           digitId[10];
 
@@ -112,6 +113,9 @@ static void theApp (GtkApplication* app, gpointer user_data)
 
     // connect the widgets to the application
     winTrafficLight = GTK_WIDGET(gtk_builder_get_object(builder, "winTrafficLight"));
+    g_string_append_printf (winTitle, " GTK %u.%u", gtk_get_major_version(), gtk_get_minor_version());
+    gtk_window_set_title (GTK_WINDOW (winTrafficLight), (const gchar *)winTitle->str);
+
     lblCounter      = GTK_WIDGET(gtk_builder_get_object(builder, "lblCounter"));
 
     trafficLights[TrafficLightA][idxRED][0]     = GTK_WIDGET(gtk_builder_get_object(builder, "tlaRedOff"));
@@ -225,7 +229,7 @@ int startGui(int argc, char *argv[])
 	{
 		dirName = NULL;
 	}
-    app = gtk_application_new ("com.webasto.trafficlight", G_APPLICATION_FLAGS_NONE);
+    app = gtk_application_new ("com.webasto.trafficlight", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect (app, "activate", G_CALLBACK (theApp), &appArgs);
     status = g_application_run (G_APPLICATION (app), 1, argv);
     g_object_unref (app);
@@ -262,7 +266,7 @@ static void appThread(GTask *task, gpointer source_object, gpointer task_data, G
     (void)task_data;
     (void)cancellable;
 
-    result = (guint32)main_gui(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
+    result = (guint32)tlMain(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
 
     g_task_return_int(task, result);
 }

@@ -38,14 +38,12 @@
 #endif
 
 #ifdef Q_SPY
-    enum {
-        TL_STAT = QS_USER,
+    // application-specific trace records
+    enum AppRecords {
+        TL_APP = QS_USER,
+        TL_STAT,
         PHILO_STAT,
         COMMAND_STAT
-    };
-    enum AppRecords
-    { /* application-specific trace records */
-        TL_APP = QS_USER
     };
 
      typedef struct std_sender_id {

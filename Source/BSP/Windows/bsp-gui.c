@@ -90,7 +90,7 @@ static void WriteTime(DWORD t);
 /* thread function for running the application main_gui() */
 static DWORD WINAPI appThread(LPVOID par) {
     (void)par; /* unused parameter */
-    return (DWORD)main_gui(); /* run the QF application */
+    return (DWORD)tlMain(0, NULL); /* run the QF application */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -106,6 +106,9 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
     l_cmdLine = cmdLine; /* save the command line string */
 
     //AllocConsole();
+
+    // HW pre intialization
+    BSP_HW_init();
 
     /* create the main custom dialog window */
     hWnd = CreateCustDialog(hInst, IDD_APPLICATION, NULL,

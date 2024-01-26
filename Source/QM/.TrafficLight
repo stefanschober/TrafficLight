@@ -9,8 +9,9 @@
   <item name="backups">0</item>
  </group>
  <group name="windows">
-  <item id="./Source::TLmain.c">0,0,541,225,*</item>
-  <item id="./Source::trafficlight.h">0,0,541,225</item>
+  <item id="./Source::TLmain.c">0,0,541,225</item>
+  <item id="./Source::trafficlight.h">0,24,541,225</item>
+  <item id="../BSP::bsp.h">0,0,541,225,*</item>
  </group>
  <group name="search">
   <item name="options">2032128</item>

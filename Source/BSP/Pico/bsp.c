@@ -34,9 +34,11 @@
 #include "qpc.h"
 #include "trafficlight.h"
 #include "bsp.h"
-#include <stdio.h>
 #include "RP2040.h"
 #include "pico/stdlib.h"
+#include "hardware/exception.h"
+#include "hardware/irq.h"
+#include <stdio.h>
 
 
 /* add other drivers if necessary... */
@@ -52,13 +54,16 @@ Q_DEFINE_THIS_FILE
 #error "unknown ARM architecture found. Aborting!"
 #endif
 
-void SysTick_Handler(void);
+static void SysTick_Handler(void);
 static void readUserButtons(void);
+
+#ifdef Q_SPY
+static void Uart0_Handler(void);
+#endif
 
 /* Local-scope defines -----------------------------------------------------*/
 /* LED pins available on the board (just one user LED LD2--Green on PA.5) */
 #define LED_LD2  PICO_DEFAULT_LED_PIN
-#define PIN_BUTTON_Pin PIN_LAST_GPIO
 
 /* Button pins available on the board (just one user Button B1 on PC.13) */
 #define READ_UserBtn()    (!gpio_get(PIN_BUTTON_Pin))
@@ -74,23 +79,51 @@ static void readUserButtons(void);
     QSTimeCtr QS_tickPeriod_;
 #endif
 
+#if !defined TRUE
+#define TRUE  (1u)
+#endif
+
+#if !defined FALSE
+#define FALSE (!TRUE)
+#endif
+
 enum {
-    PIN_A_RED_Pin = PICO_FIRST_PORT,
-    PIN_A_YLW_Pin,
-    PIN_A_GRN_Pin,
+    PIN_A_RED_Pin = PICO_FIRST_PORT, // 2
+    PIN_A_YLW_Pin,  //  3
+    PIN_A_GRN_Pin,  //  4
     
-    PIN_B_RED_Pin,
-    PIN_B_YLW_Pin,
-    PIN_B_GRN_Pin,
+    PIN_B_RED_Pin,  //  5
+    PIN_B_YLW_Pin,  //  6
+    PIN_B_GRN_Pin,  //  7
     
-    PIN_P_RED_Pin,
-    PIN_P_GRN_Pin,
+    PIN_P_RED_Pin, //  8
+    PIN_P_GRN_Pin, //  9
     
-    PIN_LAST_GPIO
+    PIN_BUTTON_Pin, // 10
+
+    PIN_RESERVED_1, // 11
+
+    PIN_UART0_TX,   // 12
+    PIN_UART0_RX,   // 13
+
+    PIN_LAST_GPIO   // 14
 };
 
 /* ISRs used in the application ==========================================*/
-void SysTick_Handler(void) {   /* system clock tick ISR */
+#ifdef Q_SPY
+static void Uart0_Handler(void)
+{
+    // is RX register NOT empty?
+    while (uart_is_readable(uart0)) {
+        uint32_t b = uart_getc(uart0);
+        QS_RX_PUT(b);
+    }
+
+    QV_ARM_ERRATUM_838869();
+}
+#endif
+
+static void SysTick_Handler(void) {   /* system clock tick ISR */
 #ifdef KERNEL_QK
     QK_ISR_ENTRY();   /* inform QK about entering an ISR */
 #endif
@@ -171,8 +204,11 @@ int main(void)
 }
 
 /* BSP functions ===========================================================*/
-void BSP_HW_init(void) {
-    stdio_init_all();
+void BSP_HW_init(void)
+{
+    // initialize the Raspberry Pi Pico
+    set_sys_clock_48mhz();
+
 }
 
 /*..........................................................................*/
@@ -182,10 +218,11 @@ void BSP_init(int argc, char *argv[]) {
 
     SystemCoreClockUpdate();
 
-    for (uint8_t gpio = PICO_FIRST_PORT; gpio < PIN_LAST_GPIO; gpio++)
+    for (uint8_t gpio = PICO_FIRST_PORT; gpio < PIN_BUTTON_Pin; gpio++)
     {
         gpio_init(gpio);
         gpio_set_dir(gpio, GPIO_OUT);
+        gpio_set_drive_strength(gpio, GPIO_DRIVE_STRENGTH_8MA);
     }
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
@@ -279,8 +316,10 @@ void QF_onStartup(void) {
     /* ... */
 
     /* enable IRQs... */
+    exception_set_exclusive_handler(SYSTICK_EXCEPTION, SysTick_Handler);
+
 #ifdef Q_SPY
-//    NVIC_EnableIRQ(USART3_IRQn); /* UART interrupt used for QS-RX */
+    irq_set_enabled(UART0_IRQ, true);
 #endif
    gpio_put(PICO_DEFAULT_LED_PIN, 1);
 }
@@ -307,8 +346,7 @@ void QV_onIdle(void) { /* called with interrupts enabled */
         b = QS_getByte();
         QF_INT_ENABLE();
 
-        putchar_raw(b & 0x00FFu);
-        stdio_flush();
+        uart_putc_raw(uart0, (b & 0x00FFu));
     }
 #elif defined NDEBUG
     /* Put the CPU and peripherals to the low-power mode.
@@ -358,7 +396,17 @@ uint8_t QS_onStartup(void const *arg) {
     (void)arg; /* avoid the "unused parameter" compiler warning */
     QS_initBuf(qsBuf, sizeof(qsBuf));
 
-    stdio_init_all(); // initialize the stdio system on Raspberry Pi pico
+    // UART
+    uart_init(uart0, 115200);
+    uart_set_translate_crlf(uart0, FALSE);
+    uart_set_hw_flow(uart0, FALSE, FALSE);
+    uart_set_format(uart0, 8, 1, UART_PARITY_NONE );
+    uart_set_fifo_enabled(uart0, TRUE);
+    gpio_set_function(PIN_UART0_TX, GPIO_FUNC_UART);
+    gpio_set_function(PIN_UART0_RX, GPIO_FUNC_UART);
+    irq_set_exclusive_handler(UART0_IRQ, Uart0_Handler);
+    uart_set_irq_enables(uart0, TRUE, FALSE);
+
     QS_tickPeriod_ = SystemCoreClock / BSP_TICKS_PER_SEC;
     QS_tickTime_ = QS_tickPeriod_; /* to start the timestamp at zero */
 
@@ -396,10 +444,9 @@ void QS_onFlush(void) {
     QF_INT_DISABLE();
     while ((b = QS_getByte()) != QS_EOD) {    /* while not End-Of-Data... */
         QF_INT_ENABLE();
-        putchar_raw(b & 0x00FFu);
+        uart_putc_raw(uart0, (b & 0x00FFu));
         QF_INT_DISABLE();
     }
-    stdio_flush();
     QF_INT_ENABLE();
 }
 #endif /* Q_SPY */

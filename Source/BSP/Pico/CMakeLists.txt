@@ -8,6 +8,11 @@ target_compile_definitions(${TGT}
         $<$<BOOL:${CONFIG_PICO_CMSIS}>:PICO_CMSIS_RENAME_EXCEPTIONS=1>
 #        $<$<BOOL:${CONFIG_PICO_CMSIS}>:PICO_NO_RAM_VECTOR_TABLE=1>
 )
-target_link_libraries(${TGT} PUBLIC pico_stdlib cmsis_core)
-
-
+target_link_libraries(${TGT}
+    PUBLIC
+        pico_stdlib
+        cmsis_core
+        hardware_exception
+        hardware_irq
+        $<$<CONFIG:Spy>:hardware_uart>
+)

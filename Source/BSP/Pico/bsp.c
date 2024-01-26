@@ -54,11 +54,11 @@ Q_DEFINE_THIS_FILE
 #error "unknown ARM architecture found. Aborting!"
 #endif
 
-static void SysTick_Handler(void);
+void SysTick_Handler(void);
 static void readUserButtons(void);
 
 #ifdef Q_SPY
-static void Uart0_Handler(void);
+void UART0_IRQ_Handler(void);
 #endif
 
 /* Local-scope defines -----------------------------------------------------*/
@@ -111,7 +111,7 @@ enum {
 
 /* ISRs used in the application ==========================================*/
 #ifdef Q_SPY
-static void Uart0_Handler(void)
+void UART0_IRQ_Handler(void)
 {
     // is RX register NOT empty?
     while (uart_is_readable(uart0)) {
@@ -123,7 +123,7 @@ static void Uart0_Handler(void)
 }
 #endif
 
-static void SysTick_Handler(void) {   /* system clock tick ISR */
+void SysTick_Handler(void) {   /* system clock tick ISR */
 #ifdef KERNEL_QK
     QK_ISR_ENTRY();   /* inform QK about entering an ISR */
 #endif
@@ -316,8 +316,6 @@ void QF_onStartup(void) {
     /* ... */
 
     /* enable IRQs... */
-    exception_set_exclusive_handler(SYSTICK_EXCEPTION, SysTick_Handler);
-
 #ifdef Q_SPY
     irq_set_enabled(UART0_IRQ, true);
 #endif
@@ -404,7 +402,6 @@ uint8_t QS_onStartup(void const *arg) {
     uart_set_fifo_enabled(uart0, TRUE);
     gpio_set_function(PIN_UART0_TX, GPIO_FUNC_UART);
     gpio_set_function(PIN_UART0_RX, GPIO_FUNC_UART);
-    irq_set_exclusive_handler(UART0_IRQ, Uart0_Handler);
     uart_set_irq_enables(uart0, TRUE, FALSE);
 
     QS_tickPeriod_ = SystemCoreClock / BSP_TICKS_PER_SEC;

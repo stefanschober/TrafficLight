@@ -8,6 +8,7 @@ target_compile_definitions(${TGT}
         $<$<BOOL:${CONFIG_PICO_CMSIS}>:PICO_CMSIS_RENAME_EXCEPTIONS=1>
 #        $<$<BOOL:${CONFIG_PICO_CMSIS}>:PICO_NO_RAM_VECTOR_TABLE=1>
 )
+
 target_link_libraries(${TGT}
     PUBLIC
         pico_stdlib
@@ -16,3 +17,5 @@ target_link_libraries(${TGT}
         hardware_irq
         $<$<CONFIG:Spy>:hardware_uart>
 )
+
+# target_link_options( ${TGT} PRIVATE -v)

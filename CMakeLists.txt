@@ -1,4 +1,4 @@
-# USC2 QM project root CMakeLists.txt
+# TrafficLight QM project root CMakeLists.txt
 
 # use a recent CMake version
 cmake_minimum_required(VERSION 3.23 FATAL_ERROR)
@@ -20,17 +20,20 @@ else()
     unset(_bindir)
 endif()
 
+# update the module search path
+if(MSYS OR WINDOWS OR WIN32)
+    string(REPLACE "\\" "/" HOME_PATH "$ENV{HOMEDRIVE}$ENV{HOMEPATH}")
+else()
+    set(HOME_PATH $ENV{HOME})
+endif()
 list(PREPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Source/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_SOURCE_DIR} ${HOME_PATH}/cmake)
 
-include(configureProject)
-set(QPC_SDK_PATH ${CMAKE_SOURCE_DIR}/Source/qpc)
-include(qpc_sdk_import)
 
 # setup Raspberry Pi Pico SDK
 if(CONFIG_PICO)
     # include must happen before project(...)
     if(NOT PICO_SDK_PATH) # check for already installed Pico SDK
-        if(EXISTS ENV{HOME}/Projects/pico-sdk)
+        if(EXISTS $ENV{HOME}/Projects/pico-sdk)
             set(PICO_SDK_PATH "$ENV{HOME}/Projects/pico-sdk")
         elseif(DEFINED ENV{PICO_SDK_PATH})
             set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
@@ -51,6 +54,11 @@ if(CONFIG_PICO)
     endif()
 endif()
 
+# include general project config & import qpc
+include(configureProject)
+set(QPC_SDK_PATH ${CMAKE_SOURCE_DIR}/Source/qpc)
+include(qpc_sdk_import)
+
 # default image/project name is trafficlight
 # Give a special name via -DIMAGE=<image>
 # the main project
@@ -60,4 +68,3 @@ project(${PROJECT_NAME}
     LANGUAGES C CXX ASM)
 
 add_subdirectory(Source)
-

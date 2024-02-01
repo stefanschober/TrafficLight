@@ -38,8 +38,7 @@
 #include "pico/stdlib.h"
 #include "hardware/exception.h"
 #include "hardware/irq.h"
-#include <stdio.h>
-
+#include "hardware/uart.h"
 
 /* add other drivers if necessary... */
 
@@ -79,14 +78,6 @@ void UART0_IRQ_Handler(void);
     QSTimeCtr QS_tickPeriod_;
 #endif
 
-#if !defined TRUE
-#define TRUE  (1u)
-#endif
-
-#if !defined FALSE
-#define FALSE (!TRUE)
-#endif
-
 enum {
     PIN_A_RED_Pin = PICO_FIRST_PORT, // 2
     PIN_A_YLW_Pin,  //  3
@@ -101,12 +92,31 @@ enum {
     
     PIN_BUTTON_Pin, // 10
 
-    PIN_RESERVED_1, // 11
+    PIN_EMERGENCY_Pin, // 11
 
     PIN_UART0_TX,   // 12
     PIN_UART0_RX,   // 13
 
     PIN_LAST_GPIO   // 14
+};
+ 
+static const uint8_t outPins[] = {
+    PIN_A_RED_Pin, // 2
+    PIN_A_YLW_Pin, //  3
+    PIN_A_GRN_Pin, //  4
+    
+    PIN_B_RED_Pin, //  5
+    PIN_B_YLW_Pin, //  6
+    PIN_B_GRN_Pin, //  7
+    
+    PIN_P_RED_Pin, //  8
+    PIN_P_GRN_Pin, //  9
+
+};
+
+static const uint8_t inPins[] ={
+    PIN_BUTTON_Pin, // 10
+    PIN_EMERGENCY_Pin // 10
 };
 
 /* ISRs used in the application ==========================================*/
@@ -179,19 +189,21 @@ static void readUserButtons(void)
     debouncedButtons |= currentAND;
     debouncedButtons &= currentOR;
     chgButtons ^= debouncedButtons;
-    if ( (debouncedButtons & chgButtons & 0x01) || (0 == time2Min) )
+    if ( (debouncedButtons & chgButtons & 0x01u) || (0 == time2Min) )
     {
-    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
+    	static const QEvt buttonEvt =  QEVT_INITIALIZER(BUTTON_SIG);
 
         QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
     	time2Min = 120ul * BSP_TICKS_PER_SEC;
     }
-    else if (debouncedButtons & chgButtons & 0x02)
+    else if (debouncedButtons & chgButtons & 0x02u)
     {
-    	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, QEVT_MARKER };
-
-        buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
-        QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
+    	static const QEvt emergencyEvt = QEVT_INITIALIZER(EMERGENCY_SIG);
+    	static const QEvt releaseEvt = QEVT_INITIALIZER(EM_RELEASE_SIG);
+        static QEvt *e;
+        
+        e = (debouncedButtons & 0x02u) ? &emergencyEvt : &releaseEvt;
+        QF_PUBLISH(e, &l_Button_Handler); /* publish to all subscribers */
     }
 }
 
@@ -218,8 +230,9 @@ void BSP_init(int argc, char *argv[]) {
 
     SystemCoreClockUpdate();
 
-    for (uint8_t gpio = PICO_FIRST_PORT; gpio < PIN_BUTTON_Pin; gpio++)
+    for (uint8_t i = 0; i < sizeof(outPins) / sizeof(outPins[0]); i++)
     {
+        uint8_t gpio = outPins[i];
         gpio_init(gpio);
         gpio_set_dir(gpio, GPIO_OUT);
         gpio_set_drive_strength(gpio, GPIO_DRIVE_STRENGTH_8MA);
@@ -227,12 +240,16 @@ void BSP_init(int argc, char *argv[]) {
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
-    gpio_init(PIN_BUTTON_Pin);
-    gpio_set_dir(PIN_BUTTON_Pin, GPIO_IN);
     // We are using the button to pull down to 0v when pressed, so ensure that when
     // unpressed, it uses internal pull ups. Otherwise when unpressed, the input will
     // be floating.
-    gpio_pull_up(PIN_BUTTON_Pin);
+    for (uint8_t i = 0; i < sizeof(inPins) / sizeof(inPins[0]); i++)
+    {
+        uint8_t gpio = inPins[i];
+        gpio_init(gpio);
+        gpio_set_dir(gpio, GPIO_IN);
+        gpio_pull_up(gpio);
+    }
 
    /* initialize the QS software tracing... */
     if (QS_INIT((void *)0) == 0U) {
@@ -396,15 +413,11 @@ uint8_t QS_onStartup(void const *arg) {
 
     // UART
     uart_init(uart0, 115200);
-    uart_set_translate_crlf(uart0, FALSE);
-    uart_set_hw_flow(uart0, FALSE, FALSE);
-    uart_set_format(uart0, 8, 1, UART_PARITY_NONE );
-    uart_set_fifo_enabled(uart0, TRUE);
+    uart_set_translate_crlf(uart0, false);
+    uart_set_irq_enables(uart0, true, false);
     gpio_set_function(PIN_UART0_TX, GPIO_FUNC_UART);
     gpio_set_function(PIN_UART0_RX, GPIO_FUNC_UART);
-    uart_set_irq_enables(uart0, TRUE, FALSE);
 
-    QS_tickPeriod_ = SystemCoreClock / BSP_TICKS_PER_SEC;
     QS_tickTime_ = QS_tickPeriod_; /* to start the timestamp at zero */
 
     /* setup the QS filters... */

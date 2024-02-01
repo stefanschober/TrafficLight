@@ -38,63 +38,119 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>      /* for memcpy() and memset() */
-#include <sys/select.h>
-#include <termios.h>
 #include <unistd.h>
+
+#if defined(__WIN32__)
+#   include <windows.h>
+#else
+#   include <sys/select.h>
+#   include <termios.h>
+#endif
 
 Q_DEFINE_THIS_FILE
 
 /* Local objects -----------------------------------------------------------*/
+#if defined(__WIN32__)
+#define close(x)    closesocket(x)
+static DWORD ConsoleMode = 0;
+static HANDLE hStdin;
+#else
 static struct termios l_tsav; /* structure with saved terminal attributes */
 // static uint8_t keyPressed = 0;
+#endif
 
-/* QF callbacks ============================================================*/
-void QF_onStartup(void) {
+static void setupConsole(void)
+{
+#if defined(__WIN32__)
+    DWORD mode = 0;
+    hStdin = GetStdHandle(STD_INPUT_HANDLE);
+
+    GetConsoleMode(hStdin, &ConsoleMode);
+    mode = ConsoleMode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
+    SetConsoleMode(hStdin, mode);
+#else
     struct termios tio;   /* modified terminal attributes */
 
     tcgetattr(0, &l_tsav); /* save the current terminal attributes */
     tcgetattr(0, &tio);    /* obtain the current terminal attributes */
     tio.c_lflag &= ~(ICANON | ECHO); /* disable the canonical mode & echo */
     tcsetattr(0, TCSANOW, &tio);     /* set the new attributes */
+#endif
+}
 
+static void shutdownConsole(void)
+{
+#ifdef __WIN32__
+    SetConsoleMode(hStdin, ConsoleMode);
+#else
+    tcsetattr(0, TCSANOW, &l_tsav);/* restore the saved terminal attributes */
+#endif
+}
+/* QF callbacks ============================================================*/
+void QF_onStartup(void) {
+    setupConsole();
     QF_setTickRate(BSP_TICKS_PER_SEC, 30); /* set the desired tick rate */
 }
 /*..........................................................................*/
 void QF_onCleanup(void) {
     printf("\nBye! Bye!\n");
-    tcsetattr(0, TCSANOW, &l_tsav);/* restore the saved terminal attributes */
-    QS_EXIT(); /* perfomr the QS cleanup */
+    shutdownConsole();
+    QS_EXIT(); /* perform the QS cleanup */
 }
 /*..........................................................................*/
-void QF_onClockTick(void) {
-    static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
+static int readConsoleChar(void)
+{
+    char ch = 0;
+#if defined(__WIN32__)
+    INPUT_RECORD inp;
+    DWORD read;
+
+    if(PeekConsoleInput(hStdin, &inp, 1, &read))
+    {
+        if(KEY_EVENT == inp.EventType)
+        {
+            char c;
+
+            if(ReadConsole(hStdin, &c, 1, &read, NULL))
+            {
+                ch = c;
+            }
+        }
+    }
+#else
     struct timeval timeout = { 0, 0 };  /* timeout for select() */
     fd_set con; /* FD set representing the console */
-
-    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
     FD_ZERO(&con);
     FD_SET(0, &con);
     /* check if a console input is available, returns immediately */
     if (0 != select(1, &con, 0, 0, &timeout)) { /* any descriptor set? */
-        char ch;
         read(0, &ch, 1);
-        switch (ch)
-        {
-			case '\33':  // ESC pressed
-			case 'q':    // q pressed
-			case 'Q':    // Q pressed
-				BSP_terminate(0);
-				break;
-			case 'P':
-			case 'p':
-				printf("Pedestrian button pressed...\n");
-				QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
-                // keyPressed = 1;
-                break;
-			default:
-				break;
-        }
+    }
+#endif
+
+    return ch;
+}
+void QF_onClockTick(void) {
+    static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
+
+    QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
+
+    switch (readConsoleChar())
+    {
+        case '\33':  // ESC pressed
+        case 'q':    // q pressed
+        case 'Q':    // Q pressed
+            BSP_terminate(0);
+            break;
+        case 'P':
+        case 'p':
+            printf("Pedestrian button pressed...\n");
+            QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
+            // keyPressed = 1;
+            break;
+        default:
+            break;
     }
 }
 /*..........................................................................*/
@@ -122,31 +178,40 @@ void Q_onAssert(char const *module, int loc) {
 * The two options are selected by the following QS_IMPL_OPTION macro.
 * Please set the value of this macro to either 1 or 2:
 */
-#define QS_IMPL_OPTION 1
-#include "qspy.h"
+#include "qs.h"
 
 /*--------------------------------------------------------------------------*/
-#if (QS_IMPL_OPTION == 1)
-
 /*
 * 1. Output to the TCP/IP socket, which requires a separate QSPY host
 *    application running. This option does not link to the QSPY code.
 */
+#if !defined(__WIN32__)
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+
+typedef int SOCKET;
+#endif
 #include <errno.h>
 #include <time.h>
 
 #define QS_TX_SIZE    (4*1024)
 #define QS_RX_SIZE    1024
 #define QS_IMEOUT_MS  100
+#if !defined(INVALID_SOCKET)
 #define INVALID_SOCKET -1
+#endif
+#if !defined(QSPY_ERROR)
+enum {
+    QSPY_ERROR,
+    QSPY_SUCCESS
+};
+#endif
 
 /* local variables .........................................................*/
 static void *idleThread(void *par); // the expected P-Thread signature
-static int l_sock = INVALID_SOCKET;
+static SOCKET l_sock = INVALID_SOCKET;
 static uint8_t l_running;
 
 /*..........................................................................*/
@@ -156,16 +221,27 @@ uint8_t QS_onStartup(void const *arg) {
     char hostName[64];
     char const *src;
     char *dst;
+    uint8_t ret;
 
-    uint16_t port_local  = 51234; /* default local port */
-    uint16_t port_remote = 6601;  /* default QSPY server port */
-    int sockopt_bool;
-    struct sockaddr_in sa_local;
-    struct sockaddr_in sa_remote;
-    struct hostent *host;
+    uint16_t port = 6601;  /* default QSPY server port */
+    struct sockaddr_in sockAddr;
+    struct hostent *server;
+#if defined(__WIN32__)
+    WSADATA wsaData;
+    ULONG sockopt_bool = 1;
+#else
+    int sockopt_bool = 1;
+#endif
 
     QS_initBuf(qsBuf, sizeof(qsBuf));
     QS_rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+
+#if defined(__WIN32__)
+    if (WSAStartup(MAKEWORD(2,0), &wsaData) == SOCKET_ERROR) {
+        printf("Windows Sockets cannot be initialized.");
+        return (uint8_t)0;
+    }
+#endif
 
     src = (arg != (void const *)0)
           ? (char const *)arg
@@ -179,68 +255,61 @@ uint8_t QS_onStartup(void const *arg) {
     }
     *dst = '\0';
     if (*src == ':') {
-        port_remote = (uint16_t)strtoul(src + 1, NULL, 10);
+        port = (uint16_t)strtoul(src + 1, NULL, 10);
     }
 
     printf("<TARGET> Connecting to QSPY on Host=%s:%d...\n",
-           hostName, port_remote);
+           hostName, port);
 
     l_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); /* TCP socket */
     if (l_sock == INVALID_SOCKET){
-        printf("<TARGET> ERROR   cannot create client socket, errno=%d\n",
-               errno);
-        goto error;
+        printf("Socket cannot be created; error 0x%08X\n",
+               WSAGetLastError());
+        return (uint8_t)0; /* failure */
     }
 
-    /* configure the socket */
-    sockopt_bool = 1;
-    setsockopt(l_sock, SOL_SOCKET, SO_REUSEADDR,
-               &sockopt_bool, sizeof(sockopt_bool));
-
-    sockopt_bool = 0;
-    setsockopt(l_sock, SOL_SOCKET, SO_LINGER,
-               &sockopt_bool, sizeof(sockopt_bool));
-
-    /* local address:port */
-    memset(&sa_local, 0, sizeof(sa_local));
-    sa_local.sin_family = AF_INET;
-    sa_local.sin_port = htons(port_local);
-    host = gethostbyname(""); /* local host */
-    //sa_local.sin_addr.s_addr = inet_addr(
-    //    inet_ntoa(*(struct in_addr *)*host->h_addr_list));
-    //if (bind(l_sock, &sa_local, sizeof(sa_local)) == -1) {
-    //    printf("<TARGET> Cannot bind to the local port Err=0x%08X\n",
-    //           WSAGetLastError());
-    //    /* no error */
-    //}
-
-    /* remote hostName:port (QSPY server socket) */
-    host = gethostbyname(hostName);
-    if (host == NULL) {
-        printf("<TARGET> ERROR   cannot resolve host Name=%s:%d,errno=%d\n",
-               hostName, port_remote, errno);
-        goto error;
+    server = gethostbyname(hostName);
+    if (server == NULL) {
+        printf("QSpy host name %s cannot be resolved; error 0x%08X\n",
+               hostName, WSAGetLastError());
+        return (uint8_t)0;
     }
-    memset(&sa_remote, 0, sizeof(sa_remote));
-    sa_remote.sin_family = AF_INET;
-    memcpy(&sa_remote.sin_addr, host->h_addr, host->h_length);
-    sa_remote.sin_port = htons(port_remote);
 
-    /* try to connect to the QSPY server */
-    if (connect(l_sock, (struct sockaddr *)&sa_remote, sizeof(sa_remote))
-        == -1)
+    memset(&sockAddr, 0, sizeof(sockAddr));
+    sockAddr.sin_family = AF_INET;
+    memcpy(&sockAddr.sin_addr, server->h_addr, server->h_length);
+    sockAddr.sin_port = htons(port);
+    if (connect(l_sock, (struct sockaddr *)&sockAddr, sizeof(sockAddr))
+        == SOCKET_ERROR)
     {
-        printf("<TARGET> ERROR   cannot connect to QSPY on Host="
-               "%s:%d,errno=%d\n", hostName, port_remote, errno);
-        goto error;
+        printf("Cannot connect to the QSPY server; error 0x%08X\n",
+               WSAGetLastError());
+        QS_EXIT();
+        return (uint8_t)0; /* failure */
     }
 
+    /* Set the socket to non-blocking mode. */
+    sockopt_bool = 1;
+    if (ioctlsocket(l_sock, FIONBIO, &sockopt_bool) == SOCKET_ERROR) {
+        printf("Socket configuration failed.\n"
+               "Windows socket error 0x%08X.",
+               WSAGetLastError());
+        QS_EXIT();
+        return (uint8_t)0; /* failure */
+    }
     printf("<TARGET> Connected  to QSPY on Host=%s:%d\n",
-           hostName, port_remote);
+           hostName, port);
 
+// create QSPY thread
+#if defined(__WIN32__)
+    /* return the status of creating the idle thread */
+    ret = (uint8_t)((CreateThread(NULL, 1024, (LPTHREAD_START_ROUTINE)(&idleThread), (void *)0, 0, NULL)
+            != (HANDLE)0) ? 1 : 0);
+#else
     pthread_attr_t attr;
     struct sched_param param;
     pthread_t idle;
+    int ret;
 
     // SCHED_FIFO corresponds to real-time preemptive priority-based
     // scheduler.
@@ -253,7 +322,8 @@ uint8_t QS_onStartup(void const *arg) {
     pthread_attr_setschedparam(&attr, &param);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
 
-    if (pthread_create(&idle, &attr, &idleThread, 0) != 0) {
+    ret (pthread_create(&idle, &attr, &idleThread, 0) != 0);
+    if ret {
         // Creating the p-thread with the SCHED_FIFO policy failed.
         // Most probably this application has no superuser privileges,
         // so we just fall back to the default SCHED_OTHER policy
@@ -264,16 +334,18 @@ uint8_t QS_onStartup(void const *arg) {
         if (pthread_create(&idle, &attr, &idleThread, 0) == 0) {
             return false;
         }
+
+
     }
     pthread_attr_destroy(&attr);
-
-    return (uint8_t)1;  // success
-
-error:
-    return (uint8_t)0; // failure
+#endif
+    return ret;
 }
 /*..........................................................................*/
 void QS_onCleanup(void) {
+#if defined(__WIN32__)
+    WSACleanup();
+#endif
     l_running = (uint8_t)0;
     if (l_sock != INVALID_SOCKET) {
         close(l_sock);
@@ -350,109 +422,6 @@ static void *idleThread(void *par) { // the expected P-Thread signature
 
     return 0; // return success
 }
-
-/*--------------------------------------------------------------------------*/
-#elif (QS_IMPL_OPTION == 2)
-
-/*
-* 2. Direct linking with the QSPY host application to perform direct output
-*    to the console from the running application. (This option requires
-*    the QSPY source code, which is part of the QTools collection).
-*/
-
-/*..........................................................................*/
-static void *idleThread(void *par); // the expected P-Thread signature
-static uint8_t l_running;
-
-/*..........................................................................*/
-uint8_t QS_onStartup(void const *arg) {
-    static uint8_t qsBuf[4*1024]; // 4K buffer for Quantum Spy
-    initBuf(qsBuf, sizeof(qsBuf));
-
-    QSPY_config(QP_VERSION,         // version
-                QS_OBJ_PTR_SIZE,    // objPtrSize
-                QS_FUN_PTR_SIZE,    // funPtrSize
-                QS_TIME_SIZE,       // tstampSize
-                Q_SIGNAL_SIZE,      // sigSize,
-                QF_EVENT_SIZ_SIZE,  // evtSize
-                QF_EQUEUE_CTR_SIZE, // queueCtrSize
-                QF_MPOOL_CTR_SIZE,  // poolCtrSize
-                QF_MPOOL_SIZ_SIZE,  // poolBlkSize
-                QF_TIMEEVT_CTR_SIZE,// tevtCtrSize
-                (void *)0,          // matFile,
-                (void *)0,
-                (QSPY_CustParseFun)0); // customized parser function
-
-    pthread_attr_t attr;
-    struct sched_param param;
-    pthread_t idle;
-
-    // SCHED_FIFO corresponds to real-time preemptive priority-based
-    // scheduler.
-    // NOTE: This scheduling policy requires the superuser priviledges
-
-    pthread_attr_init(&attr);
-    pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
-    param.sched_priority = sched_get_priority_min(SCHED_FIFO);
-
-    pthread_attr_setschedparam(&attr, &param);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-
-    if (pthread_create(&idle, &attr, &idleThread, 0) != 0) {
-        // Creating the p-thread with the SCHED_FIFO policy failed.
-        // Most probably this application has no superuser privileges,
-        // so we just fall back to the default SCHED_OTHER policy
-        // and priority 0.
-        pthread_attr_setschedpolicy(&attr, SCHED_OTHER);
-        param.sched_priority = 0;
-        pthread_attr_setschedparam(&attr, &param);
-        if (pthread_create(&idle, &attr, &idleThread, 0) == 0) {
-            return false;
-        }
-    }
-    pthread_attr_destroy(&attr);
-
-    return true;
-}
-/*..........................................................................*/
-void QS_onCleanup(void) {
-    l_running = (uint8_t)0;
-    QSPY_stop();
-}
-/*..........................................................................*/
-void QS_onFlush(void) {
-    uint16_t nBytes = 1024U;
-    uint8_t const *block;
-    while ((block = QS_getBlock(&nBytes)) != (uint8_t *)0) {
-        QSPY_parse(block, nBytes);
-        nBytes = 1024U;
-    }
-}
-/*..........................................................................*/
-static void *idleThread(void *par) { // the expected P-Thread signature
-    (void)par;
-
-    l_running = (uint8_t)1;
-    while (l_running) {
-        uint16_t nBytes = 256U;
-        uint8_t const *block;
-        struct timeval timeout = { 0, 10000 }; // timeout for select()
-
-        QF_CRIT_ENTRY(dummy);
-        block = QS_getBlock(&nBytes);
-        QF_CRIT_EXIT(dummy);
-
-        if (block != (uint8_t *)0) {
-            QSPY_parse(block, nBytes);
-        }
-        select(0, 0, 0, 0, &timeout);   // sleep for a while
-    }
-    return 0; // return success
-}
-
-#else
-#error Incorrect value of the QS_IMPL_OPTION macro
-#endif // QS_IMPL_OPTION
 
 //............................................................................
 QSTimeCtr QS_onGetTime(void) {
@@ -533,14 +502,17 @@ void BSP_terminate(int16_t result) {
     QF_stop();
 }
 /*..........................................................................*/
-void BSP_setlight(eTLidentity_t id, eTLlight_t light)
+void BSP_setlight(eTLidentity_t id, uint8_t light)
 {
+
     static char * const strIdentity[MaxIdentity] = {
         "Traffic Light A", "Traffic Light B", "Pedestrian Light"
     };
-    static char * const strColor[NO_LIGHT] = {
-        "RED", "YELLOW", "GREEN"
+    static char * const strColor[] = {
+        "NONW", "RED", "YELLOW", "RED/YELLOW", "GREEN"
     };
+
+    // Q_ASSERT(light <= GREEN && id < MaxIdentity);
     printf("%s is %s\n", strIdentity[id], strColor[light]);
 
 #if 0

@@ -6,6 +6,7 @@ target_compile_definitions(${TGT}
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         KERNEL_$<IF:$<STREQUAL:${CONFIG_KERNEL},QK>,QK,QV>=1
         $<$<CONFIG:Spy>:Q_SPY>
+        $<$<BOOL:${CONFIG_UNIT_TEST}>:Q_UTEST>
         $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
 )
 

@@ -91,7 +91,6 @@ if(CONFIG_VERBOSE)
 "========================================================
   Configuration options set:
     CONFIG_GUI                  = ${CONFIG_GUI}
-    CONFIG_CONSOLE              = ${CONFIG_CONSOLE}
     CONFIG_UNIT_TEST            = ${CONFIG_UNIT_TEST}
     CONFIG_CPPCHECK             = ${CONFIG_CPPCHECK}
     CONFIG_CHECKMISRA           = ${CONFIG_CHECKMISRA}

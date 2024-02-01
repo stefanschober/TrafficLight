@@ -1,7 +1,8 @@
 # the WIN32 target is a GUI-only target system
 if(CONFIG_UNIT_TEST)
     set(CONFIG_GUI OFF)
-else()
+endif()
+if(NOT DEFINED CONFIG_GUI)
     set(CONFIG_GUI ON)
 endif()
 set(QPC_CFG_GUI ${CONFIG_GUI})
@@ -13,7 +14,7 @@ endif()
 #default port is WIN32
 set(PORT win32)
 
-if(CONFIG_GTK)
+if(CONFIG_GUI AND CONFIG_GTK)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(GTK3 gtk+-3.0) # QUIET IMPORTED_TARGET)
 
@@ -21,6 +22,8 @@ if(CONFIG_GTK)
         message(FATAL_ERROR "The package GTK3, required for this build, could not be found on the system!")
     endif()
 
+    # enable GTK support for sources
+    target_compile_definitions(${TGT} PRIVATE USE_GTK=1)
     # Add other flags to the compiler
     target_compile_options(${TGT} PRIVATE ${GTK3_CFLAGS_OTHER})
 

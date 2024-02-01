@@ -51,6 +51,7 @@
 *.sct
 *.ld
 *.ctu-info
+*.dump
 
 # Kernel Module Compile Results
 *.mod*
@@ -89,4 +90,4 @@ Source/GTK+/resources.c
 **/Default/
 **/Spy/
 **/QUtest
-**/[Bb]uild/
+**/[Bb]uild*/

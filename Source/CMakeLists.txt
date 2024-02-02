@@ -1,11 +1,11 @@
 # TrafficLight QM project root CMakeLists.txt
 
-# enable ccache
-find_program(CCACHE_PROGRAM ccache ccache.exe)
-if(CCACHE_PROGRAM)
-    set(CMAKE_C_COMPILER_LAUNCHER   "${CCACHE_PROGRAM}")
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
-endif()
+# uncomment to enable ccache
+#find_program(CCACHE_PROGRAM ccache ccache.exe)
+#if(CCACHE_PROGRAM)
+#    set(CMAKE_C_COMPILER_LAUNCHER   "${CCACHE_PROGRAM}")
+#    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+#endif()
 
 # set C-C++ standards
 set(CMAKE_C_STANDARD 17)

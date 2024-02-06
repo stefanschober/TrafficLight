@@ -102,6 +102,8 @@ void BSP_init(int argc, char *argv[]) {
     QS_OBJ_DICTIONARY(&l_Button_Handler); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
     QS_USR_DICTIONARY(COMMAND_STAT);
+
+    QS_GLB_FILTER(QS_ALL_RECORDS);
 }
 /*..........................................................................*/
 void BSP_terminate(int16_t result)
@@ -277,22 +279,23 @@ uint8_t QS_onStartup(void const *arg) {
     }
 
     /* set up the QS filters... */
-    QS_FILTER_ON(QS_QEP_STATE_ENTRY);
-    QS_FILTER_ON(QS_QEP_STATE_EXIT);
-    QS_FILTER_ON(QS_QEP_STATE_INIT);
-    QS_FILTER_ON(QS_QEP_INIT_TRAN);
-    QS_FILTER_OFF(QS_QEP_INTERN_TRAN);
-    QS_FILTER_ON(QS_QEP_TRAN);
-    QS_FILTER_OFF(QS_QEP_IGNORED);
-    QS_FILTER_ON(QS_QEP_DISPATCH);
-    QS_FILTER_OFF(QS_QEP_UNHANDLED);
+#if 0
+    QS_GLB_FILTER(QS_QEP_STATE_ENTRY);
+    QS_GLB_FILTER(QS_QEP_STATE_EXIT);
+    QS_GLB_FILTER(QS_QEP_STATE_INIT);
+    QS_GLB_FILTER(QS_QEP_INIT_TRAN);
+    QS_GLB_FILTER(-QS_QEP_INTERN_TRAN);
+    QS_GLB_FILTER(QS_QEP_TRAN);
+    QS_GLB_FILTER(-QS_QEP_IGNORED);
+    QS_GLB_FILTER(QS_QEP_DISPATCH);
+    QS_GLB_FILTER(-QS_QEP_UNHANDLED);
 
-    QS_FILTER_OFF(QS_QF_ACTIVE_POST);
-    QS_FILTER_OFF(QS_QF_ACTIVE_POST_LIFO);
-    QS_FILTER_OFF(QS_QF_PUBLISH);
-
-    // QS_FILTER_ON(TL_STAT);
-    QS_FILTER_ON(COMMAND_STAT);
+    QS_GLB_FILTER(-QS_QF_ACTIVE_POST);
+    QS_GLB_FILTER(-QS_QF_ACTIVE_POST_LIFO);
+    QS_GLB_FILTER(-QS_QF_PUBLISH);
+#endif
+    QS_LOC_FILTER(TL_STAT);
+    QS_LOC_FILTER(COMMAND_STAT);
 
     /* return the status of creating the idle thread */
     return (CreateThread(NULL, 1024, &idleThread, (void *)0, 0, NULL)

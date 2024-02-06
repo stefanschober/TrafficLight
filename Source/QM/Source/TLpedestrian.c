@@ -93,6 +93,18 @@ QActive * const AO_TLpedestrian = &l_pedestrian.super;   /* "opaque" pointer to 
 void TLpedestrian_ctor(void) {
     TLpedestrian *me = &l_pedestrian;
 
+    QS_FUN_DICTIONARY(TLpedestrian_initial);
+    QS_FUN_DICTIONARY(TLpedestrian_RUN);
+    QS_FUN_DICTIONARY(TLpedestrian_GREEN);
+    QS_FUN_DICTIONARY(TLpedestrian_RED);
+    QS_FUN_DICTIONARY(TLpedestrian_RED_1);
+    QS_FUN_DICTIONARY(TLpedestrian_RED_2);
+    QS_FUN_DICTIONARY(TLpedestrian_RED_3);
+    QS_FUN_DICTIONARY(TLpedestrian_RED_4);
+    QS_FUN_DICTIONARY(TLpedestrian_RED_5);
+    QS_FUN_DICTIONARY(TLpedestrian_INIT_WAIT);
+    QS_OBJ_DICTIONARY(AO_TLpedestrian);
+
     QActive_ctor(&me->super, Q_STATE_CAST(&TLpedestrian_initial));
     QTimeEvt_ctorX(&me->timeEvt, &me->super, TIMEOUT_SIG, 0U);
 
@@ -129,17 +141,6 @@ static void TLpedestrian_setLight(TLpedestrian * const me,
 //${AOs::TLpedestrian::SM} ...................................................
 static QState TLpedestrian_initial(TLpedestrian * const me, void const * const par) {
     //${AOs::TLpedestrian::SM::initial}
-    QS_FUN_DICTIONARY(TLpedestrian_initial);
-    QS_FUN_DICTIONARY(TLpedestrian_RUN);
-    QS_FUN_DICTIONARY(TLpedestrian_GREEN);
-    QS_FUN_DICTIONARY(TLpedestrian_RED);
-    QS_FUN_DICTIONARY(TLpedestrian_RED_1);
-    QS_FUN_DICTIONARY(TLpedestrian_RED_2);
-    QS_FUN_DICTIONARY(TLpedestrian_RED_3);
-    QS_FUN_DICTIONARY(TLpedestrian_RED_4);
-    QS_FUN_DICTIONARY(TLpedestrian_RED_5);
-    QS_FUN_DICTIONARY(TLpedestrian_INIT_WAIT);
-
     QActive_subscribe((QActive *)me, TL_IS_RED_SIG);
     QActive_subscribe((QActive *)me, BUTTON_SIG);
     QActive_subscribe((QActive *)me, GLOBAL_START_SIG);

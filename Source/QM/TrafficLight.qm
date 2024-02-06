@@ -21,24 +21,7 @@ BSP_setlight(me-&gt;identity, me-&gt;light);</code>
    </operation>
    <statechart properties="0x01">
     <initial target="../1">
-     <action>QS_FUN_DICTIONARY(TLtraffic_initial);
-QS_FUN_DICTIONARY(TLtraffic_RUN);
-QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
-QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
-QS_FUN_DICTIONARY(TLtraffic_GREEN);
-QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
-QS_FUN_DICTIONARY(TLtraffic_GREEN_2);
-QS_FUN_DICTIONARY(TLtraffic_GREEN_3);
-QS_FUN_DICTIONARY(TLtraffic_YELLOW);
-QS_FUN_DICTIONARY(TLtraffic_YELLOW_1);
-QS_FUN_DICTIONARY(TLtraffic_YELLOW_2);
-QS_FUN_DICTIONARY(TLtraffic_RED);
-QS_FUN_DICTIONARY(TLtraffic_RED_1);
-QS_FUN_DICTIONARY(TLtraffic_RED_2);
-QS_FUN_DICTIONARY(TLtraffic_RED_3);
-QS_FUN_DICTIONARY(TLtraffic_RED_4);
-
-QActive_subscribe((QActive *)me, PL_IS_RED_SIG);
+     <action>QActive_subscribe((QActive *)me, PL_IS_RED_SIG);
 QActive_subscribe((QActive *)me, STARTNEWCYCLE_SIG);
 QActive_subscribe((QActive *)me, PEDREQUEST_SIG);
 QActive_subscribe((QActive *)me, EMERGENCY_SIG);
@@ -133,7 +116,7 @@ QActive_subscribe((QActive *)me, EM_RELEASE_SIG);</action>
         </choice_glyph>
        </choice>
        <choice target="../../../7">
-        <guard>( 0 ==TL_ID(me) )</guard>
+        <guard>( TrafficLightA == (me-&gt;identity) )</guard>
         <choice_glyph conn="38,38,4,3,30,6">
          <action box="1,9,10,2"/>
         </choice_glyph>
@@ -267,18 +250,7 @@ BSP_setlight(PedestrianLight, me-&gt;light);</code>
    </operation>
    <statechart properties="0x01">
     <initial target="../1">
-     <action>QS_FUN_DICTIONARY(TLpedestrian_initial);
-QS_FUN_DICTIONARY(TLpedestrian_RUN);
-QS_FUN_DICTIONARY(TLpedestrian_GREEN);
-QS_FUN_DICTIONARY(TLpedestrian_RED);
-QS_FUN_DICTIONARY(TLpedestrian_RED_1);
-QS_FUN_DICTIONARY(TLpedestrian_RED_2);
-QS_FUN_DICTIONARY(TLpedestrian_RED_3);
-QS_FUN_DICTIONARY(TLpedestrian_RED_4);
-QS_FUN_DICTIONARY(TLpedestrian_RED_5);
-QS_FUN_DICTIONARY(TLpedestrian_INIT_WAIT);
-
-QActive_subscribe((QActive *)me, TL_IS_RED_SIG);
+     <action>QActive_subscribe((QActive *)me, TL_IS_RED_SIG);
 QActive_subscribe((QActive *)me, BUTTON_SIG);
 QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
 QActive_subscribe((QActive *)me, EMERGENCY_SIG);
@@ -418,16 +390,7 @@ BSP_setPedLed(ledStatus);</code>
    </operation>
    <statechart properties="0x01">
     <initial target="../1">
-     <action>QS_FUN_DICTIONARY(TLblinker_initial);
-QS_FUN_DICTIONARY(TLblinker_RUN);
-QS_FUN_DICTIONARY(TLblinker_INIT);
-QS_FUN_DICTIONARY(TLblinker_INACTIVE);
-QS_FUN_DICTIONARY(TLblinker_ACTIVE);
-QS_FUN_DICTIONARY(TLblinker_OFF);
-QS_FUN_DICTIONARY(TLblinker_ON);
-QS_FUN_DICTIONARY(TLblinker_SHUTDOWN);
-
-QActive_subscribe((QActive *)me, START_BLINK_SIG);
+     <action>QActive_subscribe((QActive *)me, START_BLINK_SIG);
 QActive_subscribe((QActive *)me, STOP_BLINK_SIG);
 QActive_subscribe((QActive *)me, OFF_BLINK_SIG);
 QActive_subscribe((QActive *)me, GLOBAL_START_SIG);
@@ -525,7 +488,7 @@ QActive_subscribe((QActive *)me, EMERGENCY_SIG);</action>
     <state_diagram size="69,69"/>
    </statechart>
   </class>
-  <attribute name="AO_TLtraffic[N_TL]" type="QActive * const" visibility="0x00" properties="0x00"/>
+  <attribute name="AO_TLtrafficA" type="QActive * const" visibility="0x00" properties="0x00"/>
   <attribute name="AO_TLpedestrian" type="QActive * const" visibility="0x00" properties="0x00"/>
   <attribute name="AO_TLblinker" type="QActive * const" visibility="0x00" properties="0x00"/>
   <attribute name="the_Ticker0" type="QActive * const" visibility="0x00" properties="0x00">
@@ -533,11 +496,29 @@ QActive_subscribe((QActive *)me, EMERGENCY_SIG);</action>
   </attribute>
   <attribute name="l_ticker0" type="QTicker" visibility="0x02" properties="0x00"/>
   <operation name="TLtraffic_ctor" type="int16_t" visibility="0x00" properties="0x00">
-   <code>uint8_t n;
+   <code>QS_FUN_DICTIONARY(TLtraffic_initial);
+QS_FUN_DICTIONARY(TLtraffic_RUN);
+QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
+QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
+QS_FUN_DICTIONARY(TLtraffic_GREEN);
+QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
+QS_FUN_DICTIONARY(TLtraffic_GREEN_2);
+QS_FUN_DICTIONARY(TLtraffic_GREEN_3);
+QS_FUN_DICTIONARY(TLtraffic_YELLOW);
+QS_FUN_DICTIONARY(TLtraffic_YELLOW_1);
+QS_FUN_DICTIONARY(TLtraffic_YELLOW_2);
+QS_FUN_DICTIONARY(TLtraffic_RED);
+QS_FUN_DICTIONARY(TLtraffic_RED_1);
+QS_FUN_DICTIONARY(TLtraffic_RED_2);
+QS_FUN_DICTIONARY(TLtraffic_RED_3);
+QS_FUN_DICTIONARY(TLtraffic_RED_4);
 
-for (n = 0; n &lt; N_TL; n++)
+QS_OBJ_DICTIONARY(AO_TLtrafficA);
+QS_OBJ_DICTIONARY(AO_TLtrafficB);
+
+for (uint8_t n = 0; n &lt; N_TL; n++)
 {
-    TLtraffic *me = &amp;l_traffic[n];
+    TLtraffic *me = l_traffic[n];
 
     QActive_ctor(&amp;me-&gt;super, Q_STATE_CAST(&amp;TLtraffic_initial));
     QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);
@@ -558,6 +539,18 @@ for (n = 0; n &lt; N_TL; n++)
   <operation name="TLpedestrian_ctor" type="void" visibility="0x00" properties="0x00">
    <code>TLpedestrian *me = &amp;l_pedestrian;
 
+QS_FUN_DICTIONARY(TLpedestrian_initial);
+QS_FUN_DICTIONARY(TLpedestrian_RUN);
+QS_FUN_DICTIONARY(TLpedestrian_GREEN);
+QS_FUN_DICTIONARY(TLpedestrian_RED);
+QS_FUN_DICTIONARY(TLpedestrian_RED_1);
+QS_FUN_DICTIONARY(TLpedestrian_RED_2);
+QS_FUN_DICTIONARY(TLpedestrian_RED_3);
+QS_FUN_DICTIONARY(TLpedestrian_RED_4);
+QS_FUN_DICTIONARY(TLpedestrian_RED_5);
+QS_FUN_DICTIONARY(TLpedestrian_INIT_WAIT);
+QS_OBJ_DICTIONARY(AO_TLpedestrian);
+
 QActive_ctor(&amp;me-&gt;super, Q_STATE_CAST(&amp;TLpedestrian_initial));
 QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);
 
@@ -571,6 +564,16 @@ me-&gt;toGreen = T_5sec;</code>
   </operation>
   <operation name="TLblinker_ctor" type="void" visibility="0x00" properties="0x00">
    <code>TLblinker *me = &amp;l_blinker;
+
+QS_FUN_DICTIONARY(TLblinker_initial);
+QS_FUN_DICTIONARY(TLblinker_RUN);
+QS_FUN_DICTIONARY(TLblinker_INIT);
+QS_FUN_DICTIONARY(TLblinker_INACTIVE);
+QS_FUN_DICTIONARY(TLblinker_ACTIVE);
+QS_FUN_DICTIONARY(TLblinker_OFF);
+QS_FUN_DICTIONARY(TLblinker_ON);
+QS_FUN_DICTIONARY(TLblinker_SHUTDOWN);
+QS_OBJ_DICTIONARY(AO_TLblinker);
 
 QActive_ctor(&amp;me-&gt;super, Q_STATE_CAST(&amp;TLblinker_initial));
 QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
@@ -590,25 +593,25 @@ TLblinker_ctor();</code>
    <code>uint8_t n;
 uint_fast8_t aoPrio = 1u;
 
-QS_OBJ_DICTIONARY(AO_TLblinker);
 QACTIVE_START(the_Ticker0, aoPrio++, 0, 0, 0, 0, 0);
 
 /* start the active objects... */
-// QS_OBJ_DICTIONARY(AO_TLtraffic[0]);
-// QS_OBJ_DICTIONARY(AO_TLtraffic[1]);
-// QS_OBJ_DICTIONARY(AO_TLtraffic[2]);
-for (n = 0U; n &lt; N_TL; ++n) {
-    QS_OBJ_DICTIONARY(AO_TLtraffic[n]);
-    QACTIVE_START(AO_TLtraffic[n],           /* AO to start */
-                  aoPrio++, /* QP priority of the AO */
-                  trafficQueueSto[n],      /* event queue storage */
-                  Q_DIM(trafficQueueSto[n]), /* queue length [events] */
-                  (void *)0,             /* stack storage (not used) */
-                  0U,                    /* size of the stack [bytes] */
-                 (QEvt *)0);             /* initialization event */
-}
+QACTIVE_START(AO_TLtrafficA,           /* AO to start */
+              aoPrio++, /* QP priority of the AO */
+              trafficQueueStoA,      /* event queue storage */
+              Q_DIM(trafficQueueStoA), /* queue length [events] */
+              (void *)0,             /* stack storage (not used) */
+              0U,                    /* size of the stack [bytes] */
+             (QEvt *)0);             /* initialization event */
 
-QS_OBJ_DICTIONARY(AO_TLpedestrian);
+QACTIVE_START(AO_TLtrafficB,           /* AO to start */
+              aoPrio++, /* QP priority of the AO */
+              trafficQueueStoB,      /* event queue storage */
+              Q_DIM(trafficQueueStoB), /* queue length [events] */
+              (void *)0,             /* stack storage (not used) */
+              0U,                    /* size of the stack [bytes] */
+             (QEvt *)0);             /* initialization event */
+
 QACTIVE_START(AO_TLpedestrian,                  /* AO to start */
               aoPrio++, /* QP priority of the AO */
               pedestrianQueueSto,             /* event queue storage */
@@ -617,7 +620,6 @@ QACTIVE_START(AO_TLpedestrian,                  /* AO to start */
               0U,                        /* size of the stack [bytes] */
               (QEvt *)0);                /* initialization event */
 
-QS_OBJ_DICTIONARY(AO_TLblinker);
 QACTIVE_START(AO_TLblinker,                  /* AO to start */
               aoPrio++, /* QP priority of the AO */
               blinkerQueueSto,             /* event queue storage */
@@ -626,6 +628,7 @@ QACTIVE_START(AO_TLblinker,                  /* AO to start */
               0U,                        /* size of the stack [bytes] */
               (QEvt *)0);                /* initialization event */</code>
   </operation>
+  <attribute name="AO_TLtrafficB" type="QActive * const" visibility="0x00" properties="0x00"/>
  </package>
  <package name="Events" stereotype="0x01">
   <class name="TLevt" superclass="qpc::QEvt"/>
@@ -694,13 +697,13 @@ typedef enum TLlight {
 #define T_20sec   _TIMETICK_(20u)
 #define T_30sec   _TIMETICK_(30u)
 
+#define N_TL    (2u)
+
 $declare(Events::TLevt)
 
-/* number of traffic lights */
-#define N_TL ((uint8_t)2)
-
 $declare(AOs::TLtraffic_ctor)
-$declare(AOs::AO_TLtraffic[N_TL])
+$declare(AOs::AO_TLtrafficA)
+$declare(AOs::AO_TLtrafficB)
 
 $declare(AOs::TLpedestrian_ctor)
 $declare(AOs::AO_TLpedestrian)
@@ -725,19 +728,22 @@ Q_DEFINE_THIS_FILE
 #define startTimeout(timeout)    QTimeEvt_rearm(&amp;me-&gt;timeEvt, timeout)
 #define sendMessage(msg)         { QEvt *e = Q_NEW(QEvt, msg); QF_PUBLISH(e, (QActive *)me); }
 /* helper macro to provide the ID of Philo &quot;me_&quot; */
-#define TL_ID(me_)    ((eTLidentity_t)((me_) - l_traffic))
+// #define TL_ID(me_)    ((eTLidentity_t)((me_) - l_traffic))
 
 /* Active object class -----------------------------------------------------*/
 $declare(AOs::TLtraffic)
 
 /* Local objects -----------------------------------------------------------*/
-static TLtraffic l_traffic[N_TL];   /* storage for all TLs */
+static TLtraffic l_trafficA;   /* storage for all TLs */
+static TLtraffic l_trafficB;   /* storage for all TLs */
+static TLtraffic *l_traffic[N_TL] = {
+    &amp;l_trafficA,
+    &amp;l_trafficB
+};
 
 /* Global objects ----------------------------------------------------------*/
-QActive * const AO_TLtraffic[N_TL] = { /* &quot;opaque&quot; pointers to TL AO */
-    &amp;l_traffic[0].super,
-    &amp;l_traffic[1].super
-};
+QActive * const AO_TLtrafficA = &amp;l_trafficA.super; /* &quot;opaque&quot; pointers to TL AO */
+QActive * const AO_TLtrafficB = &amp;l_trafficB.super; /* &quot;opaque&quot; pointers to TL AO */
 
 /* TL definition --------------------------------------------------------*/
 $define(AOs::TLtraffic_ctor)
@@ -785,7 +791,8 @@ $declare${AOs::callConstructors}
 $declare${AOs::startAllActiveObjects}
 
 /* AO event queues &amp; event pool data storage */
-static QEvt const *trafficQueueSto[N_TL][5 * WIN_FUDGE_FACTOR];
+static QEvt const *trafficQueueStoA[5 * WIN_FUDGE_FACTOR];
+static QEvt const *trafficQueueStoB[5 * WIN_FUDGE_FACTOR];
 static QEvt const *pedestrianQueueSto[5 * WIN_FUDGE_FACTOR];
 static QEvt const *blinkerQueueSto[5 * WIN_FUDGE_FACTOR];
 static QSubscrList subscrSto[MAX_PUBLISH_SIG];
@@ -801,8 +808,8 @@ int tlMain(int argc, char *argv[])
     /* object dictionaries... */
     QS_OBJ_DICTIONARY(smlPoolSto);
     QS_OBJ_DICTIONARY(pedestrianQueueSto);
-    QS_OBJ_DICTIONARY(trafficQueueSto[0]);
-    QS_OBJ_DICTIONARY(trafficQueueSto[1]);
+    QS_OBJ_DICTIONARY(trafficQueueStoA);
+    QS_OBJ_DICTIONARY(trafficQueueStoB);
     QS_OBJ_DICTIONARY(blinkerQueueSto);
 
     QS_SIG_DICTIONARY(TIME_TICK_SIG, (void *)0);

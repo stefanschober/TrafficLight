@@ -163,6 +163,8 @@ void BSP_init(gint argc, gchar *argv[])
     QS_OBJ_DICTIONARY(&l_SysTick_Handler); /* must be called *after* QF_init() */
     QS_OBJ_DICTIONARY(&l_Button_Handler); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
+
+    QS_GLB_FILTER(QS_ALL_RECORDS);
 }
 /*..........................................................................*/
 void BSP_terminate(gint16 result) {

@@ -60,7 +60,8 @@ static void startAllActiveObjects(void);
 //$enddecl${AOs::startAllActiveObjects} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /* AO event queues & event pool data storage */
-static QEvt const *trafficQueueSto[N_TL][5 * WIN_FUDGE_FACTOR];
+static QEvt const *trafficQueueStoA[5 * WIN_FUDGE_FACTOR];
+static QEvt const *trafficQueueStoB[5 * WIN_FUDGE_FACTOR];
 static QEvt const *pedestrianQueueSto[5 * WIN_FUDGE_FACTOR];
 static QEvt const *blinkerQueueSto[5 * WIN_FUDGE_FACTOR];
 static QSubscrList subscrSto[MAX_PUBLISH_SIG];
@@ -76,8 +77,8 @@ int tlMain(int argc, char *argv[])
     /* object dictionaries... */
     QS_OBJ_DICTIONARY(smlPoolSto);
     QS_OBJ_DICTIONARY(pedestrianQueueSto);
-    QS_OBJ_DICTIONARY(trafficQueueSto[0]);
-    QS_OBJ_DICTIONARY(trafficQueueSto[1]);
+    QS_OBJ_DICTIONARY(trafficQueueStoA);
+    QS_OBJ_DICTIONARY(trafficQueueStoB);
     QS_OBJ_DICTIONARY(blinkerQueueSto);
 
     QS_SIG_DICTIONARY(TIME_TICK_SIG, (void *)0);
@@ -158,25 +159,25 @@ static void startAllActiveObjects(void) {
     uint8_t n;
     uint_fast8_t aoPrio = 1u;
 
-    QS_OBJ_DICTIONARY(AO_TLblinker);
     QACTIVE_START(the_Ticker0, aoPrio++, 0, 0, 0, 0, 0);
 
     /* start the active objects... */
-    // QS_OBJ_DICTIONARY(AO_TLtraffic[0]);
-    // QS_OBJ_DICTIONARY(AO_TLtraffic[1]);
-    // QS_OBJ_DICTIONARY(AO_TLtraffic[2]);
-    for (n = 0U; n < N_TL; ++n) {
-        QS_OBJ_DICTIONARY(AO_TLtraffic[n]);
-        QACTIVE_START(AO_TLtraffic[n],           /* AO to start */
-                      aoPrio++, /* QP priority of the AO */
-                      trafficQueueSto[n],      /* event queue storage */
-                      Q_DIM(trafficQueueSto[n]), /* queue length [events] */
-                      (void *)0,             /* stack storage (not used) */
-                      0U,                    /* size of the stack [bytes] */
-                     (QEvt *)0);             /* initialization event */
-    }
+    QACTIVE_START(AO_TLtrafficA,           /* AO to start */
+                  aoPrio++, /* QP priority of the AO */
+                  trafficQueueStoA,      /* event queue storage */
+                  Q_DIM(trafficQueueStoA), /* queue length [events] */
+                  (void *)0,             /* stack storage (not used) */
+                  0U,                    /* size of the stack [bytes] */
+                 (QEvt *)0);             /* initialization event */
 
-    QS_OBJ_DICTIONARY(AO_TLpedestrian);
+    QACTIVE_START(AO_TLtrafficB,           /* AO to start */
+                  aoPrio++, /* QP priority of the AO */
+                  trafficQueueStoB,      /* event queue storage */
+                  Q_DIM(trafficQueueStoB), /* queue length [events] */
+                  (void *)0,             /* stack storage (not used) */
+                  0U,                    /* size of the stack [bytes] */
+                 (QEvt *)0);             /* initialization event */
+
     QACTIVE_START(AO_TLpedestrian,                  /* AO to start */
                   aoPrio++, /* QP priority of the AO */
                   pedestrianQueueSto,             /* event queue storage */
@@ -185,7 +186,6 @@ static void startAllActiveObjects(void) {
                   0U,                        /* size of the stack [bytes] */
                   (QEvt *)0);                /* initialization event */
 
-    QS_OBJ_DICTIONARY(AO_TLblinker);
     QACTIVE_START(AO_TLblinker,                  /* AO to start */
                   aoPrio++, /* QP priority of the AO */
                   blinkerQueueSto,             /* event queue storage */

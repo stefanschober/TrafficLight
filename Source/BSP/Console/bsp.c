@@ -488,10 +488,10 @@ void BSP_init(int argc, char **argv) {
     QS_USR_DICTIONARY(TL_STAT);
 
     /* setup the QS filters... */
-    QS_FILTER_ON(QS_SM_RECORDS); // state machine records
-    QS_FILTER_ON(QS_UA_RECORDS); // all usedr records
-    //QS_FILTER_ON(QS_MUTEX_LOCK);
-    //QS_FILTER_ON(QS_MUTEX_UNLOCK);
+    QS_GLB_FILTER(QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QS_UA_RECORDS); // all usedr records
+    //QS_GLB_FILTER(QS_MUTEX_LOCK);
+    //QS_GLB_FILTER(QS_MUTEX_UNLOCK);
 }
 /*..........................................................................*/
 void BSP_terminate(int16_t result) {

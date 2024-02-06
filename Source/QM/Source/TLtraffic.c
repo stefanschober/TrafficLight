@@ -37,7 +37,7 @@ Q_DEFINE_THIS_FILE
 #define startTimeout(timeout)    QTimeEvt_rearm(&me->timeEvt, timeout)
 #define sendMessage(msg)         { QEvt *e = Q_NEW(QEvt, msg); QF_PUBLISH(e, (QActive *)me); }
 /* helper macro to provide the ID of Philo "me_" */
-#define TL_ID(me_)    ((eTLidentity_t)((me_) - l_traffic))
+// #define TL_ID(me_)    ((eTLidentity_t)((me_) - l_traffic))
 
 /* Active object class -----------------------------------------------------*/
 //$declare${AOs::TLtraffic} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -88,13 +88,16 @@ static QState TLtraffic_RED_YELLOW_1(TLtraffic * const me, QEvt const * const e)
 //$enddecl${AOs::TLtraffic} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 /* Local objects -----------------------------------------------------------*/
-static TLtraffic l_traffic[N_TL];   /* storage for all TLs */
+static TLtraffic l_trafficA;   /* storage for all TLs */
+static TLtraffic l_trafficB;   /* storage for all TLs */
+static TLtraffic *l_traffic[N_TL] = {
+    &l_trafficA,
+    &l_trafficB
+};
 
 /* Global objects ----------------------------------------------------------*/
-QActive * const AO_TLtraffic[N_TL] = { /* "opaque" pointers to TL AO */
-    &l_traffic[0].super,
-    &l_traffic[1].super
-};
+QActive * const AO_TLtrafficA = &l_trafficA.super; /* "opaque" pointers to TL AO */
+QActive * const AO_TLtrafficB = &l_trafficB.super; /* "opaque" pointers to TL AO */
 
 /* TL definition --------------------------------------------------------*/
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -108,11 +111,29 @@ QActive * const AO_TLtraffic[N_TL] = { /* "opaque" pointers to TL AO */
 
 //${AOs::TLtraffic_ctor} .....................................................
 int16_t TLtraffic_ctor(void) {
-    uint8_t n;
+    QS_FUN_DICTIONARY(TLtraffic_initial);
+    QS_FUN_DICTIONARY(TLtraffic_RUN);
+    QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
+    QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN_2);
+    QS_FUN_DICTIONARY(TLtraffic_GREEN_3);
+    QS_FUN_DICTIONARY(TLtraffic_YELLOW);
+    QS_FUN_DICTIONARY(TLtraffic_YELLOW_1);
+    QS_FUN_DICTIONARY(TLtraffic_YELLOW_2);
+    QS_FUN_DICTIONARY(TLtraffic_RED);
+    QS_FUN_DICTIONARY(TLtraffic_RED_1);
+    QS_FUN_DICTIONARY(TLtraffic_RED_2);
+    QS_FUN_DICTIONARY(TLtraffic_RED_3);
+    QS_FUN_DICTIONARY(TLtraffic_RED_4);
 
-    for (n = 0; n < N_TL; n++)
+    QS_OBJ_DICTIONARY(AO_TLtrafficA);
+    QS_OBJ_DICTIONARY(AO_TLtrafficB);
+
+    for (uint8_t n = 0; n < N_TL; n++)
     {
-        TLtraffic *me = &l_traffic[n];
+        TLtraffic *me = l_traffic[n];
 
         QActive_ctor(&me->super, Q_STATE_CAST(&TLtraffic_initial));
         QTimeEvt_ctorX(&me->timeEvt, &me->super, TIMEOUT_SIG, 0U);
@@ -146,23 +167,6 @@ static void TLtraffic_setLight(TLtraffic * const me,
 //${AOs::TLtraffic::SM} ......................................................
 static QState TLtraffic_initial(TLtraffic * const me, void const * const par) {
     //${AOs::TLtraffic::SM::initial}
-    QS_FUN_DICTIONARY(TLtraffic_initial);
-    QS_FUN_DICTIONARY(TLtraffic_RUN);
-    QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
-    QS_FUN_DICTIONARY(TLtraffic_INIT_TL);
-    QS_FUN_DICTIONARY(TLtraffic_GREEN);
-    QS_FUN_DICTIONARY(TLtraffic_GREEN_1);
-    QS_FUN_DICTIONARY(TLtraffic_GREEN_2);
-    QS_FUN_DICTIONARY(TLtraffic_GREEN_3);
-    QS_FUN_DICTIONARY(TLtraffic_YELLOW);
-    QS_FUN_DICTIONARY(TLtraffic_YELLOW_1);
-    QS_FUN_DICTIONARY(TLtraffic_YELLOW_2);
-    QS_FUN_DICTIONARY(TLtraffic_RED);
-    QS_FUN_DICTIONARY(TLtraffic_RED_1);
-    QS_FUN_DICTIONARY(TLtraffic_RED_2);
-    QS_FUN_DICTIONARY(TLtraffic_RED_3);
-    QS_FUN_DICTIONARY(TLtraffic_RED_4);
-
     QActive_subscribe((QActive *)me, PL_IS_RED_SIG);
     QActive_subscribe((QActive *)me, STARTNEWCYCLE_SIG);
     QActive_subscribe((QActive *)me, PEDREQUEST_SIG);
@@ -321,8 +325,8 @@ static QState TLtraffic_INIT_TL(TLtraffic * const me, QEvt const * const e) {
         }
         //${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT}
         case TIMEOUT_SIG: {
-            //${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[(0==TL_ID(me))]}
-            if (( 0 ==TL_ID(me) )) {
+            //${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[(TrafficLightA==(me->identity))~}
+            if (( TrafficLightA == (me->identity) )) {
                 status_ = Q_TRAN(&TLtraffic_RED_YELLOW_1);
             }
             //${AOs::TLtraffic::SM::RUN::INIT_TL::TIMEOUT::[else]}

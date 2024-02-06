@@ -89,6 +89,16 @@ QActive * const AO_TLblinker = &l_blinker.super;   /* "opaque" pointer to PL AO 
 void TLblinker_ctor(void) {
     TLblinker *me = &l_blinker;
 
+    QS_FUN_DICTIONARY(TLblinker_initial);
+    QS_FUN_DICTIONARY(TLblinker_RUN);
+    QS_FUN_DICTIONARY(TLblinker_INIT);
+    QS_FUN_DICTIONARY(TLblinker_INACTIVE);
+    QS_FUN_DICTIONARY(TLblinker_ACTIVE);
+    QS_FUN_DICTIONARY(TLblinker_OFF);
+    QS_FUN_DICTIONARY(TLblinker_ON);
+    QS_FUN_DICTIONARY(TLblinker_SHUTDOWN);
+    QS_OBJ_DICTIONARY(AO_TLblinker);
+
     QActive_ctor(&me->super, Q_STATE_CAST(&TLblinker_initial));
     QTimeEvt_ctorX(&me->timeEvt, &me->super, TIMEOUT_SIG, 0U);
 }
@@ -108,15 +118,6 @@ static void TLblinker_setLed(TLblinker * const me,
 //${AOs::TLblinker::SM} ......................................................
 static QState TLblinker_initial(TLblinker * const me, void const * const par) {
     //${AOs::TLblinker::SM::initial}
-    QS_FUN_DICTIONARY(TLblinker_initial);
-    QS_FUN_DICTIONARY(TLblinker_RUN);
-    QS_FUN_DICTIONARY(TLblinker_INIT);
-    QS_FUN_DICTIONARY(TLblinker_INACTIVE);
-    QS_FUN_DICTIONARY(TLblinker_ACTIVE);
-    QS_FUN_DICTIONARY(TLblinker_OFF);
-    QS_FUN_DICTIONARY(TLblinker_ON);
-    QS_FUN_DICTIONARY(TLblinker_SHUTDOWN);
-
     QActive_subscribe((QActive *)me, START_BLINK_SIG);
     QActive_subscribe((QActive *)me, STOP_BLINK_SIG);
     QActive_subscribe((QActive *)me, OFF_BLINK_SIG);

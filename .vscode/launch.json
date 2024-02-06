@@ -38,17 +38,17 @@
             "name": "(gdb) Bash unter Windows – starten",
             "type": "cppdbg",
             "request": "launch",
-            "program": "C:/Users/SchoberS/Projects/TrafficLight/Build/MinGW/trafficlight.exe",
+            "program": "${workspaceFolder}/Build/gtk/Debug/trafficlight.exe",
             "args": [],
             "stopAtEntry": true,
-            "cwd": "C:/Users/SchoberS/Projects/TrafficLight/Source",
+            "cwd": "${workspaceFolder}",
             "environment": [
-                {"name": "MSYSTEM", "value": "MINGW64"}
+                {"name": "MSYSTEM", "value": "UCRT64"}
             ],
             "externalConsole": false,
             "pipeTransport": {
-                "debuggerPath": "/mingw64/bin/gdb",
-                "pipeProgram": "C:/Users/SchoberS/MSYS2/usr/bin/bash.exe",
+                "debuggerPath": "/ucrt64/bin/gdb",
+                "pipeProgram": "C:/Users/Schobers/MSYS2/usr/bin/bash",
                 "pipeArgs": ["-c"],
                 "pipeCwd": ""
             },

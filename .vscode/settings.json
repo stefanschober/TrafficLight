@@ -1,19 +1,15 @@
 {
-    "cmake.sourceDirectory": "${workspaceFolder}/Source",
-    "cmake.buildDirectory": "${workspaceFolder}/Build/Pico_Make",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.buildDirectory": "${workspaceFolder}/Build",
     "cmake.configureArgs": [
-        "-DCONFIG_PICO=FALSE",
-        "-DCONFIG_PICO_CMSIS=TRUE",
-        "-DCONFIG_KERNEL_QK=TRUE",
-        "-DCONFIG_KERNEL_QV=FALSE",
-        "-DTARGET=trafficlight",
-        "-DCONFIG_DEBUG=FALSE"
+        "--preset=local"
     ],
     "cmake.clearOutputBeforeBuild": false,
     "cmake.ignoreKitEnv": true,
-    "cmake.generator": "Unix Makefiles",
+    "cmake.generator": "Ninja Multi-Config",
     "cmake.configureEnvironment": {
-        "PICO_SDK_PATH": "/home/stefan/Projects/pico/pico-sdk"
+        "PICO_SDK_PATH": "/home/stefan/Projects/pico/pico-sdk",
+        "QPC_SDK_PATH": "${workspaceFolder}/Source/qpc"
     },
     "cmake.statusbar.advanced": {
         "debug": {

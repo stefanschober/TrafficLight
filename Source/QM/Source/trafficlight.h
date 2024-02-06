@@ -90,6 +90,8 @@ typedef enum TLlight {
 #define T_20sec   _TIMETICK_(20u)
 #define T_30sec   _TIMETICK_(30u)
 
+#define N_TL    (2u)
+
 //$declare${Events::TLevt} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${Events::TLevt} ...........................................................
@@ -99,19 +101,21 @@ typedef struct {
 } TLevt;
 //$enddecl${Events::TLevt} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-/* number of traffic lights */
-#define N_TL ((uint8_t)2)
-
 //$declare${AOs::TLtraffic_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${AOs::TLtraffic_ctor} .....................................................
 int16_t TLtraffic_ctor(void);
 //$enddecl${AOs::TLtraffic_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-//$declare${AOs::AO_TLtraffic[N_TL]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+//$declare${AOs::AO_TLtrafficA} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-//${AOs::AO_TLtraffic[N_TL]} .................................................
-extern QActive * const AO_TLtraffic[N_TL];
-//$enddecl${AOs::AO_TLtraffic[N_TL]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//${AOs::AO_TLtrafficA} ......................................................
+extern QActive * const AO_TLtrafficA;
+//$enddecl${AOs::AO_TLtrafficA} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//$declare${AOs::AO_TLtrafficB} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+//${AOs::AO_TLtrafficB} ......................................................
+extern QActive * const AO_TLtrafficB;
+//$enddecl${AOs::AO_TLtrafficB} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 //$declare${AOs::TLpedestrian_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 

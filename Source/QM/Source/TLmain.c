@@ -69,11 +69,8 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
-int tlMain(int argc, char *argv[])
+int tlMain(void)
 {
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(argc, argv); /* initialize the Board Support Package */
-
     /* object dictionaries... */
     QS_OBJ_DICTIONARY(smlPoolSto);
     QS_OBJ_DICTIONARY(pedestrianQueueSto);
@@ -156,7 +153,6 @@ static void callConstructors(void) {
 
 //${AOs::startAllActiveObjects} ..............................................
 static void startAllActiveObjects(void) {
-    uint8_t n;
     uint_fast8_t aoPrio = 1u;
 
     QACTIVE_START(the_Ticker0, aoPrio++, 0, 0, 0, 0, 0);

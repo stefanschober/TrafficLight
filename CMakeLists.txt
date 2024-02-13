@@ -15,10 +15,9 @@ get_filename_component(_bindir "${CMAKE_BINARY_DIR}" REALPATH)
 if(${_srcdir} STREQUAL ${_bindir})
     message(FATAL_ERROR "  FATAL: In-source builds are not allowed!
          You should create a separate directory for build files.")
-else()
-    unset(_srcdir)
-    unset(_bindir)
 endif()
+unset(_srcdir)
+unset(_bindir)
 
 # update the module search path
 if(MSYS OR WINDOWS OR WIN32)

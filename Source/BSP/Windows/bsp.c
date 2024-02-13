@@ -86,9 +86,9 @@ void BSP_init(int argc, char *argv[]) {
 #ifdef Q_SPY
     char *l_cmdLine = NULL;
 
-    if(argc > 1)
+    if(argc)
     {
-        l_cmdLine = argv[1];
+        l_cmdLine = argv[0];
     }
     if (QS_INIT(l_cmdLine) == (uint8_t)0) { /* QS initialization failed? */
         MessageBox(NULL,

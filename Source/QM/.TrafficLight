@@ -9,13 +9,7 @@
   <item name="backups">0</item>
  </group>
  <group name="windows">
-  <item id="./Source::TLmain.c">0,0,633,646</item>
-  <item id="./Source::trafficlight.h">0,445,541,225</item>
-  <item id="../BSP::bsp.h">-207,24,840,646</item>
-  <item id="./Source::TLtraffic.c">0,0,596,300</item>
-  <item id="AOs::TLtraffic::SM">0,190,640,480</item>
-  <item id="AOs::TLpedestrian::SM">200,0,640,480</item>
-  <item id="AOs::TLblinker::SM">0,0,840,646,*</item>
+  <item id="./Source::TLmain.c">0,0,488,646,*</item>
  </group>
  <group name="search">
   <item name="options">2032384</item>

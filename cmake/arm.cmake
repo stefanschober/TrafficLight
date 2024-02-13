@@ -125,7 +125,19 @@ target_compile_definitions(${TGT}
         STACKSIZE=${STACKSIZE}
         $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
         $<$<NOT:$<BOOL:${CONFIG_LIBINIT}>>:NO_LIBINIT>
+        $<$<AND:$<BOOL:${CONFIG_PICO}>,$<BOOL:${CONFIG_PICO_CMSIS}>>:PICO_CMSIS_RENAME_EXCEPTIONS=1>
+        # $<$<AND:$<BOOL:${CONFIG_PICO}>,$<BOOL:${CONFIG_PICO_CMSIS}>>:PICO_NO_RAM_VECTOR_TABLE=1>
 )
+
+target_link_libraries(${TGT}
+    PUBLIC
+        $<$<BOOL:${CONFIG_PICO}>:pico_stdlib>
+        $<$<BOOL:${CONFIG_PICO}>:cmsis_core>
+        $<$<BOOL:${CONFIG_PICO}>:hardware_exception>
+        $<$<BOOL:${CONFIG_PICO}>:hardware_irq>
+        $<$<AND:$<CONFIG:Spy>,$<BOOL:${CONFIG_PICO}>>:hardware_uart>
+)
+
 
 add_custom_target(${TGT}Hex ALL
     COMMAND ${MKHEX} ${MKHEX_ARGS}

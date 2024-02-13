@@ -142,6 +142,6 @@ void TLblinker_ctor(void);
 extern QActive * const AO_TLblinker;
 //$enddecl${AOs::AO_TLblinker} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-int tlMain(int argc, char *argv[]);
+int tlMain(void);
 
 #endif /* trafficlight_h */

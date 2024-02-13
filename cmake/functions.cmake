@@ -1,20 +1,4 @@
 # miscellaneous functions for various use cases
-# define function to output list of modules
-set (MODLIST ${CMAKE_BINARY_DIR}/modlist.txt)
-file(WRITE ${MODLIST} "Module list for Project ${PROJECT_NAME} (${PORT})\n")
-file(APPEND ${MODLIST} "Using C Compiler ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VERSION} (${CMAKE_C_COMPILER_ID})\n")
-function(listModules PATH)
-  file(APPEND ${MODLIST} ${PATH} ":\n")
-  foreach(_mod IN LISTS ARGN)
-    file(APPEND ${MODLIST} "    - ${_mod}\n")
-  endforeach()
-endfunction()
-function(listIncludes PATH)
-#  file(APPEND ${MODLIST} "Includes - ${PATH}:\n")
-#  foreach(_inc IN LISTS ARGN)
-#    file(APPEND ${MODLIST} "    - ${_inc}\n")
-#  endforeach()
-endfunction()
 
 # functions to work with .par files
 function(findParFile)

@@ -172,9 +172,11 @@ static void readUserButtons(void)
 /* main()        ===========================================================*/
 int main(void)
 {
-   BSP_HW_init();
+    BSP_HW_init();
+    QF_init();    /* initialize the framework and the underlying RT kernel */
+    BSP_init(0, NULL); /* initialize the Board Support Package */
 
-   return tlMain(0, NULL); 
+    return tlMain(); 
 }
 
 /* BSP functions ===========================================================*/

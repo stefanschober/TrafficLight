@@ -5,9 +5,9 @@ target_compile_definitions(${TGT}
         TARGET=${TGT}
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         KERNEL_$<IF:$<STREQUAL:${CONFIG_KERNEL},QK>,QK,QV>=1
-        $<$<CONFIG:Spy>:Q_SPY>
-        $<$<BOOL:${CONFIG_UNIT_TEST}>:Q_UTEST>
-        $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
+        $<$<CONFIG:Spy>:Q_SPY=1>
+        $<$<AND:$<CONFIG:Spy>,$<BOOL:${CONFIG_UNIT_TEST}>>:Q_UTEST=1>
+        $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI=1>
 )
 
 target_compile_options(${TGT}

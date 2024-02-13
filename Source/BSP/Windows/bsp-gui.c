@@ -50,6 +50,7 @@ Q_DEFINE_THIS_FILE
 static HINSTANCE l_hInst;   /* this application instance */
 static HWND      l_hWnd;    /* main window handle */
 static LPSTR     l_cmdLine; /* the command line string */
+static LPSTR     argv[1];
 
 static SegmentDisplay   l_trafficlights[3];   /* SegmentDisplay to show Philo status */
 static SegmentDisplay   l_pedLed;
@@ -90,7 +91,7 @@ static void WriteTime(DWORD t);
 /* thread function for running the application main_gui() */
 static DWORD WINAPI appThread(LPVOID par) {
     (void)par; /* unused parameter */
-    return (DWORD)tlMain(0, NULL); /* run the QF application */
+    return (DWORD)tlMain(); /* run the QF application */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -104,11 +105,14 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
     l_hInst   = hInst;   /* save the application instance */
     l_cmdLine = cmdLine; /* save the command line string */
+    argv[0]   = l_cmdLine;
 
     //AllocConsole();
 
-    // HW pre intialization
+    // BSP/QPC pre intialization
     BSP_HW_init();
+    QF_init();    /* initialize the framework and the underlying RT kernel */
+    BSP_init(1, argv); /* initialize the Board Support Package */
 
     /* create the main custom dialog window */
     hWnd = CreateCustDialog(hInst, IDD_APPLICATION, NULL,

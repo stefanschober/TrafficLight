@@ -1,13 +1,7 @@
 # BSP/Raspi
-set(_src "")
-set(_inc ${CMAKE_CURRENT_SOURCE_DIR})
-list(APPEND _src bsp.c)
-if(CONFIG_GUI)
-    list(APPEND _src bsp-gui.c resources.c)
-endif()
-target_sources(${TGT} PRIVATE ${_src})
-target_include_directories(${TGT} PRIVATE ${_inc})
-listIncludes(${CMAKE_CURRENT_SOURCE_DIR} ${_inc})
-listModules(${CMAKE_CURRENT_SOURCE_DIR} ${_src})
-
-unset(_src)
+target_sources(${TGT} PRIVATE
+    bsp.c
+    $<$<BOOL:${CONFIG_GUI}>:${CMAKE_CURRENT_SOURCE_DIR}/bsp-gui.c>
+    $<$<BOOL:${CONFIG_GUI}>:${CMAKE_CURRENT_SOURCE_DIR}/resources.c>
+)
+target_include_directories(${TGT} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

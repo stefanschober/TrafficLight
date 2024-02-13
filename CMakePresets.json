@@ -33,6 +33,31 @@
       "binaryDir": "${sourceDir}/Build/local"
     },
     {
+      "name": "con",
+      "inherits": "dft_",
+      "displayName": "Default Console",
+      "description": "Build for local console system",
+      "binaryDir": "${sourceDir}/Build/console",
+      "cacheVariables": {
+        "CONFIG_GUI": "OFF"
+      }
+    },
+    {
+      "name": "unitTest",
+      "inherits": "dft_",
+      "displayName": "Default",
+      "description": "Build for unit testing on local system with qunittest",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/Build/qutest",
+      "cacheVariables": {
+        "CONFIG_UNIT_TEST": "ON",
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Spy"
+        }
+      }
+    },
+    {
       "name": "gtk",
       "inherits": "dft_",
       "displayName": "Build with GTK+3 GUI",
@@ -47,7 +72,6 @@
       "inherits": "dft_",
       "displayName": "Pico config",
       "description": "Build for Raspberry Pi Pico",
-      "generator": "Ninja",
       "binaryDir": "${sourceDir}/Build/pico",
       "cacheVariables": {
         "PORT": {
@@ -142,6 +166,16 @@
       "name": "local",
       "inherits": "dft_",
       "configurePreset": "local"
+    },
+    {
+      "name": "con",
+      "inherits": "dft_",
+      "configurePreset": "con"
+    },
+    {
+      "name": "qutest",
+      "inherits": "dft_",
+      "configurePreset": "unitTest"
     },
     {
       "name": "gtk",

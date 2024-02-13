@@ -590,8 +590,7 @@ TLpedestrian_ctor(); /* instantiate the Table active object */
 TLblinker_ctor();</code>
   </operation>
   <operation name="startAllActiveObjects" type="void" visibility="0x00" properties="0x00">
-   <code>uint8_t n;
-uint_fast8_t aoPrio = 1u;
+   <code>uint_fast8_t aoPrio = 1u;
 
 QACTIVE_START(the_Ticker0, aoPrio++, 0, 0, 0, 0, 0);
 
@@ -714,7 +713,7 @@ $declare(AOs::AO_TLpedestrian)
 $declare(AOs::TLblinker_ctor)
 $declare(AOs::AO_TLblinker)
 
-int tlMain(int argc, char *argv[]);
+int tlMain(void);
 
 #endif /* trafficlight_h */</text>
   </file>
@@ -800,11 +799,8 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
-int tlMain(int argc, char *argv[])
+int tlMain(void)
 {
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(argc, argv); /* initialize the Board Support Package */
-
     /* object dictionaries... */
     QS_OBJ_DICTIONARY(smlPoolSto);
     QS_OBJ_DICTIONARY(pedestrianQueueSto);

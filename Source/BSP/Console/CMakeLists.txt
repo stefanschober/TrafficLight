@@ -1,7 +1,10 @@
 # BSP/Windows
-set(_src "")
-list(APPEND _src bsp.c)
-target_sources(${TGT} PRIVATE ${_src})
-listModules(${CMAKE_CURRENT_SOURCE_DIR} ${_src})
-
-unset(_src)
+if(CONFIG_UNIT_TEST)
+    target_sources(${TGT} PRIVATE
+        bsp-qutest.c
+    )
+else()
+    target_sources(${TGT} PRIVATE
+        bsp.c
+    )
+endif()

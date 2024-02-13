@@ -38,7 +38,7 @@
             "name": "(gdb) Bash unter Windows – starten",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Build/gtk/Debug/trafficlight.exe",
+            "program": "${workspaceFolder}/Build/gtk/Spy/trafficlight.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
@@ -47,11 +47,12 @@
             ],
             "externalConsole": false,
             "pipeTransport": {
-                "debuggerPath": "/ucrt64/bin/gdb",
-                "pipeProgram": "C:/Users/Schobers/MSYS2/usr/bin/bash",
+                "debuggerPath": "gdb",
+                "pipeProgram": "bash",
                 "pipeArgs": ["-c"],
                 "pipeCwd": ""
             },
+            "MIMode": "gdb",
             "setupCommands": [
                 {
                     "description": "Automatische Strukturierung und Einrückung für \"gdb\" aktivieren",

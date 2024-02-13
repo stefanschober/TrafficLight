@@ -65,6 +65,13 @@ include(qpc_sdk_import)
 project(${PROJECT_NAME}
     VERSION ${SW_VERSION}
     DESCRIPTION "Trafficlight project"
-    LANGUAGES C CXX ASM)
+    LANGUAGES C CXX ASM
+)
+
+if(NOT CMAKE_C_FLAGS_SPY)
+    foreach(LANG IN ITEMS C CXX ASM)
+        set(CMAKE_${LANG}_FLAGS_SPY ${CMAKE_${LANG}_FLAGS_DEBUG})
+    endforeach()
+endif()
 
 add_subdirectory(Source)

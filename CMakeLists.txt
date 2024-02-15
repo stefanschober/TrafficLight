@@ -27,6 +27,10 @@ else()
 endif()
 list(PREPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Source/cmake ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_SOURCE_DIR} ${HOME_PATH}/cmake)
 
+# include general project config & import qpc
+include(configureProject)
+set(QPC_SDK_PATH ${CMAKE_SOURCE_DIR}/Source/qpc)
+include(qpc_sdk_import)
 
 # setup Raspberry Pi Pico SDK
 if(CONFIG_PICO)
@@ -52,11 +56,6 @@ if(CONFIG_PICO)
         message(FATAL "PICO_SDK_PATH not found!")
     endif()
 endif()
-
-# include general project config & import qpc
-include(configureProject)
-set(QPC_SDK_PATH ${CMAKE_SOURCE_DIR}/Source/qpc)
-include(qpc_sdk_import)
 
 # default image/project name is trafficlight
 # Give a special name via -DIMAGE=<image>

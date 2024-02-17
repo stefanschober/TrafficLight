@@ -29,7 +29,7 @@ list(PREPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Source/cmake ${CMAKE_SOURCE_D
 
 # include general project config & import qpc
 include(configureProject)
-set(QPC_SDK_PATH ${CMAKE_SOURCE_DIR}/Source/qpc)
+set(QPC_SDK_PATH ${HOME_PATH}/Projects/qpc)
 include(qpc_sdk_import)
 
 # setup Raspberry Pi Pico SDK

@@ -19,3 +19,7 @@ target_link_options(${TGT}
     PRIVATE
         $<$<BOOL:${CONFIG_VERBOSE}>:-v>
 )
+
+if((NOT CONFIG_GUI) AND (NOT (PORT MATCHES ARM)))
+    target_compile_definitions(qpc PUBLIC QF_CONSOLE)
+endif()

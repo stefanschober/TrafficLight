@@ -216,13 +216,13 @@ uint16_t BSP_getButton(void)
 
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
-    setupConsole();
+    QF_consoleSetup();
     QF_setTickRate(BSP_TICKS_PER_SEC, 30); /* set the desired tick rate */
 }
 /*..........................................................................*/
 void QF_onCleanup(void) {
     printf("\nBye! Bye!\n");
-    shutdownConsole();
+    QF_consoleCleanup();
     QS_EXIT(); /* perform the QS cleanup */
 }
 /*..........................................................................*/
@@ -231,7 +231,7 @@ void QF_onClockTick(void) {
 
     QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
-    switch (readConsoleChar())
+    switch (QF_consoleGetKey())
     {
         case '\33':  // ESC pressed
         case 'q':    // q pressed

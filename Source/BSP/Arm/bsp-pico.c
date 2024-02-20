@@ -129,7 +129,13 @@ void UART0_IRQ_Handler(void)
         QS_RX_PUT(b);
     }
 
+#if defined KERNEL_QK
+    QK_ARM_ERRATUM_838869();
+#elif defined KERLEL_QV
     QV_ARM_ERRATUM_838869();
+#else
+#   warning "no valid KERNEL defined. Are you sure?...
+#endif
 }
 #endif
 

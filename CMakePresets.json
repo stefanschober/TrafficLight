@@ -73,11 +73,16 @@
       "inherits": "dft_",
       "displayName": "Pico config",
       "description": "Build for Raspberry Pi Pico",
+      "generator": "Ninja",
       "binaryDir": "${sourceDir}/Build/pico",
       "cacheVariables": {
         "PORT": {
           "type": "STRING",
           "value": "arm-cm"
+        },
+        "CMAKE_BUILD_TYPE": {
+          "type": "STRING",
+          "value": "Debug"
         },
         "CONFIG_GUI": "OFF",
         "CONFIG_PICO": "ON"

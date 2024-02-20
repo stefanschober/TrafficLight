@@ -87,7 +87,7 @@ project(${PROJECT_NAME}
 
 if(NOT CMAKE_C_FLAGS_SPY)
     foreach(LANG IN ITEMS C CXX ASM)
-        set(CMAKE_${LANG}_FLAGS_SPY ${CMAKE_${LANG}_FLAGS_DEBUG})
+        set(CMAKE_${LANG}_FLAGS_SPY "${CMAKE_${LANG}_FLAGS_DEBUG} -DQ_SPY=1")
     endforeach()
 endif()
 

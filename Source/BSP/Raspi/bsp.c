@@ -34,7 +34,7 @@
 #include <unistd.h>
 #include <gtk/gtk.h>
 
-#if defined RASPI
+#if defined RASPI_IO
 #if defined PIGPIO_LIB
 #	include "pigpio.h"
 
@@ -100,7 +100,7 @@ Q_DEFINE_THIS_FILE
 #endif
 
 // LOCAL functions ----------------------------------------------------------
-#if defined RASPI
+#if defined RASPI_IO
 enum outputPins {
     pinTLAred     = 17,
     pinTLAyellow  = 27,
@@ -136,7 +136,7 @@ int main (gint argc, gchar *argv[])
 /*..........................................................................*/
 void BSP_HW_init()
 {
-#if defined RASPI
+#if defined RASPI_IO
     // uint16_t io;
 
     piHandle = GPIO_INIT();
@@ -170,7 +170,7 @@ void BSP_init(gint argc, gchar *argv[])
 void BSP_terminate(gint16 result) {
     (void)result;
     QF_stop(); /* stop the main QF application and the ticker thread */
-#if defined RASPI
+#if defined RASPI_IO
     GPIO_TERMINATE();
 #endif
 }
@@ -178,7 +178,7 @@ void BSP_terminate(gint16 result) {
 void BSP_setlight(eTLidentity_t id, uint8_t light)
 {
     guiSetLight(id, light);
-#if defined RASPI
+#if defined RASPI_IO
     switch(id)
     {
         case TrafficLightA:
@@ -210,7 +210,7 @@ void BSP_setlight(eTLidentity_t id, uint8_t light)
 void BSP_setPedLed(guint16 status)
 {
     guiSetPedLed(status);
-#if defined RASPI
+#if defined RASPI_IO
     GPIO_WRITE(pinTLblink, status ? 1 : 0);
 #endif
 }
@@ -248,7 +248,7 @@ void QF_onClockTick(void) {
 
     QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
-#if defined RASPI
+#if defined RASPI_IO
     if(GPIO_READ(pinUsrButton))
     {
         if(button < 5)

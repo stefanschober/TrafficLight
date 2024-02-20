@@ -212,7 +212,7 @@ int main(void)
 {
    BSP_HW_init();
 
-   return tlMain(0, NULL); 
+   return tlMain(); 
 }
 
 /* BSP functions ===========================================================*/

@@ -39,7 +39,8 @@
       "description": "Build for local console system",
       "binaryDir": "${sourceDir}/Build/console",
       "cacheVariables": {
-        "CONFIG_GUI": "OFF"
+        "CONFIG_GUI": "OFF",
+        "CONFIG_QF_CON": "ON"
       }
     },
     {

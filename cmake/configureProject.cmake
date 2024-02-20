@@ -2,24 +2,21 @@
 message("Project configuration and options setting started")
 
 # set up configurable options
-option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
 option(CONFIG_CPPCHECK   "set to ON, if CPP_CHECK shall be enabled (default: OFF)" OFF)
-option(CONFIG_CPPCHECK_TGT "set to ON, to generate a separate CPPCHECK target (default: OFF)" OFF)
 option(CONFIG_CHECKMISRA "set to ON, if CPP_CHECK shall be enabled with MISRA support (default: OFF)" OFF)
+
 option(CONFIG_GUI        "set to ON, if a Windows (TM) GUI shall be compiled in (default: OFF)" OFF)
 option(CONFIG_GTK        "set to ON, if GTK+3 GUI shall be compiled in (default: OFF)" OFF)
+
+option(CONFIG_PICO       "set to ON, if Raspberry Pi Pico system shall be configured. (default: OFF)" OFF)
+
 option(CONFIG_PICOLIB    "set to ON, if the pico standard library shall be used. (default: OFF)" OFF)
-option(CONFIG_RASPI      "set to ON, if Raspberry Pi Linux system shall be configured. (default: OFF)" OFF)
 option(CONFIG_RASPI_IO   "set to ON, if Raspberry Pi hardware I?O shall be configured. (default: OFF)" OFF)
-option(CONFIG_PIGPIO     "set to ON, if the PIGPIO server on the Raspberry Pi shall be used. (default: OFF)" OFF)
-option(CONFIG_VERBOSE   "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
-option(CONFIG_PICO      "set to ON, if Raspberry Pi Pico system shall be configured. (default: OFF)" OFF)
-option(CONFIG_PICO_CMSIS "set to ON, if Raspberry Pi Pico system shall use CMSIS APIs. (default: ON)" ON)
-option(CONFIG_CORTEX_M0 "set to ON, if an ARM Cortex-M0 target system shall be configured. (default: OFF)" OFF)
-option(CONFIG_CORTEX_M0plus "set to ON, if an ARM Cortex-M0+ target system shall be configured. (default: OFF)" OFF)
-option(CONFIG_CORTEX_M3 "set to ON, if an ARM Cortex-M3 target system shall be configured. (default: OFF)" OFF)
-option(CONFIG_CORTEX_M4 "set to ON, if an ARM Cortex-M4 target system shall be configured. (default: OFF)" OFF)
-option(CONFIG_DEBUG     "set to ON, to enable DEBUG support. (default: ON)" ON)
+option(CONFIG_PIGPIO_LIB "set to ON, if the PIGPIO server on the Raspberry Pi shall be used. (default: OFF)" OFF)
+
+option(CONFIG_UNIT_TEST  "set to ON, if Q_UTEST shall be enabled (default: OFF)" OFF)
+option(CONFIG_VERBOSE    "set to ON, to set the -v/--verbose option to compiler/linker calls. (default: OFF)" OFF)
+option(CONFIG_DEBUG      "set to ON, to enable DEBUG support. (default: ON)" ON)
 
 set(CMAKE_BUILD_TYPE Debug CACHE STRING "The build type (DEBUG, RELEASE, SPY) to build for (default: DEBUG)")
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;Spy" CACHE STRING "The list of available build configurations for multi config generators")

@@ -29,7 +29,23 @@ list(PREPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/Source/cmake ${CMAKE_SOURCE_D
 
 # include general project config & import qpc
 include(configureProject)
-set(QPC_SDK_PATH ${HOME_PATH}/Projects/qpc)
+
+# include must happen before project(...)
+if(NOT QPC_SDK_PATH) # check for already installed QPC SDK
+    foreach(p qpc qpc-sdk)
+        set(qpcPath "$ENV{HOME}/Projects/${p}")
+        if(EXISTS "${qpcPath}")
+            set(QPC_SDK_PATH "${qpcPath}")
+            break()
+        endif()
+    endforeach()
+    if((NOT QPC_SDK_PATH) AND (DEFINED ENV{QPC_SDK_PATH}) AND (EXISTS "$ENV{QPC_SDK_PATH}"))
+        set(QPC_SDK_PATH $ENV{QPC_SDK_PATH})
+    else()
+        set(QPC_FETCH_FROM_GIT TRUE)
+        set(QPC_FETCH_FROM_GIT_PATH $ENV{HOME}/Projects/qpc-sdk)
+    endif()
+endif()
 include(qpc_sdk_import)
 
 # setup Raspberry Pi Pico SDK
@@ -38,8 +54,11 @@ if(CONFIG_PICO)
     if(NOT PICO_SDK_PATH) # check for already installed Pico SDK
         if(EXISTS $ENV{HOME}/Projects/pico-sdk)
             set(PICO_SDK_PATH "$ENV{HOME}/Projects/pico-sdk")
-        elseif(DEFINED ENV{PICO_SDK_PATH})
+        elseif((DEFINED ENV{PICO_SDK_PATH}) AND (EXISTS "$ENV{PICO_SDK_PATH}"))
             set(PICO_SDK_PATH $ENV{PICO_SDK_PATH})
+        else()
+            set(PICO_SDK_FETCH_FROM_GIT TRUE)
+            set(PICO_SDK_FETCH_FROM_GIT_PATH $ENV{HOME}/Projects/pico-sdk)
         endif()
     endif()
     set(PICO_BOARD pico)

@@ -40,7 +40,6 @@ endif()
 target_compile_definitions(${TGT}
     PUBLIC
         USC2_WIN32
-        $<$<CONFIG:Spy>:Q_SPY>
         $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI>
 )
 

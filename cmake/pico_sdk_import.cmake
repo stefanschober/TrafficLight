@@ -59,14 +59,20 @@ if (NOT PICO_SDK_PATH)
     endif ()
 endif ()
 
-get_filename_component(PICO_SDK_PATH "${PICO_SDK_PATH}" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+file(REAL_PATH "${PICO_SDK_PATH}" PICO_SDK_PATH BASE_DIRECTORY "${CMAKE_BINARY_DIR}")
 if (NOT EXISTS ${PICO_SDK_PATH})
     message(FATAL_ERROR "Directory '${PICO_SDK_PATH}' not found")
 endif ()
 
-set(PICO_SDK_INIT_CMAKE_FILE ${PICO_SDK_PATH}/pico_sdk_init.cmake)
+find_file(PICO_SDK_INIT_CMAKE_FILE pico_sdk_init.cmake
+    HINTS ${PICO_SDK_PATH}
+    PATH_SUFFIXES pico_sdk-src
+)
+# set(PICO_SDK_INIT_CMAKE_FILE ${PICO_SDK_PATH}/pico_sdk_init.cmake)
 if (NOT EXISTS ${PICO_SDK_INIT_CMAKE_FILE})
     message(FATAL_ERROR "Directory '${PICO_SDK_PATH}' does not appear to contain the Raspberry Pi Pico SDK")
+else()
+    cmake_path(GET PICO_SDK_INIT_CMAKE_FILE PARENT_PATH PICO_SDK_PATH)
 endif ()
 
 set(PICO_SDK_PATH ${PICO_SDK_PATH} CACHE PATH "Path to the Raspberry Pi Pico SDK" FORCE)

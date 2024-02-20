@@ -5,9 +5,11 @@ target_compile_definitions(${TGT}
         TARGET=${TGT}
         $<$<BOOL:${ADD_DEBUG_CODE}>:${ADD_DEBUG_CODE}>
         KERNEL_$<IF:$<STREQUAL:${CONFIG_KERNEL},QK>,QK,QV>=1
-        $<$<CONFIG:Spy>:Q_SPY=1>
         $<$<AND:$<CONFIG:Spy>,$<BOOL:${CONFIG_UNIT_TEST}>>:Q_UTEST=1>
         $<$<BOOL:${CONFIG_GUI}>:QWIN_GUI=1>
+        $<$<BOOL:${CONFIG_QF_CON}>:QF_CONSOLE=1>
+        $<$<BOOL:${CONFIG_RASPI_IO}>:RASPI_IO=1>
+        $<$<AND:$<BOOL:${CONFIG_RASPI_IO}>,$<BOOL:${CONFIG_PIGPIO_LIB}>>:PIGPIO_LIB=1>
 )
 
 target_compile_options(${TGT}
@@ -20,6 +22,6 @@ target_link_options(${TGT}
         $<$<BOOL:${CONFIG_VERBOSE}>:-v>
 )
 
-if((NOT CONFIG_GUI) AND (NOT (PORT MATCHES ARM)))
-    target_compile_definitions(qpc PUBLIC QF_CONSOLE)
+if(CONFIG_QF_CON)
+    target_compile_definitions(qpc PRIVATE QF_CONSOLE=1)
 endif()

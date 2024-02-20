@@ -99,16 +99,11 @@ if(CONFIG_VERBOSE)
     CONFIG_KERNEL               = ${CONFIG_KERNEL}
     QPC_DIR                     = ${QPC_DIR}
 
-    CONFIG_CORTEX_M0            = ${CONFIG_CORTEX_M0}
-    CONFIG_CORTEX_M0plus        = ${CONFIG_CORTEX_M0plus}
-    CONFIG_CORTEX_M3            = ${CONFIG_CORTEX_M3}
-    CONFIG_CORTEX_M4            = ${CONFIG_CORTEX_M4}
     CONFIG_PICO                 = ${CONFIG_PICO}
     MCU                         = ${MCU}
 
-    CONFIG_RASPI                = ${CONFIG_RASPI}
     CONFIG_RASPI_IO             = ${CONFIG_RASPI_IO}
-    CONFIG_PIGPIO               = ${CONFIG_PIGPIO}
+    CONFIG_PIGPIO_LIB           = ${CONFIG_PIGPIO_LIB}
 
     CONFIG_DEBUG                = ${CONFIG_DEBUG}
 

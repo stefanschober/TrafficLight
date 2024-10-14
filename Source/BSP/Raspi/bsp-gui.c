@@ -93,6 +93,8 @@ typedef struct {
 } appArgs_t;
 #define APP_ARGS(o) ((appArgs_t *)(o))
 
+#include "resources.h"
+
 static void theApp (GtkApplication* app, gpointer user_data)
 {
 	GtkBuilder      *builder;

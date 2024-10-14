@@ -90,7 +90,10 @@ static void WriteTime(DWORD t);
 /*..........................................................................*/
 /* thread function for running the application main_gui() */
 static DWORD WINAPI appThread(LPVOID par) {
-    (void)par; /* unused parameter */
+    // BSP/QPC pre intialization
+    BSP_HW_init();
+    QF_init();    /* initialize the framework and the underlying RT kernel */
+    BSP_init(1, par); /* initialize the Board Support Package */
     return (DWORD)tlMain(); /* run the QF application */
 }
 
@@ -108,11 +111,6 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
     argv[0]   = l_cmdLine;
 
     //AllocConsole();
-
-    // BSP/QPC pre intialization
-    BSP_HW_init();
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(1, argv); /* initialize the Board Support Package */
 
     /* create the main custom dialog window */
     hWnd = CreateCustDialog(hInst, IDD_APPLICATION, NULL,
@@ -173,7 +171,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                                timeDisplayBmp, sizeof(timeDisplayBmp)/sizeof(timeDisplayBmp[0]));
 
             /* --> QP: spawn the application thread to run main_gui() */
-            Q_ALLEGE(CreateThread(NULL, 0, &appThread, NULL, 0, NULL)
+            Q_ALLEGE(CreateThread(NULL, 0, &appThread, argv, 0, NULL)
                      != (HANDLE)0);
 
             Q_ALLEGE(SetTimer(hWnd, 1000u, 1000u, (TIMERPROC)NULL) != 0);

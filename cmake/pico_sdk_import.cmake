@@ -37,6 +37,7 @@ if (NOT PICO_SDK_PATH)
                     GIT_REPOSITORY https://github.com/raspberrypi/pico-sdk
                     GIT_TAG master
                     GIT_SUBMODULES_RECURSE FALSE
+                    SOURCE_SUBDIR external
             )
         else ()
             FetchContent_Declare(
@@ -48,7 +49,7 @@ if (NOT PICO_SDK_PATH)
 
         if (NOT pico_sdk)
             message("Downloading Raspberry Pi Pico SDK")
-            FetchContent_Populate(pico_sdk)
+            FetchContent_MakeAvailable(pico_sdk)
             set(PICO_SDK_PATH ${pico_sdk_SOURCE_DIR})
         endif ()
         set(FETCHCONTENT_BASE_DIR ${FETCHCONTENT_BASE_DIR_SAVE})

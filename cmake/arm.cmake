@@ -10,7 +10,6 @@ if(CONFIG_PICO)
     pico_add_extra_outputs(${TGT})
 
     set(MCU RP2040)
-    set(INCFILE armgnu)
 else()
     # MCU based settings (size of flash memory)
     if(NOT MCU)
@@ -106,16 +105,14 @@ else()
         message(FATAL_ERROR "Unknown Compiler/Toolset ${CMAKE_C_COMPILER_ID}")
     endif()
 
-    if(NOT CONFIG_PICO)
-        # create the real scatter file from the template (*.sct.in)
-        message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
-        configure_file(${SCATTER_IN} ${SCATTER_OUT})
-    endif()
+    # create the real scatter file from the template (*.sct.in)
+    message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
+    configure_file(${SCATTER_IN} ${SCATTER_OUT})
+
+    # include toolchain specific options/settings
+    include(${INCFILE})
 
 endif()
-
-# include toolchain specific options/settings
-include(${INCFILE})
 
 # set project/target related compiler #define macros
 target_compile_definitions(${TGT}

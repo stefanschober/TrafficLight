@@ -1,7 +1,7 @@
 # the WIN32 target is a GUI-only target system
 if(CONFIG_UNIT_TEST)
     set(CONFIG_GUI OFF)
-elseif(NOT DEFINED CONFIG_GUI)
+else()
     set(CONFIG_GUI ON)
 endif()
 set(QPC_CFG_GUI ${CONFIG_GUI})

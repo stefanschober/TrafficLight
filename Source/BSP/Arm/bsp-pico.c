@@ -216,9 +216,9 @@ static void readUserButtons(void)
 /* main()        ===========================================================*/
 int main(void)
 {
-   BSP_HW_init();
-
-   return tlMain(); 
+    BSP_HW_init();
+    QF_init();
+    return tlMain(); 
 }
 
 /* BSP functions ===========================================================*/

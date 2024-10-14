@@ -48,6 +48,7 @@ static QActive *theLights[3];
 //============================================================================
 int main(int argc, char *argv[])
 {
+    BSP_HW_init();
     QF_init();    /* initialize the framework and the underlying RT kernel */
     BSP_init(argc, argv); /* initialize the Board Support Package */
 
@@ -55,6 +56,10 @@ int main(int argc, char *argv[])
     QS_TEST_PAUSE();
 
     return tlMain(); // run the QF application
+}
+/*..........................................................................*/
+void BSP_HW_init(void) {
+
 }
 /*..........................................................................*/
 void BSP_init(int argc, char **argv)

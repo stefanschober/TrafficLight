@@ -127,8 +127,6 @@ static int piHandle = -1;
 
 int main (gint argc, gchar *argv[])
 {
-    BSP_HW_init();
-    
     return startGui(argc, argv);
 }
 

@@ -218,6 +218,8 @@ int main(void)
 {
     BSP_HW_init();
     QF_init();
+    BSP_init(0, NULL);
+    
     return tlMain(); 
 }
 

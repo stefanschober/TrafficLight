@@ -102,6 +102,36 @@
       }
     },
     {
+      "name": "pico2",
+      "inherits": "pico",
+      "displayName": "Pico2 config",
+      "description": "Build for Raspberry Pi Pico2 with QV kernel",
+      "binaryDir": "${sourceDir}/Build/pico2",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        },
+        "PICO_BOARD": {
+          "type": "STRING",
+          "value": "pico2"
+        }
+      }
+    },
+    {
+      "name": "pico2QK",
+      "inherits": "pico2",
+      "displayName": "Pico2 QK config",
+      "description": "Build for Raspberry Pi Pico2 with QK kernel",
+      "binaryDir": "${sourceDir}/Build/picoQK2",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    },
+    {
       "name": "win32",
       "inherits": "dft_",
       "displayName": "MinGW config",
@@ -226,6 +256,14 @@
     {
       "name": "picoQK",
       "configurePreset": "picoQK"
+    },
+    {
+      "name": "pico2",
+      "configurePreset": "pico2"
+    },
+    {
+      "name": "pico2QK",
+      "configurePreset": "pico2QK"
     }
   ],
   "vendor": {

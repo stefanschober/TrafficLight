@@ -169,16 +169,6 @@ static void readUserButtons(void)
     }
 }
 
-/* main()        ===========================================================*/
-int main(void)
-{
-    BSP_HW_init();
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(0, NULL); /* initialize the Board Support Package */
-
-    return tlMain(); 
-}
-
 /* BSP functions ===========================================================*/
 void BSP_HW_init(void) {
     /* NOTE: SystemInit() has been already called from the startup code

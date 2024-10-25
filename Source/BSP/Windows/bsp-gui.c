@@ -49,8 +49,8 @@ Q_DEFINE_THIS_FILE
 /* local variables ---------------------------------------------------------*/
 static HINSTANCE l_hInst;   /* this application instance */
 static HWND      l_hWnd;    /* main window handle */
-static LPSTR     l_cmdLine; /* the command line string */
-static LPSTR     argv[1];
+static LPSTR     *_argv;
+static int        _argc;
 
 static SegmentDisplay   l_trafficlights[3];   /* SegmentDisplay to show Philo status */
 static SegmentDisplay   l_pedLed;
@@ -89,33 +89,32 @@ static void WriteTime(DWORD t);
 
 /*..........................................................................*/
 /* thread function for running the application main_gui() */
-static DWORD WINAPI appThread(LPVOID par) {
+static DWORD WINAPI appThread(LPVOID par)
+{
+    (void)par;  // unused
     // BSP/QPC pre intialization
     BSP_HW_init();
     QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(1, par); /* initialize the Board Support Package */
+    BSP_init(_argc, _argv); /* initialize the Board Support Package */
     return (DWORD)tlMain(); /* run the QF application */
 }
 
 /*--------------------------------------------------------------------------*/
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
-                   LPSTR cmdLine, int iCmdShow)
+int startGui(int argc, char *argv[])
 {
     HWND hWnd;
     MSG  msg;
 
-    (void)hPrevInst; /* unused parameter */
-
-    l_hInst   = hInst;   /* save the application instance */
-    l_cmdLine = cmdLine; /* save the command line string */
-    argv[0]   = l_cmdLine;
+    l_hInst = GetModuleHandle(NULL);   /* save the application instance */
+    _argv   = argv;
+    _argc   = argc;
 
     //AllocConsole();
 
     /* create the main custom dialog window */
-    hWnd = CreateCustDialog(hInst, IDD_APPLICATION, NULL,
+    hWnd = CreateCustDialog(l_hInst, IDD_APPLICATION, NULL,
                             &WndProc, "QP_APP");
-    ShowWindow(hWnd, iCmdShow);  /* show the main window */
+    ShowWindow(hWnd, SW_SHOWNORMAL);  /* show the main window */
 
     /* enter the message loop... */
     while (GetMessage(&msg, NULL, 0, 0)) {
@@ -171,7 +170,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                                timeDisplayBmp, sizeof(timeDisplayBmp)/sizeof(timeDisplayBmp[0]));
 
             /* --> QP: spawn the application thread to run main_gui() */
-            Q_ALLEGE(CreateThread(NULL, 0, &appThread, argv, 0, NULL)
+            Q_ALLEGE(CreateThread(NULL, 0, &appThread, NULL, 0, NULL)
                      != (HANDLE)0);
 
             Q_ALLEGE(SetTimer(hWnd, 1000u, 1000u, (TIMERPROC)NULL) != 0);

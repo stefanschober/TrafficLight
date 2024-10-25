@@ -125,12 +125,6 @@ static int piHandle = -1;
 
 // static struct termios l_tsav; /* structure with saved terminal attributes */
 
-int main (gint argc, gchar *argv[])
-{
-    return startGui(argc, argv);
-}
-
-
 /*..........................................................................*/
 void BSP_HW_init()
 {

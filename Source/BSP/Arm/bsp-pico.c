@@ -34,9 +34,14 @@
 #include "qpc.h"
 #include "trafficlight.h"
 #include "bsp.h"
+#if defined PICO_RP2040
 #include "RP2040.h"
+#elif defined PICO_RP2350
+#include "RP2350.h"
+#endif
 #include "pico/stdlib.h"
 #include "hardware/exception.h"
+#include "hardware/clocks.h"
 #include "hardware/irq.h"
 #include "hardware/uart.h"
 
@@ -49,7 +54,7 @@ Q_DEFINE_THIS_FILE
 #error "No real time kernel (neither KERNEL_QV nor KERNEL_QK) is defined. Aborting!"
 #endif
 
-#if !(__ARM_ARCH == 6 || __ARM_ARCH == 7)
+#if !(__ARM_ARCH == 6 || __ARM_ARCH == 7 || __ARM_ARCH == 8)
 #error "unknown ARM architecture found. Aborting!"
 #endif
 
@@ -134,7 +139,7 @@ void UART0_IRQ_Handler(void)
 #elif defined KERLEL_QV
     QV_ARM_ERRATUM_838869();
 #else
-#   warning "no valid KERNEL defined. Are you sure?...
+#   warning "no valid KERNEL defined. Are you sure?"
 #endif
 }
 #endif
@@ -211,16 +216,6 @@ static void readUserButtons(void)
         e = (debouncedButtons & 0x02u) ? &emergencyEvt : &releaseEvt;
         QF_PUBLISH(e, &l_Button_Handler); /* publish to all subscribers */
     }
-}
-
-/* main()        ===========================================================*/
-int main(void)
-{
-    BSP_HW_init();
-    QF_init();
-    BSP_init(0, NULL);
-    
-    return tlMain(); 
 }
 
 /* BSP functions ===========================================================*/

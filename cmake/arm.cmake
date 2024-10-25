@@ -1,15 +1,25 @@
 #default port is arm-cm
 set(PORT arm-cm)
 
+# no GUI on embedded target
+if(CONFIG_GUI)
+    message(WARNING "GUI is not supported on embedded targets. Resetting CONFIG_GUI!")
+    set(CONFIG_GUI OFF)
+endif()
+
 if(CONFIG_PICO)
     message(STATUS "setup Raspberry Pi Pico SDK from ${PICO_SDK_PATH}")
     pico_sdk_init()
 
-    pico_enable_stdio_usb(${TGT} TRUE)
-    pico_enable_stdio_uart(${TGT} TRUE)
     pico_add_extra_outputs(${TGT})
 
-    set(MCU RP2040)
+    if(PICO_BOARD STREQUAL pico2)
+        set(MCU RP2350)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m33")
+    else()
+        set(MCU RP2040)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m0plus")
+    endif()
 else()
     # MCU based settings (size of flash memory)
     if(NOT MCU)
@@ -17,26 +27,26 @@ else()
         set(MCU STM32F091xC)
     endif()
 
-    # no GUI on embedded target
-    if(CONFIG_GUI)
-        message(WARNING "GUI is not supported on embedded targets. Resetting CONFIG_GUI!")
-	    set(CONFIG_GUI OFF)
-    endif()
-
     if(NOT CONFIG_LIBINIT)
         set(NO_LIBINIT true)
     endif()
 
-    if(MCU STREQUAL "TLE9842QX")
-        set(MCU_FLASH_SIZE 36)
-    elseif(MCU STREQUAL "TLE9842_2QX")
-        set(MCU_FLASH_SIZE 40)
-    elseif(MCU STREQUAL "TLE984[35]QX")
-        set(MCU_FLASH_SIZE 48)
-    elseif(MCU STREQUAL "TLE9843_2QX")
-        set(MCU_FLASH_SIZE 52)
-    elseif(MCU MATCHES "TLE9844[^ \t]*QX")
-        set(MCU_FLASH_SIZE 64)
+    if(MCU MATCHES "STM32F091[^ \t]*C")
+        set(MCU_FLASH_SIZE 256)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m0plus")
+    elseif(MCU MATCHES "TLE984[2345][^ \t]*")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mcpu=cortex-m0")
+        if(MCU STREQUAL "TLE9842QX")
+            set(MCU_FLASH_SIZE 36)
+        elseif(MCU STREQUAL "TLE9842_2QX")
+            set(MCU_FLASH_SIZE 40)
+        elseif(MCU STREQUAL "TLE984[35]QX")
+            set(MCU_FLASH_SIZE 48)
+        elseif(MCU STREQUAL "TLE9843_2QX")
+            set(MCU_FLASH_SIZE 52)
+        elseif(MCU MATCHES "TLE9844[^ \t]*QX")
+            set(MCU_FLASH_SIZE 64)
+        endif()
     elseif(MCU MATCHES "STM32F091[^ \t]*C")
         set(MCU_FLASH_SIZE 256)
     else()
@@ -66,76 +76,35 @@ else()
         set(SCATTER_TPL "stm32f091")
     endif()
 
-    if(CMAKE_C_COMPILER_ID STREQUAL "ARMCC")
-        find_program(FROMELF
-            NAMES fromelf fromelf.exe
-            PATHS ${CMAKE_FIND_ROOT_PATH}
-            PATH_SUFFIXES bin
-        )
-        if(NOT FROMELF)
-            message(FATAL_ERROR "Ooops - the KEIL/ARMCC program 'fromelf' cannot be found")
-        endif()
-        set(MKHEX ${FROMELF})
-        set(MKHEX_ARGS --i32combined --output=$<TARGET_NAME:${TGT}>.hex $<TARGET_FILE_NAME:${TGT}>)
-        set(MKSIZE ${FROMELF})
-        set(MKSIZE_ARGS --text -z $<TARGET_FILE_NAME:${TGT}>)
-
-        set(SCATTER_FILE ${SCATTER_TPL}.sct)
-        set(SCATTER_IN ${SCATTER_FILE}.in)
-        set(SCATTER_OUT ${CMAKE_BINARY_DIR}/${SCATTER_FILE})
-        set(INCFILE armcc)
-    elseif(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        if(NOT CMAKE_OBJCOPY)
-            message(FATAL_ERROR "Ooops - the GNU/binutils program 'objcopy' cannot be found!")
-        endif()
-        find_program(CMAKE_SIZE
-            NAMES ${_CMAKE_TOOLCHAIN_PREFIX}size${_CMAKE_TOOLCHAIN_SUFFIX}
-            HINTS ${_CMAKE_TOOLCHAIN_LOCATION}
-        )
-        set(MKHEX ${CMAKE_OBJCOPY})
-        set(MKHEX_ARGS -O ihex $<TARGET_FILE_NAME:${TGT}> $<TARGET_NAME:${TGT}>.hex)
-        set(MKSIZE ${CMAKE_SIZE})
-        set(MKSIZE_ARGS $<TARGET_FILE_NAME:${TGT}>)
-
-        set(SCATTER_FILE ${SCATTER_TPL}.ld)
-        set(SCATTER_IN ${SCATTER_FILE}.in)
-        set(SCATTER_OUT ${CMAKE_BINARY_DIR}/${SCATTER_FILE}.cpp)
-        set(INCFILE armgnu)
-    else()
-        message(FATAL_ERROR "Unknown Compiler/Toolset ${CMAKE_C_COMPILER_ID}")
+    if(NOT CMAKE_OBJCOPY)
+        message(FATAL_ERROR "Ooops - the GNU/binutils program 'objcopy' cannot be found!")
     endif()
+    find_program(CMAKE_SIZE
+        NAMES ${_CMAKE_TOOLCHAIN_PREFIX}size${_CMAKE_TOOLCHAIN_SUFFIX}
+        HINTS ${_CMAKE_TOOLCHAIN_LOCATION}
+    )
+    set(MKHEX ${CMAKE_OBJCOPY})
+    set(MKHEX_ARGS -O ihex $<TARGET_FILE_NAME:${TGT}> $<TARGET_NAME:${TGT}>.hex)
+    set(MKSIZE ${CMAKE_SIZE})
+    set(MKSIZE_ARGS $<TARGET_FILE_NAME:${TGT}>)
+
+    set(SCATTER_FILE ${SCATTER_TPL}.ld)
+    set(SCATTER_IN ${SCATTER_FILE}.in)
+    set(SCATTER_OUT ${CMAKE_BINARY_DIR}/${SCATTER_FILE}.cpp)
+    set(INCFILE armgnu)
 
     # create the real scatter file from the template (*.sct.in)
     message(STATUS ${SCATTER_IN} -> ${SCATTER_OUT})
     configure_file(${SCATTER_IN} ${SCATTER_OUT})
 
-    # include toolchain specific options/settings
-    include(${INCFILE})
-
+    execute_process(
+        COMMAND ${CMAKE_C_COMPILER} -E -I  ${CMAKE_CURRENT_SOURCE_DIR} -P ${SCATTER_FILE}.cpp -o ${SCATTER_FILE}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        RESULT_VARIABLE _ld_ok
+    )    
 endif()
 
 # set project/target related compiler #define macros
-target_compile_definitions(${TGT}
-	PUBLIC
-        ${MCU}
-        FLASHSIZE=${MCU_FLASH_SIZE}
-        STACKSIZE=${STACKSIZE}
-        $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
-        $<$<NOT:$<BOOL:${CONFIG_LIBINIT}>>:NO_LIBINIT>
-        $<$<AND:$<BOOL:${CONFIG_PICO}>,$<BOOL:${CONFIG_PICO_CMSIS}>>:PICO_CMSIS_RENAME_EXCEPTIONS=1>
-        # $<$<AND:$<BOOL:${CONFIG_PICO}>,$<BOOL:${CONFIG_PICO_CMSIS}>>:PICO_NO_RAM_VECTOR_TABLE=1>
-)
-
-target_link_libraries(${TGT}
-    PUBLIC
-        $<$<BOOL:${CONFIG_PICO}>:pico_stdlib>
-        $<$<BOOL:${CONFIG_PICO}>:cmsis_core>
-        $<$<BOOL:${CONFIG_PICO}>:hardware_exception>
-        $<$<BOOL:${CONFIG_PICO}>:hardware_irq>
-        $<$<AND:$<CONFIG:Spy>,$<BOOL:${CONFIG_PICO}>>:hardware_uart>
-)
-
-
 add_custom_target(${TGT}Hex ALL
     COMMAND ${MKHEX} ${MKHEX_ARGS}
     COMMAND ${MKSIZE} ${MKSIZE_ARGS}
@@ -144,41 +113,3 @@ add_custom_target(${TGT}Hex ALL
     VERBATIM
 )
 add_dependencies(${TGT}Hex ${TGT})
-
-if(PARAMNAME AND PROFILENAME)
-    findParFile(RESULT PARAM_IN
-                FILENAME ${PARAMNAME}
-    )
-    findParFile(RESULT PROFILE_IN
-                FILENAME ${PROFILENAME}
-    )
-
-    if(PARAM_IN AND PROFILE_IN)
-        copyParFile(RESULT PARAM_OUT
-                    IN ${PARAM_IN}
-                    TEMPLATE ${PARAMNAME}
-        )
-        copyParFile(RESULT PROFILE_OUT
-                    IN ${PROFILE_IN}
-                    TEMPLATE ${PROFILENAME}
-        )
-
-        # 2) the hex file with application and eeprom data built from
-        #    preceding targets
-        getTargetName(TGT_NAME ${TGT})
-        add_custom_target(tgtCpl ALL
-            COMMAND ${CMAKE_COMMAND}
-                -DHEXFILE=$<TARGET_NAME:${TGT}>
-                -DPARAM_IN=${CMAKE_CURRENT_BINARY_DIR}/${PARAMNAME}.bin
-                -DPROFILE_IN=${CMAKE_CURRENT_BINARY_DIR}/${PROFILENAME}.bin
-                $<$<STREQUAL:${CMAKE_C_COMPILER_ID}:-DARMCC=ON>
-                -P ${CMAKE_CURRENT_LIST_DIR}/createTgtCpl.cmake
-            BYPRODUCTS ${TGT_NAME}.cpl.hex
-            WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-            COMMENT "Create complete hex file for supplier (app code + eeprom data)"
-            VERBATIM
-            SOURCES ${EEPROM_DATA_FILE}
-        )
-        add_dependencies(tgtCpl ${TGT}Hex)
-    endif()
-endif()

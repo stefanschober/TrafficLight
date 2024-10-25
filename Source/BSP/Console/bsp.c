@@ -125,18 +125,6 @@ static int readConsoleChar(void)
     return ch;
 }
 
-/* main()        ===========================================================*/
-#if !defined Q_UTEST
-int main(int argc, char *argv[])
-{
-    BSP_HW_init();
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(argc, argv); /* initialize the Board Support Package */
-
-    return tlMain();
-}
-#endif
-
 /* BSP functions ===========================================================*/
 void BSP_HW_init(void) {
 

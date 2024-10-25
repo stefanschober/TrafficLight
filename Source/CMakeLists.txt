@@ -23,7 +23,7 @@ if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
 endif()
 
 # the project target(s)
-add_executable(${TGT} "")
+add_executable(${TGT} main.c)
 set_property(TARGET ${TGT} PROPERTY POSITION_INDEPENDENT_CODE FALSE)
 set_property(TARGET ${TGT} PROPERTY OUTPUT_NAME ${IMAGE})
 

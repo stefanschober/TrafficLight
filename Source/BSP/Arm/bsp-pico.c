@@ -211,7 +211,7 @@ static void readUserButtons(void)
     {
     	static const QEvt emergencyEvt = QEVT_INITIALIZER(EMERGENCY_SIG);
     	static const QEvt releaseEvt = QEVT_INITIALIZER(EM_RELEASE_SIG);
-        static QEvt *e;
+        static const QEvt *e;
         
         e = (debouncedButtons & 0x02u) ? &emergencyEvt : &releaseEvt;
         QF_PUBLISH(e, &l_Button_Handler); /* publish to all subscribers */

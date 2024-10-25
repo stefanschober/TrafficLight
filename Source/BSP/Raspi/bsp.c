@@ -236,11 +236,11 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static uint8_t button = 0;
-
     QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
 #if defined RASPI_IO
+    static uint8_t button = 0;
+
     if(GPIO_READ(pinUsrButton))
     {
         if(button < 5)

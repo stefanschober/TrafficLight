@@ -110,7 +110,7 @@ QActive * const AO_TLtrafficB = &l_trafficB.super; /* "opaque" pointers to TL AO
 //$define${AOs::TLtraffic_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${AOs::TLtraffic_ctor} .....................................................
-int16_t TLtraffic_ctor(void) {
+void TLtraffic_ctor(void) {
     QS_FUN_DICTIONARY(TLtraffic_initial);
     QS_FUN_DICTIONARY(TLtraffic_RUN);
     QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);

@@ -46,10 +46,9 @@
     #define WIN32_LEAN_AND_MEAN
     #include <windows.h>  /* Win32 API for multithreading */
     #include <winsock2.h> /* for Windows network facilities */
+
+    Q_DEFINE_THIS_FILE
 #endif
-
-
-Q_DEFINE_THIS_FILE
 
 /* local variables ---------------------------------------------------------*/
 #ifdef Q_SPY

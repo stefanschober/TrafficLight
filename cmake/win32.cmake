@@ -13,4 +13,10 @@ endif()
 #default port is WIN32
 set(PORT win32)
 
-include(custom_commands)
+# linker options
+target_link_options(${TGT} PUBLIC
+    -pthread
+    $<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>
+    $<IF:$<CONFIG:Debug,Spy>,-g3,-g0>
+    LINKER:--cref,--gc-sections,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
+)

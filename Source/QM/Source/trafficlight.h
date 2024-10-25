@@ -104,7 +104,7 @@ typedef struct {
 //$declare${AOs::TLtraffic_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 //${AOs::TLtraffic_ctor} .....................................................
-int16_t TLtraffic_ctor(void);
+void TLtraffic_ctor(void);
 //$enddecl${AOs::TLtraffic_ctor} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //$declare${AOs::AO_TLtrafficA} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 

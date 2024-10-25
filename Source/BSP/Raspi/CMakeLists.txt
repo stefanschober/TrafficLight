@@ -23,14 +23,6 @@ target_compile_options(${TGT} PUBLIC
     -ffunction-sections
     -fdata-sections
     -pthread
-#   $<$<BOOL:${CONFIG_RASPI}>:-v>
-)
-
-# linker options
-target_link_options(${TGT} PUBLIC
-    -pthread
-    $<IF:$<CONFIG:Debug,Spy>,-g3,-g0>
-    LINKER:--cref,--gc-sections,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
 )
 
 if(CONFIG_RASPI_IO)

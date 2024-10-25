@@ -332,6 +332,7 @@ void Q_onAssert(char const *module, int loc) {
     BSP_wait4SW1();
 #endif
     NVIC_SystemReset();
+    for(;;) {}
 }
 
 /* QS callbacks ============================================================*/

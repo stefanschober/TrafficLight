@@ -41,7 +41,9 @@
 
 enum { WIN_FUDGE_FACTOR = WIN_FUDGE };
 
+#if defined Q_SPY
 Q_DEFINE_THIS_FILE
+#endif
 
 //$declare${AOs::Ticker_ctor} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 

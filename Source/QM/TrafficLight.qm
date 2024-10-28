@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="6.0.0" links="0">
+<model version="6.2.3" links="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.state-machine.com/qm/qm.xsd">
  <framework name="qpc"/>
  <package name="AOs" stereotype="0x02">
   <class name="TLtraffic" superclass="qpc::QActive">
@@ -495,7 +495,7 @@ QActive_subscribe((QActive *)me, EMERGENCY_SIG);</action>
    <code> = (QActive * const)&amp;l_ticker0.super;</code>
   </attribute>
   <attribute name="l_ticker0" type="QTicker" visibility="0x02" properties="0x00"/>
-  <operation name="TLtraffic_ctor" type="int16_t" visibility="0x00" properties="0x00">
+  <operation name="TLtraffic_ctor" type="void" visibility="0x00" properties="0x00">
    <code>QS_FUN_DICTIONARY(TLtraffic_initial);
 QS_FUN_DICTIONARY(TLtraffic_RUN);
 QS_FUN_DICTIONARY(TLtraffic_EMERGENCY);
@@ -633,90 +633,6 @@ QACTIVE_START(AO_TLblinker,                  /* AO to start */
   <class name="TLevt" superclass="qpc::QEvt"/>
  </package>
  <directory name="./Source">
-  <file name="trafficlight.h">
-   <text>#ifndef trafficlight_h
-#define trafficlight_h
-
-enum TLSignals {
-    TIME_TICK_SIG = Q_USER_SIG, /* time ticker event */
-    GLOBAL_START_SIG,
-    STARTNEWCYCLE_SIG,             /* published by traffic light to start cycle */
-    PEDREQUEST_SIG,       /* published by pedestrian light to start cycle */
-    TL_IS_RED_SIG,
-    PL_IS_RED_SIG,
-    BUTTON_SIG,                 /* published by BSP to notify about pedestrian requests */
-    START_BLINK_SIG,
-    STOP_BLINK_SIG,
-    OFF_BLINK_SIG,
-    EMERGENCY_SIG,
-    EM_RELEASE_SIG,
-    MAX_PUBLISH_SIG,
-    TIMEOUT_SIG,                /* used for time events */
-    MAX_SIG                     /* the last signal */
-};
-
-typedef enum TLidentity {
-    TrafficLightA = 0,
-    TrafficLightB,
-    PedestrianLight,
-    MaxIdentity
-} eTLidentity_t;
-
-#if 0
-typedef enum TLlight {
-    RED = 0,
-    RED_YELLOW,
-    YELLOW,
-    GREEN,
-    NO_LIGHT
-} eTLlight_t;
-#endif
-#define NO_LIGHT   0x00u
-#define RED        0x01u
-#define YELLOW     0x02u
-#define GREEN      0x04u
-#define RED_YELLOW (RED | YELLOW)
-#define MAX_LIGHT  3 // Red, Yellow, Green
-
-#define _TIMETICK_(t)    ((t) * (BSP_TICKS_PER_SEC))
-#define _TIMETICKms_(t)  ((_TIMETICK_(t) / 1000u) ? (_TIMETICK_(t) / 1000u) : 1u)
-
-/* timeout definitions */
-#define T_5ms     _TIMETICKms_(5u)
-#define T_10ms    _TIMETICKms_(10u)
-#define T_50ms    _TIMETICKms_(50u) 
-#define T_100ms   _TIMETICKms_(100u) 
-#define T_250ms   _TIMETICKms_(250u) 
-#define T_500ms   _TIMETICKms_(500u) 
-#define T_1sec    _TIMETICKms_(1000u)
-#define T_2sec    _TIMETICK_(2u)
-#define T_5sec    _TIMETICK_(5u)
-#define T_10sec   _TIMETICK_(10u)
-#define T_15sec   _TIMETICK_(15u)
-#define T_20sec   _TIMETICK_(20u)
-#define T_30sec   _TIMETICK_(30u)
-
-#define N_TL    (2u)
-
-$declare(Events::TLevt)
-
-$declare(AOs::TLtraffic_ctor)
-$declare(AOs::AO_TLtrafficA)
-$declare(AOs::AO_TLtrafficB)
-
-$declare(AOs::TLpedestrian_ctor)
-$declare(AOs::AO_TLpedestrian)
-
-// $declare(AOs::TLbutton_ctor)
-// $declare(AOs::AO_TLbutton)
-
-$declare(AOs::TLblinker_ctor)
-$declare(AOs::AO_TLblinker)
-
-int tlMain(void);
-
-#endif /* trafficlight_h */</text>
-  </file>
   <file name="TLtraffic.c">
    <text>#include &quot;qpc.h&quot;
 #include &quot;trafficlight.h&quot;
@@ -775,12 +691,6 @@ $define(AOs::TLpedestrian)</text>
 #include &quot;bsp.h&quot;
 
 /* &quot;fudge factor&quot; for Windows, see NOTE1 */
-#define WIN_FUDGE    1
-#if defined(QWIN_GUI)
-#   undef WIN_FUDGE
-#   define WIN_FUDGE 10
-#endif
-
 enum { WIN_FUDGE_FACTOR = WIN_FUDGE };
 
 Q_DEFINE_THIS_FILE
@@ -899,15 +809,102 @@ $define(AOs::TLblinker_ctor)
 $define(AOs::TLblinker)</text>
   </file>
  </directory>
- <directory name="../BSP">
+ <directory name="../include">
+  <file name="trafficlight.h">
+   <text>#ifndef trafficlight_h
+#define trafficlight_h
+
+enum TLSignals {
+    TIME_TICK_SIG = Q_USER_SIG, /* time ticker event */
+    GLOBAL_START_SIG,
+    STARTNEWCYCLE_SIG,             /* published by traffic light to start cycle */
+    PEDREQUEST_SIG,       /* published by pedestrian light to start cycle */
+    TL_IS_RED_SIG,
+    PL_IS_RED_SIG,
+    BUTTON_SIG,                 /* published by BSP to notify about pedestrian requests */
+    START_BLINK_SIG,
+    STOP_BLINK_SIG,
+    OFF_BLINK_SIG,
+    EMERGENCY_SIG,
+    EM_RELEASE_SIG,
+    MAX_PUBLISH_SIG,
+    TIMEOUT_SIG,                /* used for time events */
+    MAX_SIG                     /* the last signal */
+};
+
+typedef enum TLidentity {
+    TrafficLightA = 0,
+    TrafficLightB,
+    PedestrianLight,
+    MaxIdentity
+} eTLidentity_t;
+
+#if 0
+typedef enum TLlight {
+    RED = 0,
+    RED_YELLOW,
+    YELLOW,
+    GREEN,
+    NO_LIGHT
+} eTLlight_t;
+#endif
+#define NO_LIGHT   0x00u
+#define RED        0x01u
+#define YELLOW     0x02u
+#define GREEN      0x04u
+#define RED_YELLOW (RED | YELLOW)
+#define MAX_LIGHT  3 // Red, Yellow, Green
+
+#define _TIMETICK_(t)    ((t) * (BSP_TICKS_PER_SEC))
+#define _TIMETICKms_(t)  ((_TIMETICK_(t) / 1000u) ? (_TIMETICK_(t) / 1000u) : 1u)
+
+/* timeout definitions */
+#define T_5ms     _TIMETICKms_(5u)
+#define T_10ms    _TIMETICKms_(10u)
+#define T_50ms    _TIMETICKms_(50u) 
+#define T_100ms   _TIMETICKms_(100u) 
+#define T_250ms   _TIMETICKms_(250u) 
+#define T_500ms   _TIMETICKms_(500u) 
+#define T_1sec    _TIMETICKms_(1000u)
+#define T_2sec    _TIMETICK_(2u)
+#define T_5sec    _TIMETICK_(5u)
+#define T_10sec   _TIMETICK_(10u)
+#define T_15sec   _TIMETICK_(15u)
+#define T_20sec   _TIMETICK_(20u)
+#define T_30sec   _TIMETICK_(30u)
+
+#define N_TL    (2u)
+
+$declare(Events::TLevt)
+
+$declare(AOs::TLtraffic_ctor)
+$declare(AOs::AO_TLtrafficA)
+$declare(AOs::AO_TLtrafficB)
+
+$declare(AOs::TLpedestrian_ctor)
+$declare(AOs::AO_TLpedestrian)
+
+// $declare(AOs::TLbutton_ctor)
+// $declare(AOs::AO_TLbutton)
+
+$declare(AOs::TLblinker_ctor)
+$declare(AOs::AO_TLblinker)
+
+int tlMain(void);
+
+#endif /* trafficlight_h */</text>
+  </file>
   <file name="bsp.h">
    <text>#ifndef bsp_h
 #define bsp_h
 
+/* WIN_FUDGE = &quot;fudge factor&quot; for Windows, see NOTE1 */
 #if defined QWIN_GUI
 #  define BSP_TICKS_PER_SEC    100U
+#  define WIN_FUDGE             10U
 #else
 #  define BSP_TICKS_PER_SEC   1000U
+#  define WIN_FUDGE              1U
 #endif
 
 #ifdef Q_SPY

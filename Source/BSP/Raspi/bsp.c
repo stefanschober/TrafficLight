@@ -210,14 +210,14 @@ void BSP_setPedLed(guint16 status)
 // called when button PEDESTRIAN is clicked
 void BSP_publishBtnEvt(void)
 {
-	static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
+	static QEvt const buttonEvt = QEVT_INITIALIZER(BUTTON_SIG);
 
     QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
 }
 // called when button EMERGENCY is clicked
 void BSP_publishEmergencyEvt(void)
 {
-	static QEvt emergencyEvt = { EM_RELEASE_SIG, 0U, QEVT_MARKER };
+	static QEvt emergencyEvt = QEVT_INITIALIZER(EM_RELEASE_SIG);
 
     emergencyEvt.sig = ((emergencyEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
     QF_PUBLISH(&emergencyEvt, &l_Button_Handler); /* publish to all subscribers */

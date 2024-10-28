@@ -170,10 +170,11 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                                timeDisplayBmp, sizeof(timeDisplayBmp)/sizeof(timeDisplayBmp[0]));
 
             /* --> QP: spawn the application thread to run main_gui() */
-            Q_ALLEGE(CreateThread(NULL, 0, &appThread, NULL, 0, NULL)
-                     != (HANDLE)0);
+            HANDLE thr = CreateThread(NULL, 0, &appThread, NULL, 0, NULL);
+            Q_ASSERT(thr != (HANDLE)0);
 
-            Q_ALLEGE(SetTimer(hWnd, 1000u, 1000u, (TIMERPROC)NULL) != 0);
+            UINT_PTR tmr = SetTimer(hWnd, 1000u, 1000u, (TIMERPROC)NULL);
+            Q_ASSERT(tmr != (UINT_PTR)0);
             return 0;
         }
 
@@ -233,7 +234,8 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
             if (timCount >= 1000)
                 timCount = 0;
             WriteTime(timCount);
-            Q_ALLEGE(SetTimer(hWnd, 1000, 1000, (TIMERPROC)NULL) != 0);
+            UINT_PTR tmr = SetTimer(hWnd, 1000, 1000, (TIMERPROC)NULL);
+            Q_ASSERT(tmr != (UINT_PTR)0);
             return 0;
         }
 

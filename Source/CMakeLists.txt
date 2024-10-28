@@ -45,6 +45,7 @@ else()
 endif()
 
 # add subdirectories with source/header files
+target_include_directories(${TGT} PUBLIC include)
 add_subdirectory(BSP)
 add_subdirectory(QM)
 
@@ -55,6 +56,7 @@ set(QPC_CFG_UNIT_TEST ${CONFIG_UNIT_TEST})
 set(QPC_CFG_GUI ${CONFIG_GUI})
 set(QPC_CFG_VERBOSE ${CONFIG_VERBOSE})
 set(QPC_CFG_PORT ${PORT})
+set(QPC_CFG_QPCONFIG_H_INCLUDE_PATH ${CMAKE_CURRENT_LIST_DIR}/include)
 qpc_sdk_init()
 
 target_link_libraries(${TGT} PRIVATE qpc)

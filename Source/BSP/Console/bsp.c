@@ -143,7 +143,8 @@ void BSP_init(int argc, char **argv) {
            "Press ESC to quit...\n",
            QP_versionStr);
 
-    Q_ALLEGE(QS_INIT((argc > 1) ? argv[1] : ""));
+    int ret = QS_INIT((argc > 1) ? argv[1] : "");
+    Q_ASSERT(ret);
     QS_OBJ_DICTIONARY(&l_SysTick_Handler); /* must be called *after* QF_init() */
     QS_OBJ_DICTIONARY(&l_Button_Handler); /* must be called *after* QF_init() */
     QS_USR_DICTIONARY(TL_STAT);
@@ -205,7 +206,7 @@ uint16_t BSP_getButton(void)
 /* QF callbacks ============================================================*/
 void QF_onStartup(void) {
     QF_consoleSetup();
-    QF_setTickRate(BSP_TICKS_PER_SEC, 30); /* set the desired tick rate */
+    QF_setTickRate(BSP_TICKS_PER_SEC, 10); /* set the desired tick rate */
 }
 /*..........................................................................*/
 void QF_onCleanup(void) {
@@ -215,7 +216,8 @@ void QF_onCleanup(void) {
 }
 /*..........................................................................*/
 void QF_onClockTick(void) {
-    static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
+    static QEvt    const    buttonEvt = QEVT_INITIALIZER(BUTTON_SIG);
+    static QEvt /* const */ emergencyEvt = QEVT_INITIALIZER(EM_RELEASE_SIG);
 
     QTICKER_TRIG(the_Ticker0, &l_SysTick_Handler); /* post to Ticker0 */
 
@@ -231,6 +233,12 @@ void QF_onClockTick(void) {
             printf("Pedestrian button pressed...\n");
             QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
             // keyPressed = 1;
+            break;
+        case 'e':
+        case 'E':
+            emergencyEvt.sig = ((emergencyEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
+            printf("Emergency signal triggered as %s\n", (emergencyEvt.sig == EMERGENCY_SIG) ? "active" : "passive");
+            QF_PUBLISH(&emergencyEvt, &l_Button_Handler); /* publish to all subscribers */
             break;
         default:
             break;

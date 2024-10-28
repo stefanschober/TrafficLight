@@ -19,4 +19,4 @@ else()
 endif()
 
 target_sources(${TGT} PRIVATE bsp-common.c)
-target_include_directories(${TGT} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# target_include_directories(${TGT} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

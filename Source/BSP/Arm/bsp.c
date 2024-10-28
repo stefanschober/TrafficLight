@@ -155,14 +155,14 @@ static void readUserButtons(void)
     chgButtons ^= debouncedButtons;
     if ( (debouncedButtons & chgButtons & 0x01) || (0 == time2Min) )
     {
-    	static QEvt const buttonEvt = { BUTTON_SIG, 0U, QEVT_MARKER };
+    	static QEvt const buttonEvt = QEVT_INITIALIZER(BUTTON_SIG);
 
         QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */
     	time2Min = 120ul * BSP_TICKS_PER_SEC;
     }
     else if (debouncedButtons & chgButtons & 0x02)
     {
-    	static QEvt buttonEvt = { EM_RELEASE_SIG, 0U, QEVT_MARKER };
+    	static QEvt buttonEvt = QEVT_INITIALIZER(EM_RELEASE_SIG);
 
         buttonEvt.sig = ((buttonEvt.sig == EMERGENCY_SIG) ? EM_RELEASE_SIG : EMERGENCY_SIG);
         QF_PUBLISH(&buttonEvt, &l_Button_Handler); /* publish to all subscribers */

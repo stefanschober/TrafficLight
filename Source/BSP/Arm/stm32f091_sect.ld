@@ -138,8 +138,9 @@ PROVIDE ( _end = ABSOLUTE(_ebss) );
 PROVIDE ( __end__ = end );
 PROVIDE (__bss_end__ = end);
 PROVIDE (_ebss = end);
-PROVIDE (__initial_sp = __stack_end);
+PROVIDE (_sstack = __stack_start);
 PROVIDE (_estack = __stack_end);
+PROVIDE (__initial_sp = __stack_end);
 
 PROVIDE ( Image$$ROM$$Base     = ORIGIN(R_TEXT) );
 PROVIDE ( Image$$ROM$$Limit    = ORIGIN(R_EEPROM) );

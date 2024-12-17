@@ -6,6 +6,7 @@ target_compile_definitions(${TGT} PUBLIC
     ${MCU}
     FLASHSIZE=${MCU_FLASH_SIZE}
     STACKSIZE=${STACKSIZE}
+    $<$<BOOL:${STACK_CHECK}>:STACK_CHECK>
     $<$<BOOL:${HEAPSIZE}>:HEAPSIZE=${HEAPSIZE}>
     $<$<NOT:$<BOOL:${CONFIG_LIBINIT}>>:NO_LIBINIT>
 )
@@ -28,10 +29,11 @@ if(CONFIG_PICO)
     pico_enable_stdio_usb(${TGT} TRUE)
     pico_enable_stdio_uart(${TGT} TRUE)
 else()
-    foreach(dir IN ITEMS Src TrafficLight/SW4STM32 Drivers/STM32F0xx_HAL_Driver/Src)
-        add_subdirectory(${dir})
-    endforeach()
-
+    # foreach(dir IN ITEMS Src TrafficLight/SW4STM32 Drivers/STM32F0xx_HAL_Driver/Src)
+    #    add_subdirectory(${dir})
+    # endforeach()
+    add_subdirectory(TrafficLight)
+    
     target_include_directories(${TGT} PRIVATE
         Drivers/CMSIS/Device/ST/STM32F0xx/Include Drivers/CMSIS/Include
         Drivers/CMSIS/Include

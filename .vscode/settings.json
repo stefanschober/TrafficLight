@@ -1,15 +1,10 @@
 {
     "cmake.sourceDirectory": "${workspaceFolder}",
-    "cmake.buildDirectory": "${workspaceFolder}/Build",
-    "cmake.configureArgs": [
-        "--preset=local"
-    ],
     "cmake.clearOutputBeforeBuild": false,
     "cmake.ignoreKitEnv": true,
-    "cmake.generator": "Ninja Multi-Config",
     "cmake.configureEnvironment": {
-        "PICO_SDK_PATH": "/home/stefan/Projects/pico/pico-sdk",
-        "QPC_SDK_PATH": "${workspaceFolder}/Source/qpc"
+        "PICO_SDK_PATH": "C:/Users/s.schober/Projects/pico/pico-sdk",
+        "QPC_SDK_PATH": "C:/Users/s.schober/Projects/qpc"
     },
     "cmake.statusbar.advanced": {
         "debug": {

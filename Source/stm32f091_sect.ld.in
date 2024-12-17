@@ -24,26 +24,27 @@ SECTIONS {
         *(.const*)
     } > R_RODATA
     
-    .preinit_array : {
+    .preinit_array (READONLY) : {
         PROVIDE_HIDDEN (__preinit_array_start = .);
         KEEP (*(.preinit_array*))
         PROVIDE_HIDDEN (__preinit_array_end = .);
     } >R_ARRAYS
 
-    .init_array : {
+    .init_array (READONLY) : {
         PROVIDE_HIDDEN (__init_array_start = .);
         KEEP (*(SORT(.init_array.*)))
         KEEP (*(.init_array*))
         PROVIDE_HIDDEN (__init_array_end = .);
     } >R_ARRAYS
 
-    .fini_array : {
+    .fini_array (READONLY) : {
         PROVIDE_HIDDEN (__fini_array_start = .);
         KEEP (*(.fini_array*))
         KEEP (*(SORT(.fini_array.*)))
         PROVIDE_HIDDEN (__fini_array_end = .);
     } >R_ARRAYS
 
+#if defined USE_EEPROM
     .eepar  : {
     	PROVIDE(__eeprom_start = .);
         PROVIDE(__eepar_start = .);
@@ -62,7 +63,8 @@ SECTIONS {
         PROVIDE(__eevar_end = .);
 		PROVIDE(__eeprom_end = .);
     } >R_EEPROM
-    
+#endif
+
 	.noinit (NOLOAD) : {
         PROVIDE(__noinit_start = .);
         *(.noinit)
@@ -70,10 +72,12 @@ SECTIONS {
         . = ALIGN(4);
         PROVIDE(__noinit_end = .);
     } >R_NOINIT
-    
+
+#if defined USE_NAD_MEMORY
 	.nacnad  : {
 		KEEP(*(.nacnad))
 	} >R_NADROM
+#endif
 
     .data :  {
         PROVIDE(__data_start = .);
@@ -92,7 +96,7 @@ SECTIONS {
         PROVIDE(_ebss = .);         /* define a global symbol at bss end */
     } >R_BSS
 
-    .ARM.exidx   : {
+    .ARM.exidx : {
         PROVIDE(__exidx_start = .);
         *(.ARM.exidx* .gnu.linkonce.armexidx.*)
         PROVIDE(__exidx_end = .);
@@ -138,8 +142,10 @@ PROVIDE ( _end = ABSOLUTE(_ebss) );
 PROVIDE ( __end__ = end );
 PROVIDE (__bss_end__ = end);
 PROVIDE (_ebss = end);
-PROVIDE (__initial_sp = __stack_end);
+PROVIDE (_sstack = __stack_start);
 PROVIDE (_estack = __stack_end);
+PROVIDE (_stack_size = SIZEOF(.stack));
+PROVIDE (__initial_sp = __stack_end);
 
 PROVIDE ( Image$$ROM$$Base     = ORIGIN(R_TEXT) );
 PROVIDE ( Image$$ROM$$Limit    = ORIGIN(R_EEPROM) );

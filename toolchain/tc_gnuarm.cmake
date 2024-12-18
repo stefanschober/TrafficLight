@@ -5,38 +5,40 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
+set(CMAKE_C_COMPILER_FORCED TRUE)
+set(CMAKE_CXX_COMPILER_FORCED TRUE)
+set(CMAKE_C_COMPILER_ID GNU)
+set(CMAKE_CXX_COMPILER_ID GNU)
+
 #---------------------------------------------------------------------------------------
 # Set toolchain paths
 #---------------------------------------------------------------------------------------
-set(TOOLCHAIN arm-none-eabi)
+set(TOOLCHAIN_PREFIX arm-none-eabi)
 
-if(NOT DEFINED TOOLCHAIN_PREFIX)
-    if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
-        set(TOOLCHAIN_PREFIX "/usr")
-    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
-        set(TOOLCHAIN_PREFIX "/usr/local")
-    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
-        if(DEFINED ENV{MINGW_PREFIX})
-            set(TOOLCHAIN_PREFIX $ENV{MINGW_PREFIX})
-            # STRING(REGEX REPLACE "^.*/(mingw|clang)64$" "/\\164" TOOLCHAIN_PREFIX $ENV{MINGW_PREFIX})
-        else()
-            message(STATUS "Please specify the TOOLCHAIN_PREFIX !\n For example: -DTOOLCHAIN_PREFIX=\"C:/Program Files/GNU Tools ARM Embedded\" ")
-        endif()
-    else()
-        set(TOOLCHAIN_PREFIX "/usr")
-        message(STATUS "No TOOLCHAIN_PREFIX specified, using default: " ${TOOLCHAIN_PREFIX})
-    endif()
+# check if toolchain can be found in standard PATH
+find_program(_GCC
+    NAMES
+        ${TOOLCHAIN_PREFIX}-gcc ${TOOLCHAIN_PREFIX}-gcc.exe
+    PATH_SUFFIXES
+        bin
+    NO_CACHE
+)
+if(NOT _GCC)
+    message(FATAL_ERROR "'${TOOLCHAIN_PREFIX}-gcc' cannot be found in 'PATH' env variable! - ABORT -")
 endif()
-set(TOOLCHAIN_BIN_DIR ${TOOLCHAIN_PREFIX}/bin)
-set(TOOLCHAIN_INC_DIR ${TOOLCHAIN_PREFIX}/${TOOLCHAIN}/include)
-set(TOOLCHAIN_LIB_DIR ${TOOLCHAIN_PREFIX}/${TOOLCHAIN}/lib)
+unset(_GCC)
 
-# Set system depended extensions
-if(WIN32)
-    set(TOOLCHAIN_EXT ".exe" )
-else()
-    set(TOOLCHAIN_EXT "" )
-endif()
+#---------------------------------------------------------------------------------------
+# Set compilers
+#---------------------------------------------------------------------------------------
+set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc CACHE INTERNAL "C Compiler")
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++ CACHE INTERNAL "C++ Compiler")
+set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}-gcc CACHE INTERNAL "ASM Compiler")
+
+# toolchain creates ELF executables
+set(CMAKE_EXECUTABLE_SUFFIX_ASM     ".elf")
+set(CMAKE_EXECUTABLE_SUFFIX_C       ".elf")
+set(CMAKE_EXECUTABLE_SUFFIX_CXX     ".elf")
 
 # Perform compiler test with static library
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
@@ -54,19 +56,23 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # -fdata-sections       Place each data item into its own section in the output file.
 # -fomit-frame-pointer  Omit the frame pointer in functions that don’t need one.
 # -mabi=aapcs           Defines enums to be a variable sized type.
-set(OBJECT_GEN_FLAGS "-mthumb -fno-builtin -Wall -ffunction-sections -fdata-sections -fomit-frame-pointer -fmessage-length=0")
+set(OBJECT_GEN_FLAGS "-mthumb -Wall -Wextra -Wpedantic -fno-builtin -ffunction-sections -fdata-sections -fomit-frame-pointer -fmessage-length=0")
 
-set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu17 " CACHE INTERNAL "C Compiler options")
-set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -std=gnu++17 " CACHE INTERNAL "C++ Compiler options")
-set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp " CACHE INTERNAL "ASM Compiler options")
+set(CMAKE_C_FLAGS   "${OBJECT_GEN_FLAGS} -std=gnu17" CACHE INTERNAL "C Compiler options")
+set(CMAKE_CXX_FLAGS "${OBJECT_GEN_FLAGS} -fno-rtti -fno-exceptions -fno-threadsafe-statics -std=gnu++17" CACHE INTERNAL "C++ Compiler options")
+set(CMAKE_ASM_FLAGS "${OBJECT_GEN_FLAGS} -x assembler-with-cpp -MMD -MP" CACHE INTERNAL "ASM Compiler options")
 
 
 # -Wl,--gc-sections     Perform the dead code elimination.
 # --specs=nano.specs    Link with newlib-nano.
 # --specs=nosys.specs   No syscalls, provide empty implementations for the POSIX system calls.
-# set(MAPFILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map" CACHE INTERNAL "Linker Map File")
-set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=nosys.specs -mthumb -nostartfiles -static" CACHE INTERNAL "Linker options")
-# set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=nosys.specs -mthumb -static" CACHE INTERNAL "Linker options")
+set(CMAKE_C_LINK_FLAGS "--specs=nano.specs --specs=nosys.specs")
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--gc-sections,--cref,--print-memory-usage")
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group -lc -lm -Wl,--end-group")
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -mthumb -nostartfiles -static")
+set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS}" CACHE INTERNAL "Linker options")
+
+set(CMAKE_CXX_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,--start-group -lstdc++ -lsupc++ -Wl,--end-group")
 
 #---------------------------------------------------------------------------------------
 # Set debug/release build configuration Options
@@ -78,13 +84,15 @@ set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections,--cref --specs=nano.specs --specs=
 set(CMAKE_C_FLAGS_DEBUG "-Og -g3" CACHE INTERNAL "C Compiler options for debug build type")
 set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3" CACHE INTERNAL "C++ Compiler options for debug build type")
 set(CMAKE_ASM_FLAGS_DEBUG "-g3" CACHE INTERNAL "ASM Compiler options for debug build type")
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-g3" CACHE INTERNAL "Linker options for debug build type")
+set(CMAKE_C_LINK_FLAGS_DEBUG "-g3" CACHE INTERNAL "Linker options for debug build type")
+set(CMAKE_CXX_LINK_FLAGS_DEBUG "${CMAKE_C_LINK_FLAGS_DEBUG}" CACHE INTERNAL "Linker options for debug build type")
 
 # Options for SPY build are identical to DEBUG build
 set(CMAKE_C_FLAGS_SPY "${CMAKE_C_FLAGS_DEBUG} -DQ_SPY=1" CACHE INTERNAL "C Compiler options for spy build type")
 set(CMAKE_CXX_FLAGS_SPY "${CMAKE_CXX_FLAGS_DEBUG} -DQ_SPY=1" CACHE INTERNAL "C++ Compiler options for spy build type")
 set(CMAKE_ASM_FLAGS_SPY "${CMAKE_ASM_FLAGS_DEBUG} -DQ_SPY=1" CACHE INTERNAL "ASM Compiler options for spy build type")
-set(CMAKE_EXE_LINKER_FLAGS_SPY "${CMAKE_EXE_LINKER_FLAGS_DEBUG}" CACHE INTERNAL "Linker options for spy build type")
+set(CMAKE_C_LINK_FLAGS_SPY "${CMAKE_C_LINK_FLAGS_DEBUG}" CACHE INTERNAL "Linker options for spy build type")
+set(CMAKE_CXX_LINK_FLAGS_SPY "${CMAKE_CXX_LINK_FLAGS_DEBUG}" CACHE INTERNAL "Linker options for spy build type")
 
 # Options for RELEASE build
 # -Os   Optimize for size. -Os enables all -O2 optimizations.
@@ -92,17 +100,12 @@ set(CMAKE_EXE_LINKER_FLAGS_SPY "${CMAKE_EXE_LINKER_FLAGS_DEBUG}" CACHE INTERNAL 
 set(CMAKE_C_FLAGS_RELEASE "-Os -g0" CACHE INTERNAL "C Compiler options for release build type")
 set(CMAKE_CXX_FLAGS_RELEASE "-Os -g0" CACHE INTERNAL "C++ Compiler options for release build type")
 set(CMAKE_ASM_FLAGS_RELEASE "" CACHE INTERNAL "ASM Compiler options for release build type")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-g0" CACHE INTERNAL "Linker options for release build type")
-# set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-g3 -flto" CACHE INTERNAL "Linker options for release build type")
+set(CMAKE_C_LINK_FLAGS_RELEASE "-g0" CACHE INTERNAL "Linker options for release build type")
+set(CMAKE_CXX_LINK_FLAGS_RELEASE "${CMAKE_C_LINK_FLAGS_RELEASE}" CACHE INTERNAL "Linker options for release build type")
 
 #---------------------------------------------------------------------------------------
-# Set compilers
+# Set FIND strategies
 #---------------------------------------------------------------------------------------
-set(CMAKE_C_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "C Compiler")
-set(CMAKE_CXX_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-g++${TOOLCHAIN_EXT} CACHE INTERNAL "C++ Compiler")
-set(CMAKE_ASM_COMPILER ${TOOLCHAIN_BIN_DIR}/${TOOLCHAIN}-gcc${TOOLCHAIN_EXT} CACHE INTERNAL "ASM Compiler")
-
-set(CMAKE_FIND_ROOT_PATH ${TOOLCHAIN_PREFIX}/${${TOOLCHAIN}} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)

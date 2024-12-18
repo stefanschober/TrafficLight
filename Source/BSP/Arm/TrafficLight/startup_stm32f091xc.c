@@ -48,9 +48,10 @@ typedef void (*p_isr_t)(void);
 
 // function prototypes
 __attribute__(( weak)) void Default_Handler(void);
+__attribute__((weak)) void HardFault_Handler(void);
 __attribute__((weak, noreturn, used)) void Reset_Handler(void);
 __attribute__((weak, alias("Default_Handler"))) void NMI_Handler(void);
-__attribute__((weak, alias("Default_Handler"))) void HardFault_Handler(void);
+// __attribute__((weak, alias("Default_Handler"))) void HardFault_Handler(void);
 __attribute__((weak, alias("Default_Handler"))) void SVC_Handler(void);
 __attribute__((weak, alias("Default_Handler"))) void PendSV_Handler(void);
 __attribute__((weak, alias("Default_Handler"))) void SysTick_Handler(void);
@@ -167,6 +168,12 @@ uint16_t getFreeStackBytes(void)
  * @retval : None
 */
 void Default_Handler(void)
+{
+    // endless loop
+    while(1) {}
+}
+
+void HardFault_Handler(void)
 {
     // endless loop
     while(1) {}

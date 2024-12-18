@@ -1,7 +1,7 @@
 #! /bin/bash
 
 declare -A platform=([Gnu]=Gnu [Pico]=Pico [Raspi]=Raspi [MinGW]=MinGW [Linux]=Linux [MSys]=MSys) # [mgwClang]="BuildMinGW/Clang")
-declare -A tctpl=([Gnu]=gnuarm [Pico]=none [Raspi]=gnuarmhf [MinGW]=mingwgcc [Linux]="none" [MSys]=msys) # [mgwClang]=mingwclang)
+declare -A tctpl=([Gnu]=armgnu [Pico]=none [Raspi]=armhfgnu [MinGW]=mingwgcc [Linux]="none" [MSys]=msys) # [mgwClang]=mingwclang)
 declare -A container=([Gnu]=none [Pico]=none [Raspi]=armhf-cross [MinGW]=crosscompile [Linux]="none" [MSys]=crosscompile)
 declare -A generator=([Make]="Make") # [Ninja]="Ninja")
 declare -A cmakegen=([Make]="${CMAKE_GENERATOR:=none}") # [Ninja]="Ninja")

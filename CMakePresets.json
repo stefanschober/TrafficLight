@@ -166,7 +166,7 @@
       "name": "arm_",
       "hidden": true,
       "inherits": "dft_",
-      "toolchainFile": "${sourceDir}/toolchain/tc_gnuarm.cmake",
+      "toolchainFile": "${sourceDir}/toolchain/tc_armgnu.cmake",
       "cacheVariables": {
           "CONFIG_GUI": "OFF"
       }

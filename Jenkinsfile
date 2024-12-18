@@ -7,7 +7,7 @@ pipeline {
         stage('build_cmake') {
             environment {
 		PICO_SDK_PATH = "${HOME}/pico_sdk"
-                CMAKE_TOOLCHAIN_FILE = "${HOME}/cmake/tc_gnuarm.cmake"
+                CMAKE_TOOLCHAIN_FILE = "${HOME}/cmake/tc_armgnu.cmake"
                 CMAKE_DEFINES = "-DCONFIG_KERNEL_QK=TRUE -DMCU=TLE9844_2QX"
                 BLD_DIR = "Build/Make_Gnu"
             }

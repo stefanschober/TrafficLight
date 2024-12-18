@@ -16,17 +16,16 @@ set(CMAKE_CXX_COMPILER_ID GNU)
 set(TOOLCHAIN_PREFIX arm-none-eabi)
 
 # check if toolchain can be found in standard PATH
-find_program(_GCC
+find_path(TOOLCHAIN_PATH
     NAMES
         ${TOOLCHAIN_PREFIX}-gcc ${TOOLCHAIN_PREFIX}-gcc.exe
     PATH_SUFFIXES
         bin
     NO_CACHE
 )
-if(NOT _GCC)
+if(NOT TOOLCHAIN_PATH)
     message(FATAL_ERROR "'${TOOLCHAIN_PREFIX}-gcc' cannot be found in 'PATH' env variable! - ABORT -")
 endif()
-unset(_GCC)
 
 #---------------------------------------------------------------------------------------
 # Set compilers
@@ -34,6 +33,7 @@ unset(_GCC)
 set(CMAKE_C_COMPILER ${TOOLCHAIN_PREFIX}-gcc CACHE INTERNAL "C Compiler")
 set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++ CACHE INTERNAL "C++ Compiler")
 set(CMAKE_ASM_COMPILER ${TOOLCHAIN_PREFIX}-gcc CACHE INTERNAL "ASM Compiler")
+set(CMAKE_SIZE ${TOOLCHAIN_PREFIX}-size CACHE INTERNAL "GNU size for arm")
 
 # toolchain creates ELF executables
 set(CMAKE_EXECUTABLE_SUFFIX_ASM     ".elf")
@@ -106,7 +106,9 @@ set(CMAKE_CXX_LINK_FLAGS_RELEASE "${CMAKE_C_LINK_FLAGS_RELEASE}" CACHE INTERNAL 
 #---------------------------------------------------------------------------------------
 # Set FIND strategies
 #---------------------------------------------------------------------------------------
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH  ${TOOLCHAIN_PATH})
+
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)

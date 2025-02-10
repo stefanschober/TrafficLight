@@ -12,5 +12,4 @@ target_compile_definitions(${TGT} PUBLIC QWIN_GUI)
 target_compile_options(${TGT} PUBLIC
     -pthread
     -mwindows
-    -mwin32
 )

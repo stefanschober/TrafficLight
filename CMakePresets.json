@@ -155,9 +155,40 @@
     {
       "name": "win32GTK",
       "inherits": "win32",
-      "displayName": "MinGW/Win32 config with QK kernel",
-      "description": "Build for MinGW/Win32 with QK kernel",
+      "displayName": "MinGW/Win32 config with GTK gui",
+      "description": "Build for MinGW/Win32 with GTK gui",
       "binaryDir": "${sourceDir}/Build/win32GTK",
+      "cacheVariables": {
+        "CONFIG_GTK": "ON"
+      }
+    },
+    {
+      "name": "clang",
+      "inherits": "dft_",
+      "displayName": "MinGW config",
+      "description": "Build for CLang/Win32",
+      "binaryDir": "${sourceDir}/Build/clang",
+      "toolchainFile": "${sourceDir}/toolchain/tc_mingwclang.cmake"
+    },
+    {
+      "name": "clangQK",
+      "inherits": "clang",
+      "displayName": "CLang/Win32 config with QK kernel",
+      "description": "Build for CLang/Win32 with QK kernel",
+      "binaryDir": "${sourceDir}/Build/clangQK",
+      "cacheVariables": {
+        "CONFIG_KERNEL": {
+          "type": "STRING",
+          "value": "QK"
+        }
+      }
+    },
+    {
+      "name": "clangGTK",
+      "inherits": "clang",
+      "displayName": "CLang/Win32 config with GTK gui",
+      "description": "Build for CLang/Win32 with GTK gui",
+      "binaryDir": "${sourceDir}/Build/clangGTK",
       "cacheVariables": {
         "CONFIG_GTK": "ON"
       }
@@ -232,6 +263,21 @@
       "name": "win32GTK",
       "inherits": "dft_",
       "configurePreset": "win32GTK"
+    },
+    {
+      "name": "clang",
+      "inherits": "dft_",
+      "configurePreset": "clang"
+    },
+    {
+      "name": "clangQK",
+      "inherits": "dft_",
+      "configurePreset": "clangQK"
+    },
+    {
+      "name": "clangGTK",
+      "inherits": "dft_",
+      "configurePreset": "clangGTK"
     },
     {
       "name": "armdft_",

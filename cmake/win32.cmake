@@ -18,5 +18,5 @@ target_link_options(${TGT} PUBLIC
     -pthread
     $<IF:$<BOOL:${CONFIG_GUI}>,-mwindows,-mconsole>
     $<IF:$<CONFIG:Debug,Spy>,-g3,-g0>
-    LINKER:--cref,--gc-sections,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
+    LINKER:$<$<C_COMPILER_ID:GNU>:--cref,>--gc-sections,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.map
 )

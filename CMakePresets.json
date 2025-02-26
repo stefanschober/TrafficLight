@@ -1,8 +1,8 @@
 {
-  "version": 6,
+  "version": 8,
   "cmakeMinimumRequired": {
     "major": 3,
-    "minor": 23,
+    "minor": 28,
     "patch": 0
   },
   "configurePresets": [
@@ -12,7 +12,7 @@
       "displayName": "Default Config",
       "description": "Default build using Ninja Multi-Config generator",
       "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/Build/default",
+      "binaryDir": "${sourceDir}/Build/${presetname}",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -30,14 +30,12 @@
       "inherits": "dft_",
       "displayName": "Default",
       "description": "Build for local system",
-      "binaryDir": "${sourceDir}/Build/local"
     },
     {
-      "name": "con",
+      "name": "console",
       "inherits": "dft_",
       "displayName": "Default Console",
       "description": "Build for local console system",
-      "binaryDir": "${sourceDir}/Build/console",
       "cacheVariables": {
         "CONFIG_GUI": "OFF",
         "CONFIG_QF_CON": "ON"
@@ -49,7 +47,6 @@
       "displayName": "Default",
       "description": "Build for unit testing on local system with qunittest",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Build/qutest",
       "cacheVariables": {
         "CONFIG_UNIT_TEST": "ON",
         "CMAKE_BUILD_TYPE": {
@@ -63,7 +60,6 @@
       "inherits": "dft_",
       "displayName": "Build with GTK+3 GUI",
       "description": "Build for local GTK+3 system",
-      "binaryDir": "${sourceDir}/Build/gtk",
       "cacheVariables": {
         "CONFIG_GTK": "ON"
       }
@@ -74,7 +70,6 @@
       "displayName": "Pico config",
       "description": "Build for Raspberry Pi Pico",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/Build/pico",
       "cacheVariables": {
         "PORT": {
           "type": "STRING",
@@ -93,7 +88,6 @@
       "inherits": "pico",
       "displayName": "Pico QK config",
       "description": "Build for Raspberry Pi Pico with QK kernel",
-      "binaryDir": "${sourceDir}/Build/picoQK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -106,7 +100,6 @@
       "inherits": "pico",
       "displayName": "Pico2 config",
       "description": "Build for Raspberry Pi Pico2 with QV kernel",
-      "binaryDir": "${sourceDir}/Build/pico2",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -123,7 +116,6 @@
       "inherits": "pico2",
       "displayName": "Pico2 QK config",
       "description": "Build for Raspberry Pi Pico2 with QK kernel",
-      "binaryDir": "${sourceDir}/Build/picoQK2",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -136,7 +128,6 @@
       "inherits": "dft_",
       "displayName": "MinGW config",
       "description": "Build for MinGW/Win32",
-      "binaryDir": "${sourceDir}/Build/win32",
       "toolchainFile": "${sourceDir}/toolchain/tc_mingwgcc.cmake"
     },
     {
@@ -144,7 +135,6 @@
       "inherits": "win32",
       "displayName": "MinGW/Win32 config with QK kernel",
       "description": "Build for MinGW/Win32 with QK kernel",
-      "binaryDir": "${sourceDir}/Build/win32QK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -157,7 +147,6 @@
       "inherits": "win32",
       "displayName": "MinGW/Win32 config with GTK gui",
       "description": "Build for MinGW/Win32 with GTK gui",
-      "binaryDir": "${sourceDir}/Build/win32GTK",
       "cacheVariables": {
         "CONFIG_GTK": "ON"
       }
@@ -167,7 +156,6 @@
       "inherits": "dft_",
       "displayName": "MinGW config",
       "description": "Build for CLang/Win32",
-      "binaryDir": "${sourceDir}/Build/clang",
       "toolchainFile": "${sourceDir}/toolchain/tc_mingwclang.cmake"
     },
     {
@@ -175,7 +163,6 @@
       "inherits": "clang",
       "displayName": "CLang/Win32 config with QK kernel",
       "description": "Build for CLang/Win32 with QK kernel",
-      "binaryDir": "${sourceDir}/Build/clangQK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -188,7 +175,6 @@
       "inherits": "clang",
       "displayName": "CLang/Win32 config with GTK gui",
       "description": "Build for CLang/Win32 with GTK gui",
-      "binaryDir": "${sourceDir}/Build/clangGTK",
       "cacheVariables": {
         "CONFIG_GTK": "ON"
       }
@@ -207,13 +193,11 @@
       "inherits": "arm_",
       "displayName": "Embedded config for Arm-CM",
       "description": "Build for arm-cm",
-      "binaryDir": "${sourceDir}/Build/arm"
     },
     {
       "name": "armQK",
       "inherits": "arm",
       "description": "Build for arm-cm, kernel QK",
-      "binaryDir": "${sourceDir}/Build/armQK",
       "cacheVariables": {
         "CONFIG_KERNEL": {
           "type": "STRING",
@@ -235,9 +219,9 @@
       "configurePreset": "local"
     },
     {
-      "name": "con",
+      "name": "console",
       "inherits": "dft_",
-      "configurePreset": "con"
+      "configurePreset": "console"
     },
     {
       "name": "qutest",
@@ -315,7 +299,7 @@
   "vendor": {
     "example.com/TrafficLight/V1.0": {
       "author": "Stefan Schober",
-      "releaseDate": "2024-01-03"
+      "releaseDate": "2025-02-20"
     }
   }
 }

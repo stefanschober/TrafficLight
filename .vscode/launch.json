@@ -34,7 +34,7 @@
             "name": "(gdb) Bash unter Windows – starten",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Build/gtk/Debug/trafficlight.exe",
+            "program": "${workspaceFolder}/Build/local/Debug/trafficlight.exe",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

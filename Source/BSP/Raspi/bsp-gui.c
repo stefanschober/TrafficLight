@@ -268,10 +268,7 @@ static void appThread(GTask *task, gpointer source_object, gpointer task_data, G
     (void)task_data;
     (void)cancellable;
 
-    BSP_HW_init();
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* initialize the Board Support Package */
-    result = (guint32)tlMain(); /* run the QF application */
+    result = (guint32)tlMain(APP_ARGS(task_data)->argc, APP_ARGS(task_data)->argv); /* run the QF application */
 
     g_task_return_int(task, result);
 }

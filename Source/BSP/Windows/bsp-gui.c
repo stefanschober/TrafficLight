@@ -92,11 +92,7 @@ static void WriteTime(DWORD t);
 static DWORD WINAPI appThread(LPVOID par)
 {
     (void)par;  // unused
-    // BSP/QPC pre intialization
-    BSP_HW_init();
-    QF_init();    /* initialize the framework and the underlying RT kernel */
-    BSP_init(_argc, _argv); /* initialize the Board Support Package */
-    return (DWORD)tlMain(); /* run the QF application */
+    return (DWORD)tlMain(_argc, _argv); /* run the QF application */
 }
 
 /*--------------------------------------------------------------------------*/
@@ -170,11 +166,15 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg,
                                timeDisplayBmp, sizeof(timeDisplayBmp)/sizeof(timeDisplayBmp[0]));
 
             /* --> QP: spawn the application thread to run main_gui() */
-            HANDLE thr = CreateThread(NULL, 0, &appThread, NULL, 0, NULL);
-            Q_ASSERT(thr != (HANDLE)0);
+            if((HANDLE)NULL == CreateThread(NULL, 0, &appThread, NULL, 0, NULL))
+            {
+                Q_ERROR();
+            }
 
-            UINT_PTR tmr = SetTimer(hWnd, 1000u, 1000u, (TIMERPROC)NULL);
-            Q_ASSERT(tmr != (UINT_PTR)0);
+            if((UINT_PTR)NULL == SetTimer(hWnd, 1000u, 1000u, (TIMERPROC)NULL))
+            {
+                Q_ERROR();
+            }
             return 0;
         }
 

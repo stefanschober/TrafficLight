@@ -69,7 +69,7 @@ static QF_MPOOL_EL(QEvt) smlPoolSto[10 * WIN_FUDGE_FACTOR];
 
 /*..........................................................................*/
 
-int tlMain(void)
+int tlMain(int argc, char *argv[])
 {
     /* object dictionaries... */
     QS_OBJ_DICTIONARY(smlPoolSto);
@@ -91,6 +91,16 @@ int tlMain(void)
     QS_SIG_DICTIONARY(EMERGENCY_SIG, (void *)0);
     QS_SIG_DICTIONARY(EM_RELEASE_SIG, (void *)0);
     QS_SIG_DICTIONARY(TIMEOUT_SIG, (void *)0);
+
+    /* initialize HW, QPC Framework QF & BSP */
+    BSP_HW_init();
+    QF_init();
+    BSP_init(argc, argv);
+
+#if defined Q_UTEST
+    // pause execution of the test and wait for the test script to continue
+    QS_TEST_PAUSE();
+#endif
 
     /* initialize publish-subscribe... */
     QF_psInit(subscrSto, Q_DIM(subscrSto));
